@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "resource.h"
 
 const unsigned int window_width = 1280;
 const unsigned int window_height = 720;
@@ -13,7 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hInstance = hInstance;
 	wc.lpszClassName = L"DirectX12";
 	wc.lpfnWndProc = WindowProcedure;
-	wc.hIcon = nullptr;
+	wc.hIcon = (HICON)LoadImage(wc.hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), 0);
 
 	if (!RegisterClassW(&wc))
 	{
