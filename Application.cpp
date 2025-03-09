@@ -18,7 +18,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return 0;
 }
 
-bool Application::CreateGameWindow(HINSTANCE& hInstance, WNDCLASSW& wc)
+bool Application::CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& wc)
 {
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
@@ -35,7 +35,7 @@ bool Application::CreateGameWindow(HINSTANCE& hInstance, WNDCLASSW& wc)
 
 	RECT wrect = { 0, 0, window_width, window_height };
 
-	CreateWindowW(
+	hwnd = CreateWindowW(
 		wc.lpszClassName,
 		L"MEngine",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
@@ -53,7 +53,17 @@ bool Application::CreateGameWindow(HINSTANCE& hInstance, WNDCLASSW& wc)
 
 bool Application::Init(HINSTANCE& hInstance)
 {
-	if (!CreateGameWindow(hInstance, _windowClass))
+	HWND hwnd = {};
+	if (!CreateGameWindow(hwnd, hInstance, _windowClass))
+	{
+		return false;
+	}
+
+	SIZE windowSize = { window_width, window_height };
+
+	//MEngine engine;
+	_engine.reset(new MEngine());
+	if (!_engine->Init(hwnd, windowSize))
 	{
 		return false;
 	}
@@ -68,6 +78,9 @@ void Application::Run()
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		_engine->Update();
+		_engine->Draw();
 	}
 }
 
