@@ -61,7 +61,6 @@ bool Application::Init(HINSTANCE& hInstance)
 
 	SIZE windowSize = { window_width, window_height };
 
-	//MEngine engine;
 	_engine.reset(new MEngine());
 	if (!_engine->Init(hwnd, windowSize))
 	{

@@ -208,7 +208,7 @@ bool MEngine::CreateFinalRenderTarget()
     return true;
 }
 
-bool MEngine::CreateSynchronizationWithGPUOblect()
+bool MEngine::CreateSynchronizationWithGPUObject()
 {
     // フェンスの作成
     HRESULT ret = _device->CreateFence(_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(_fence.ReleaseAndGetAddressOf()));
@@ -292,6 +292,7 @@ void MEngine::ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES fr
 
 MEngine::~MEngine()
 {
+    WaitDraw();
     CloseHandle(_fenceEvent);
     CoUninitialize();
 }
@@ -333,7 +334,7 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
         assert("最終的な描画先の作成に失敗！");
         return false;
     }
-    if (!CreateSynchronizationWithGPUOblect())
+    if (!CreateSynchronizationWithGPUObject())
     {
         assert("フェンスの作成に失敗！");
         return false;

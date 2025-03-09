@@ -32,7 +32,7 @@ private:
 	bool CreateCommandQueue();
 	bool CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFactory);
 	bool CreateFinalRenderTarget();
-	bool CreateSynchronizationWithGPUOblect();
+	bool CreateSynchronizationWithGPUObject();
 
 	void BegineRender();
 	void EndRender();
