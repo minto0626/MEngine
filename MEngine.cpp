@@ -72,6 +72,38 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
         oss << "  システムメモリとして割り当て可能なメモリ: " << desc.DedicatedSystemMemory / (1024 * 1024) << " MB" << endl;
         oss << "  共有可能なシステムメモリ: " << desc.SharedSystemMemory / (1024 * 1024) << " MB" << endl;
         ::OutputDebugStringA(oss.str().c_str());
+        oss.str("");
+
+        ComPtr<IDXGIOutput> outputTmp;
+        for (int j = 0; j < adapterTmp->EnumOutputs(j, &outputTmp) != DXGI_ERROR_NOT_FOUND; j++)
+        {
+            if (outputTmp == nullptr) { break; }
+
+            DXGI_OUTPUT_DESC opDesc = {};
+            outputTmp->GetDesc(&opDesc);
+
+            oss << "モニター名: " << wchar_to_string(opDesc.DeviceName) << endl;
+            oss << "  モニターサイズ" << endl;
+            oss << "   width: " << opDesc.DesktopCoordinates.right - opDesc.DesktopCoordinates.left << endl;
+            oss << "   height: " << opDesc.DesktopCoordinates.bottom - opDesc.DesktopCoordinates.top << endl;
+            ::OutputDebugStringA(oss.str().c_str());
+            oss.str("");
+
+            UINT numModes = 0;
+            outputTmp->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, nullptr);
+            vector<DXGI_MODE_DESC> modeLists(numModes);
+            outputTmp->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, modeLists.data());
+
+            oss << "  サポートモード " << numModes << "個" << endl;
+            for (const auto& mode : modeLists)
+            {
+                // 分数->整数に近似
+                UINT refreshRate = (mode.RefreshRate.Numerator + mode.RefreshRate.Denominator - 1) / mode.RefreshRate.Denominator;
+                oss << "   " << mode.Width << "x" << mode.Height << " @ " << refreshRate << " Hz" << endl;
+            }
+            ::OutputDebugStringA(oss.str().c_str());
+            oss.str("");
+        }
 #endif
 
         if (desc.DedicatedVideoMemory > maxVideoMemorySize)
