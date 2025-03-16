@@ -8,6 +8,8 @@ class MEngine
 {
 private:
 
+	HWND _hwnd;
+
 	template<typename T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -17,6 +19,7 @@ private:
 	ComPtr<ID3D12CommandQueue> _commandQueue = nullptr;
 	UINT _rtvDescriptorSize;
 
+	ComPtr<IDXGIFactory6> _dxgiFactory = nullptr;
 	ComPtr<IDXGISwapChain4> _swapchain = nullptr;
 	const unsigned int FRAME_BUFFER_COUNT = 2;
 	ComPtr<ID3D12DescriptorHeap> _rtvHeap = nullptr;
@@ -25,6 +28,8 @@ private:
 	ComPtr<ID3D12Fence> _fence = nullptr;
 	UINT64 _fenceValue = 0;
 	HANDLE _fenceEvent = nullptr;
+
+	D3D12_RESOURCE_STATES _renderTargetStates[2] = { D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COMMON };
 
 	IDXGIFactory6* CreateDXGIFactory();
 	bool CreateDevice(IDXGIFactory6* dxgiFactory);
@@ -46,4 +51,6 @@ public:
 	bool Init(HWND hwnd, SIZE& windowSize);
 	void Update();
 	void Draw();
+
+	void ToggleFullScreen();
 };

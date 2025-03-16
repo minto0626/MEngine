@@ -41,14 +41,12 @@ IDXGIFactory6* MEngine::CreateDXGIFactory()
     }
 #endif
 
-    IDXGIFactory6* dxgiFactory = nullptr;
-
 #if _DEBUG
-    CreateDXGIFactory2(dxgiFactoryFlag, IID_PPV_ARGS(&dxgiFactory));
+    CreateDXGIFactory2(dxgiFactoryFlag, IID_PPV_ARGS(_dxgiFactory.ReleaseAndGetAddressOf()));
 #else
-    CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
+    CreateDXGIFactory1(IID_PPV_ARGS(_dxgiFactory.ReleaseAndGetAddressOf()));
 #endif
-    return dxgiFactory;
+    return _dxgiFactory.Get();
 }
 
 bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
@@ -188,7 +186,7 @@ bool MEngine::CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFa
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BufferCount = FRAME_BUFFER_COUNT;
-    desc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
+    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.Scaling = DXGI_SCALING_STRETCH;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
@@ -262,10 +260,25 @@ void MEngine::BegineRender()
 {
     auto frameIndex = _swapchain->GetCurrentBackBufferIndex();
 
-    ResourceBarrier(
-        _renderTargets[frameIndex].Get(),
-        D3D12_RESOURCE_STATE_PRESENT,
-        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    // フルスクリーンの影響で、バリアが既にレンダーターゲット状態になっている可能性がある
+    if (_renderTargetStates[frameIndex] != D3D12_RESOURCE_STATE_RENDER_TARGET)
+    {
+        ResourceBarrier(
+            _renderTargets[frameIndex].Get(),
+            D3D12_RESOURCE_STATE_PRESENT,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+    }
+    _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+    // ビューポートとシザーレクトを設定
+    BOOL isFullscreen;
+    _swapchain->GetFullscreenState(&isFullscreen, nullptr);
+    FLOAT width = isFullscreen ? 1920.0f : 1280.0f; // フルスクリーンかウィンドウかで分岐
+    FLOAT height = isFullscreen ? 1080.0f : 720.0f;
+    D3D12_VIEWPORT viewport = { 0.0f, 0.0f, width, height, 0.0f, 1.0f };
+    D3D12_RECT scissorRect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+    _commandList->RSSetViewports(1, &viewport);
+    _commandList->RSSetScissorRects(1, &scissorRect);
 
     // レンダーターゲットの設定
     auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
@@ -285,6 +298,7 @@ void MEngine::EndRender()
         _renderTargets[frameIndex].Get(),
         D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PRESENT);
+    _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_PRESENT;
 
     _commandList->Close();
 
@@ -296,7 +310,11 @@ void MEngine::EndRender()
     _commandAllocator->Reset();
     _commandList->Reset(_commandAllocator.Get(), nullptr);
 
-    _swapchain->Present(1, 0);
+    auto ret = _swapchain->Present(1, 0);
+    if (FAILED(ret))
+    {
+        assert(0);
+    }
 }
 
 void MEngine::WaitDraw()
@@ -325,12 +343,30 @@ void MEngine::ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES fr
 MEngine::~MEngine()
 {
     WaitDraw();
+
+    // アプリケーション終了時に、フルスクリーン状態ならウィンドウにしてからスワップチェィンを解放しなければならない
+    BOOL isFullScreen;
+    _swapchain->GetFullscreenState(&isFullScreen, nullptr);
+    if (isFullScreen)
+    {
+        auto ret = _swapchain->SetFullscreenState(false, nullptr);
+        if (FAILED(ret))
+        {
+            ::OutputDebugStringA("アプリケーション終了時、ウィンドウモードへのスイッチに失敗");
+        }
+    }
+
     CloseHandle(_fenceEvent);
     CoUninitialize();
 }
 
 bool MEngine::Init(HWND hwnd, SIZE& windowSize)
 {
+    _hwnd = hwnd;
+
+    // Windowsのスケーリング設定を無効
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE);
+
     HRESULT ret = CoInitializeEx(0, COINIT_MULTITHREADED);
     if (FAILED(ret))
     {
@@ -372,7 +408,8 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
         return false;
     }
 
-    dxgiFactory->Release();
+    //ToggleFullScreen();
+    //ToggleFullScreen();
 
     return true;
 }
@@ -385,4 +422,240 @@ void MEngine::Draw()
 {
     BegineRender();
     EndRender();
+}
+
+void MEngine::ToggleFullScreen()
+{
+    BOOL isFullScreen;
+    ComPtr<IDXGIOutput> currentOutput;
+    _swapchain->GetFullscreenState(&isFullScreen, nullptr);
+
+    if (!isFullScreen)
+    {
+        HRESULT ret;
+        // フルスクリーンに切り替える
+
+        // GPUが現在のバッファ使用を終えるのを待つ
+        WaitDraw();
+
+        // バックバッファの参照を解放
+        for (auto& buffer : _renderTargets)
+        {
+            buffer.Reset();
+        }
+        _renderTargets.clear();
+        _swapchain.Reset();
+
+        ComPtr<IDXGIAdapter> adapter;
+        ret = _dxgiFactory->EnumAdapters(0, &adapter);
+        if (FAILED(ret)) {
+            ::OutputDebugStringA("アダプタが見つからない\n");
+            return;
+        }
+        ComPtr<IDXGIOutput> output;
+        ret = adapter->EnumOutputs(0, &output);
+        if (FAILED(ret)) {
+            ::OutputDebugStringA("モニターが見つからない\n");
+            return;
+        }
+        DXGI_OUTPUT_DESC outputDesc = {};
+        output->GetDesc(&outputDesc);
+        UINT width = outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left;
+        UINT height = outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top;
+        string op = "setting fullscreen to " + to_string(width) + "x" + to_string(height) + "\n";
+        OutputDebugStringA(op.c_str());
+
+        // モニターのモードを取得
+        DXGI_MODE_DESC modeDesc = {};
+        modeDesc.Width = width;
+        modeDesc.Height = height;
+        modeDesc.RefreshRate.Numerator = 144;   // モニターが対応している最高リフレッシュレート
+        modeDesc.RefreshRate.Denominator = 1;
+        modeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        // モニターがサポートするモードに調整
+        DXGI_MODE_DESC closestMode;
+        output->FindClosestMatchingMode(&modeDesc, &closestMode, nullptr);
+
+        // スワップチェィン再作成
+        DXGI_SWAP_CHAIN_DESC1 scDesc = {};
+        scDesc.Width = closestMode.Width;
+        scDesc.Height = closestMode.Height;
+        scDesc.Format = closestMode.Format;
+        scDesc.SampleDesc.Count = 1;
+        scDesc.SampleDesc.Quality = 0;
+        scDesc.BufferCount = FRAME_BUFFER_COUNT;
+        scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+        // フルスクリーンに対応
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc{};
+        fsDesc.RefreshRate.Numerator = closestMode.RefreshRate.Numerator;
+        fsDesc.RefreshRate.Denominator = closestMode.RefreshRate.Denominator;
+        fsDesc.Windowed = false;
+        ret = _dxgiFactory->CreateSwapChainForHwnd(
+            _commandQueue.Get(),
+            _hwnd,
+            &scDesc,
+            &fsDesc,
+            nullptr,
+            (IDXGISwapChain1**)_swapchain.ReleaseAndGetAddressOf());
+        if (FAILED(ret)) {
+            ::OutputDebugStringA("スワップチェィンの再作成に失敗\n");
+            return;
+        }
+
+        // フルスクリーン状態を設定
+        ret = _swapchain->SetFullscreenState(true, output.Get());
+        if (FAILED(ret)) {
+            ::OutputDebugStringA("フルスクリーン化に失敗\n");
+            return;
+        }
+
+        // フルスクリーンの解像度に合わせて、バッファをリサイズ
+        // memo: フリップモデル（DXGI_SWAP_EFFECT_FLIP_DISCARD）の要件を満たすため、フルスクリーン切り替え後にバッファを更新する必要がある
+        ret = _swapchain->ResizeBuffers(
+            FRAME_BUFFER_COUNT,
+            closestMode.Width,
+            closestMode.Height,
+            closestMode.Format,
+            DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+        if (FAILED(ret)) {
+            ::OutputDebugStringA("スワップチェインのバッファリサイズに失敗\n");
+            return;
+        }
+
+        DXGI_SWAP_CHAIN_DESC swapchainDesc;
+        _swapchain->GetDesc(&swapchainDesc);
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc;
+        _swapchain->GetFullscreenDesc(&fullScreenDesc);
+        string sw = "swpchain resolution: " + to_string(swapchainDesc.BufferDesc.Width) + "x" + to_string(swapchainDesc.BufferDesc.Height);
+        sw += " @ " + to_string(swapchainDesc.BufferDesc.RefreshRate.Numerator) + "/" + to_string(swapchainDesc.BufferDesc.RefreshRate.Denominator) + "Hz\n";
+        sw += "fullscreen resolution: ";
+        sw += fullScreenDesc.Windowed ? "Windowed" : "FullScreen";
+        sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
+        OutputDebugStringA(sw.c_str());
+
+        // 新しいバックバッファを取得してRTVを再生成
+        _renderTargets.resize(FRAME_BUFFER_COUNT);
+        auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
+        for (int i = 0; i <_renderTargets.size(); i++)
+        {
+            _swapchain->GetBuffer(i, IID_PPV_ARGS(_renderTargets[i].ReleaseAndGetAddressOf()));
+            _device->CreateRenderTargetView(_renderTargets[i].Get(), nullptr, rtvHandle);
+            rtvHandle.ptr += _rtvDescriptorSize;
+        }
+
+        // リソースの状態を遷移
+        // コマンドリストを閉じます。これをしないとコマンドアロケータのリセットで失敗します
+        // (おそらくコマンドリストを作成した時、デフォルトでオープン状態になっているからだと思われる)
+        _commandList->Close();
+        _commandAllocator->Reset();
+        _commandList->Reset(_commandAllocator.Get(), nullptr);
+        auto frameIndex = _swapchain->GetCurrentBackBufferIndex();
+        ResourceBarrier(
+            _renderTargets[frameIndex].Get(),
+            D3D12_RESOURCE_STATE_COMMON,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        _commandList->Close();
+        ID3D12CommandList* commandLists[] = {_commandList.Get()};
+        _commandQueue->ExecuteCommandLists(1, commandLists);
+        WaitDraw();
+        _commandAllocator->Reset();
+        _commandList->Reset(_commandAllocator.Get(), nullptr);
+
+        // ウィンドウスタイルを調整（ボーダー非表示）
+        SetWindowLong(_hwnd, GWL_STYLE, WS_POPUP);
+        SetWindowPos(_hwnd, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
+        ShowWindow(_hwnd, SW_SHOW);
+        UpdateWindow(_hwnd);
+
+        string ws = "フルスクリーンにスイッチ: " + to_string(width) + "x" + to_string(height) + "\n";
+        ::OutputDebugStringA(ws.c_str());
+    }
+    else
+    {
+        // ウィンドウモードに戻す
+
+        // GPUの処理待機
+        WaitDraw();
+
+        // バックバッファ解放
+        for (auto& buffer : _renderTargets)
+        {
+            buffer.Reset();
+        }
+        _renderTargets.clear();
+
+        // ウィンドウモードに戻す
+        auto ret = _swapchain->SetFullscreenState(false, nullptr);
+        if (FAILED(ret))
+        {
+            ::OutputDebugStringA("ウィンドウ化に失敗\n");
+            return;
+        }
+
+        // バッファをウィンドウサイズにリサイズ
+        // memo: フリップモデル（DXGI_SWAP_EFFECT_FLIP_DISCARD）の要件を満たすため、フルスクリーン切り替え後にバッファを更新する必要がある
+        UINT width = 1280;
+        UINT height = 720;
+        ret = _swapchain->ResizeBuffers(
+            FRAME_BUFFER_COUNT,
+            width,
+            height,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+        if (FAILED(ret))
+        {
+            ::OutputDebugStringA("スワップチェインのバッファリサイズに失敗\n");
+            return;
+        }
+
+        DXGI_SWAP_CHAIN_DESC swapchainDesc;
+        _swapchain->GetDesc(&swapchainDesc);
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc;
+        _swapchain->GetFullscreenDesc(&fullScreenDesc);
+        string sw = "swpchain resolution: " + to_string(swapchainDesc.BufferDesc.Width) + "x" + to_string(swapchainDesc.BufferDesc.Height);
+        sw += " @ " + to_string(swapchainDesc.BufferDesc.RefreshRate.Numerator) + "/" + to_string(swapchainDesc.BufferDesc.RefreshRate.Denominator) + "Hz\n";
+        sw += "fullscreen resolution: ";
+        sw += fullScreenDesc.Windowed ? "Windowed" : "FullScreen";
+        sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
+        OutputDebugStringA(sw.c_str());
+
+        // RTVを再生成
+        _renderTargets.resize(FRAME_BUFFER_COUNT);
+        auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
+        for (int i = 0; i < _renderTargets.size(); i++)
+        {
+            _swapchain->GetBuffer(i, IID_PPV_ARGS(_renderTargets[i].ReleaseAndGetAddressOf()));
+            _device->CreateRenderTargetView(_renderTargets[i].Get(), nullptr, rtvHandle);
+            rtvHandle.ptr += _rtvDescriptorSize;
+        }
+
+        // リソースの状態を遷移
+        _commandList->Close();
+        _commandAllocator->Reset();
+        _commandList->Reset(_commandAllocator.Get(), nullptr);
+        auto frameIndex = _swapchain->GetCurrentBackBufferIndex();
+        ResourceBarrier(
+            _renderTargets[frameIndex].Get(),
+            D3D12_RESOURCE_STATE_COMMON,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        _commandList->Close();
+        ID3D12CommandList* commandLists[] = { _commandList.Get() };
+        _commandQueue->ExecuteCommandLists(1, commandLists);
+        WaitDraw();
+        _commandAllocator->Reset();
+        _commandList->Reset(_commandAllocator.Get(), nullptr);
+
+        // ウィンドウスタイルを元に戻す
+        SetWindowLong(_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+        SetWindowPos(_hwnd, HWND_TOP, 200, 200, width, height, SWP_FRAMECHANGED);
+        ShowWindow(_hwnd, SW_SHOW);
+        UpdateWindow(_hwnd);
+
+        string ws = "ウィンドウモードにスイッチ: " + to_string(width) + "x" + to_string(height) + "\n";
+        ::OutputDebugStringA(ws.c_str());
+    }
 }
