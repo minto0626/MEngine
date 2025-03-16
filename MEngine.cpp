@@ -310,10 +310,137 @@ void MEngine::EndRender()
     _commandAllocator->Reset();
     _commandList->Reset(_commandAllocator.Get(), nullptr);
 
+    PresentFrame();
+}
+
+void MEngine::PresentFrame()
+{
     auto ret = _swapchain->Present(1, 0);
     if (FAILED(ret))
     {
-        assert(0);
+        if (ret == DXGI_ERROR_INVALID_CALL) // エラー#117
+        {
+            ::OutputDebugStringA("Present処理に失敗。回復を試みます...\n");
+
+            // フルスクリーン時にアプリケーション外部からウィンドウ化されてしまった場合（例えばスクショを撮ろうとしたとき）に
+            // フルスクリーンを維持するように試みる
+            BOOL isFullScreen;
+            _swapchain->GetFullscreenState(&isFullScreen, nullptr);
+            if (!isFullScreen)
+            {
+                ::OutputDebugStringA("フルスクリーン状態が解除れているため、もとに戻します\n");
+
+                ComPtr<IDXGIAdapter> adapter;
+                ret = _dxgiFactory->EnumAdapters(0, &adapter);
+                if (FAILED(ret)) {
+                    ::OutputDebugStringA("アダプタが見つからない\n");
+                    return;
+                }
+                ComPtr<IDXGIOutput> output;
+                ret = adapter->EnumOutputs(0, &output);
+                if (FAILED(ret)) {
+                    ::OutputDebugStringA("モニターが見つからない\n");
+                    return;
+                }
+
+                DXGI_OUTPUT_DESC outputDesc = {};
+                output->GetDesc(&outputDesc);
+                UINT width = outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left;
+                UINT height = outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top;
+
+                DXGI_MODE_DESC modeDesc = {};
+                modeDesc.Width = width;
+                modeDesc.Height = height;
+                modeDesc.RefreshRate.Numerator = 144;
+                modeDesc.RefreshRate.Denominator = 1;
+                modeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                DXGI_MODE_DESC closestMode;
+                output->FindClosestMatchingMode(&modeDesc, &closestMode, nullptr);
+
+                // フルスクリーンに戻す
+                ret = _swapchain->SetFullscreenState(true, output.Get());
+                if (FAILED(ret)) {
+                    ::OutputDebugStringA("フルスクリーン化に失敗\n");
+                    return;
+                }
+
+                ret = _swapchain->ResizeBuffers(
+                    FRAME_BUFFER_COUNT,
+                    closestMode.Width,
+                    closestMode.Height,
+                    closestMode.Format,
+                    DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+                if (FAILED(ret)){
+                    string error = "バッファのリサイズに失敗。" + to_string(ret) + "\n";
+                    ::OutputDebugStringA(error.c_str());
+                    return;
+                }
+
+                // リソースを再初期化
+                for (auto& buffer : _renderTargets)
+                {
+                    buffer.Reset();
+                }
+                _renderTargets.clear();
+                _renderTargets.resize(FRAME_BUFFER_COUNT);
+                auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
+                for (int i = 0; i < _renderTargets.size(); i++)
+                {
+                    _swapchain->GetBuffer(i, IID_PPV_ARGS(_renderTargets[i].ReleaseAndGetAddressOf()));
+                    _device->CreateRenderTargetView(_renderTargets[i].Get(), nullptr, rtvHandle);
+                    rtvHandle.ptr += _rtvDescriptorSize;
+                }
+
+                string log = "Restored fullscreen: " + to_string(closestMode.Width) + "x" + to_string(closestMode.Height);
+                log += " @ " + to_string(closestMode.RefreshRate.Numerator) + "/" + to_string(closestMode.RefreshRate.Denominator) + "Hz\n";
+                ::OutputDebugStringA(log.c_str());
+            }
+            else
+            {
+                // フルスクリーンなのにエラーなら、単純なリサイズ
+                DXGI_SWAP_CHAIN_DESC swapDesc;
+                _swapchain->GetDesc(&swapDesc);
+                ret = _swapchain->ResizeBuffers(
+                    swapDesc.BufferCount,
+                    swapDesc.BufferDesc.Width,
+                    swapDesc.BufferDesc.Height,
+                    swapDesc.BufferDesc.Format,
+                    swapDesc.Flags);
+                if (FAILED(ret)) {
+                    ::OutputDebugStringA("バッファのリサイズに失敗\n");
+                }
+
+                // リソースを再初期化
+                for (auto& buffer : _renderTargets)
+                {
+                    buffer.Reset();
+                }
+                _renderTargets.clear();
+                _renderTargets.resize(FRAME_BUFFER_COUNT);
+                auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
+                for (int i = 0; i < _renderTargets.size(); i++)
+                {
+                    _swapchain->GetBuffer(i, IID_PPV_ARGS(_renderTargets[i].ReleaseAndGetAddressOf()));
+                    _device->CreateRenderTargetView(_renderTargets[i].Get(), nullptr, rtvHandle);
+                    rtvHandle.ptr += _rtvDescriptorSize;
+                }
+
+                ::OutputDebugStringA("スワップチェィンのモードでフルスクリーン状態を維持\n");
+            }
+
+            // 再試行
+            ret = _swapchain->Present(1, 0);
+            if (FAILED(ret))
+            {
+                string error = "Presentをリトライしても失敗。" + to_string(ret) + "\n";
+                ::OutputDebugStringA(error.c_str());
+            }
+        }
+        else
+        {
+            string error = "予期せぬエラーでPresentに失敗。" + to_string(ret) + "\n";
+            ::OutputDebugStringA(error.c_str());
+        }
     }
 }
 
@@ -427,7 +554,6 @@ void MEngine::Draw()
 void MEngine::ToggleFullScreen()
 {
     BOOL isFullScreen;
-    ComPtr<IDXGIOutput> currentOutput;
     _swapchain->GetFullscreenState(&isFullScreen, nullptr);
 
     if (!isFullScreen)

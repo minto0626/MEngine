@@ -41,6 +41,7 @@ private:
 
 	void BegineRender();
 	void EndRender();
+	void PresentFrame();
 	void WaitDraw();
 
 	void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
