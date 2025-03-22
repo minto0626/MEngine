@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
+#include <windows.h>
 
 using namespace DirectX;
 
