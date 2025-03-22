@@ -139,6 +139,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MEngine.rc" />
