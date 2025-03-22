@@ -1,5 +1,5 @@
 #include "MEngine.h"
-
+#include "d3dx12.h"
 #include <string>
 #include <assert.h>
 
@@ -271,12 +271,10 @@ void MEngine::BegineRender()
     _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
     // ビューポートとシザーレクトを設定
-    BOOL isFullscreen;
-    _swapchain->GetFullscreenState(&isFullscreen, nullptr);
-    FLOAT width = isFullscreen ? 1920.0f : 1280.0f; // フルスクリーンかウィンドウかで分岐
-    FLOAT height = isFullscreen ? 1080.0f : 720.0f;
-    D3D12_VIEWPORT viewport = { 0.0f, 0.0f, width, height, 0.0f, 1.0f };
-    D3D12_RECT scissorRect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+    auto viewport = CD3DX12_VIEWPORT(_renderTargets[frameIndex].Get());
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    auto result = _swapchain->GetDesc1(&desc);
+    auto scissorRect = CD3DX12_RECT(0, 0, desc.Width, desc.Height);
     _commandList->RSSetViewports(1, &viewport);
     _commandList->RSSetScissorRects(1, &scissorRect);
 
@@ -457,13 +455,7 @@ void MEngine::WaitDraw()
 
 void MEngine::ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
-    D3D12_RESOURCE_BARRIER desc = {};
-    desc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    desc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    desc.Transition.pResource = resource;
-    desc.Transition.Subresource = 0;
-    desc.Transition.StateBefore = from;
-    desc.Transition.StateAfter = to;
+    auto desc = CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to);
     _commandList->ResourceBarrier(1, &desc);
 }
 

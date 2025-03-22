@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="d3dx12.h" />
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Vector3.h" />
