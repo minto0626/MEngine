@@ -142,6 +142,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="InputLayoutHelper.h" />
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
