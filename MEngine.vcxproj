@@ -146,7 +146,7 @@
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vector.h" />
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
