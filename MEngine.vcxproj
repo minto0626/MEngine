@@ -135,6 +135,7 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MEngine.cpp" />
+    <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
@@ -144,6 +145,7 @@
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayoutHelper.h" />
     <ClInclude Include="MEngine.h" />
+    <ClInclude Include="PipelineState.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Vector.h" />
