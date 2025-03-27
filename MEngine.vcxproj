@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="InputLayoutHelper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MEngine.cpp" />
     <ClCompile Include="PipelineState.cpp" />
