@@ -21,7 +21,7 @@ void VertexBuffer::Init(
 		&def_heapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&bufferDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS(_vertexBuffer.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) { assert("頂点バッファーの作成に失敗!"); return; }
@@ -44,11 +44,17 @@ void VertexBuffer::Init(
 	memcpy(mappedData, vertexData, bufferSize);
 	_uploadBuffer->Unmap(0, nullptr);
 
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		_vertexBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_COPY_DEST);
+	commndList->ResourceBarrier(1, &barrier);
+
 	// アップロード用のバッファーからデフォルト用のバッファーにデータを転送
 	commndList->CopyResource(_vertexBuffer.Get(), _uploadBuffer.Get());
 
 	// リソース状態を頂点バッファー用に遷移
-	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		_vertexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);

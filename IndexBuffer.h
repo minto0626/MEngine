@@ -20,4 +20,7 @@ public:
 		const void* indexData,
 		UINT indexNum,
 		DXGI_FORMAT format);
+
+	const D3D12_INDEX_BUFFER_VIEW& GetView() const { return _indexBufferView; }
+	const UINT GetIndexNum() const { return _indexNum; }
 };

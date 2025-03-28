@@ -19,4 +19,6 @@ public:
 		const void* vertexData,
 		UINT vertexNum,
 		UINT vertexStride);
+
+	const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return _vertexBufferView; }
 };

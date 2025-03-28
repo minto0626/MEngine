@@ -20,7 +20,7 @@ void IndexBuffer::Init(
 		&def_heapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&bufferDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS(_indexBuffer.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) { assert("インデックスバッファーの作成に失敗!"); return; }
@@ -43,11 +43,17 @@ void IndexBuffer::Init(
 	memcpy(mappedData, indexData, bufferSize);
 	_uploadBuffer->Unmap(0, nullptr);
 
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		_indexBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_COPY_DEST);
+	commndList->ResourceBarrier(1, &barrier);
+
 	// アップロード用のバッファーからデフォルト用のバッファーにデータを転送
 	commndList->CopyResource(_indexBuffer.Get(), _uploadBuffer.Get());
 
 	// リソース状態を頂点バッファー用に遷移
-	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		_indexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_INDEX_BUFFER);
