@@ -4,6 +4,16 @@
 #include <wrl.h>
 #include <vector>
 
+// ポリゴンの表示テスト
+#include "Vector.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
+#include "InputLayoutHelper.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
+//
+
 class MEngine
 {
 private:
@@ -45,6 +55,14 @@ private:
 	void WaitDraw();
 
 	void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+
+	// ★ポリゴンの表示テスト★
+	VertexBuffer vertexBuffer;
+	IndexBuffer indexBuffer;
+	Shader vertexShader;
+	Shader pixelShader;
+	PipelineState pipelineState;
+	RootSignature rootSignature;
 
 public:
 	~MEngine();

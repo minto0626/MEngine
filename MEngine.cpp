@@ -530,6 +530,53 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     //ToggleFullScreen();
     //ToggleFullScreen();
 
+    // ★ポリゴンの表示テスト★
+    const Vector3 vertexData[] = {
+        { -0.4f, -0.7f, 1.0f }, // 左下
+        { -0.4f,  0.7f, 1.0f }, // 左上
+        {  0.4f, -0.7f, 1.0f }, // 右下
+        {  0.4f,  0.7f, 1.0f }, // 右上
+    };
+    vertexBuffer.Init(_device.Get(), _commandList.Get(), &vertexData, _countof(vertexData), sizeof(Vector3));
+
+    const unsigned short indices[] = {
+        0, 1, 2,
+        2, 1, 3,
+    };
+    indexBuffer.Init(_device.Get(), _commandList.Get(), &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
+
+    rootSignature.Build(_device.Get());
+
+    vertexShader.LoadVS(L"BasicVertexShader.hlsl", "vs");
+    pixelShader.LoadPS(L"BasicPixelShader.hlsl", "ps");
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
+    pipelineStateDesc.pRootSignature = rootSignature.Get();
+    pipelineStateDesc.VS = vertexShader.GetBytecode();
+    pipelineStateDesc.PS = pixelShader.GetBytecode();
+    auto inputLayout = InputLayoutHelper::CreateInputLayout(
+        {
+            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+        }
+    );
+    pipelineStateDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
+    pipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+    pipelineStateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    pipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // カリングしない
+    pipelineStateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    pipelineStateDesc.BlendState.AlphaToCoverageEnable = true;  // アルファテストする
+    pipelineStateDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
+    pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画
+    pipelineStateDesc.NumRenderTargets = 1; // レンダーターゲットは一つ
+    pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    pipelineStateDesc.SampleDesc.Count = 1;
+    pipelineStateDesc.SampleDesc.Quality = 0;
+    //pipelineStateDesc.DepthStencilState.DepthEnable = true; // 深度バッファー使用
+    //pipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;    // 描画時に深度を書く
+    //pipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS; // 小さいほうを使用
+    //pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    pipelineState.Init(_device.Get(), pipelineStateDesc);
+
     return true;
 }
 
@@ -540,6 +587,15 @@ void MEngine::Update()
 void MEngine::Draw()
 {
     BegineRender();
+
+    // ★ポリゴンの表示テスト★
+    _commandList->SetPipelineState(pipelineState.Get());
+    _commandList->SetGraphicsRootSignature(rootSignature.Get());
+    _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    _commandList->IASetVertexBuffers(0, 1, &vertexBuffer.GetView());
+    _commandList->IASetIndexBuffer(&indexBuffer.GetView());
+    _commandList->DrawIndexedInstanced(indexBuffer.GetIndexNum(), 1, 0, 0, 0);
+
     EndRender();
 }
 

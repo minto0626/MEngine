@@ -1,0 +1,220 @@
+#pragma once
+#include <DirectXMath.h>
+#include <cassert>
+#include <stdexcept>
+#include <sstream>
+#include <string>
+#include <windows.h>
+
+using namespace DirectX;
+
+class Vector3
+{
+private:
+	XMFLOAT3 vec;
+
+public:
+	Vector3() : vec(0.0f, 0.0f, 0.0f) {}
+	Vector3(float x, float y, float z) : vec(x, y, z) {}
+	explicit Vector3(const XMFLOAT3& v) : vec(v) {}
+
+	float GetX() const { return vec.x; }
+	float GetY() const { return vec.y; }
+	float GetZ() const { return vec.z; }
+
+	void SetX(float x) { vec.x = x; }
+	void SetY(float y) { vec.y = y; }
+	void SetZ(float z) { vec.y = z; }
+
+	Vector3 operator +(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorAdd(v1, v2));
+		return Vector3(ret);
+	}
+	Vector3 operator -(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorSubtract(v1, v2));
+		return Vector3(ret);
+	}
+	Vector3 operator *(const float scalar) const
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorScale(v, scalar));
+		return Vector3(ret);
+	}
+	Vector3 operator *(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorMultiply(v1, v2));
+		return Vector3(ret);
+	}
+	Vector3 operator /(const float scalar) const
+	{
+		if (scalar == 0.0f) { ::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		XMVECTOR v = XMLoadFloat3(&vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorScale(v, 1.0f / scalar));
+		return Vector3(ret);
+	}
+	Vector3 operator /(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
+		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) { ::OutputDebugStringA("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVectorDivide(v1, v2));
+		return Vector3(ret);
+	}
+	Vector3 operator +=(const Vector3& other)
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMStoreFloat3(&vec, XMVectorAdd(v1, v2));
+		return *this;
+	}
+	Vector3 operator -=(const Vector3& other)
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMStoreFloat3(&vec, XMVectorSubtract(v1, v2));
+		return *this;
+	}
+	Vector3 operator *=(const float scalar)
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		XMStoreFloat3(&vec, XMVectorScale(v, scalar));
+		return *this;
+	}
+	Vector3 operator *=(const Vector3& other)
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMStoreFloat3(&vec, XMVectorMultiply(v1, v2));
+		return *this;
+	}
+	Vector3 operator /=(const float scalar)
+	{
+		if (scalar == 0.0f) {
+			::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n");
+			vec = {0.f, 0.0f, 0.0f};
+		}
+		else {
+			XMVECTOR v = XMLoadFloat3(&vec);
+			XMStoreFloat3(&vec, XMVectorScale(v, 1.0f / scalar));
+		}
+		return *this;
+	}
+	Vector3 operator /=(const Vector3& other)
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
+		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) {
+			::OutputDebugStringA("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n");
+			vec = {0.0f, 0.0f, 0.0f };
+		}
+		else {
+			XMStoreFloat3(&vec, XMVectorDivide(v1, v2));
+		}
+		return *this;
+	}
+
+	float Length() const
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		return XMVectorGetX(XMVector3Length(v));
+	}
+	float LengthSquared() const
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		return XMVectorGetX(XMVector3LengthSq(v));
+	}
+	Vector3 Normalized() const
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVector3Normalize(v));
+		return Vector3(ret);
+	}
+	void Normalize()
+	{
+		XMVECTOR v = XMLoadFloat3(&vec);
+		XMStoreFloat3(&vec, XMVector3Normalize(v));
+	}
+
+	float Dot(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		return XMVectorGetX(XMVector3Dot(v1, v2));
+	}
+	Vector3 Cross(const Vector3& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat3(&vec);
+		XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, XMVector3Cross(v1, v2));
+		return Vector3(ret);
+	}
+
+	std::string ToString() const
+	{
+		std::stringstream ss;
+		ss << "(" << GetX() << ", " << GetY() << ", " << GetZ() << ")";
+		return ss.str();
+	}
+
+	XMVECTOR ToXMVECTOR() const
+	{
+		return XMLoadFloat3(&vec);
+	}
+	Vector3 Transform(const XMMATRIX& matrix) const
+	{
+		XMVECTOR transform = XMVector3Transform(XMLoadFloat3(&vec), matrix);
+		XMFLOAT3 ret;
+		XMStoreFloat3(&ret, transform);
+		return Vector3(ret);
+	}
+
+	// 内部に持っているXMVECTORが16アライメントなので、newするときは16バイト境界に確保する
+	void* operator new(size_t size)
+	{
+		void* ptr = _aligned_malloc(size, 16);
+		if (ptr == nullptr) { throw std::bad_alloc(); }
+		assert((reinterpret_cast<uintptr_t>(ptr) % 16) == 0);	// アライメントを確認
+		return ptr;
+	}
+
+public:
+
+	static Vector3 Zero() { return Vector3(0.0f, 0.0f, 0.0f); }
+	static Vector3 One() { return Vector3(1.0f, 1.0f, 1.0f); }
+
+	static float Angle(const Vector3& a, const Vector3& b)
+	{
+		float dot = a.Dot(b);
+		float lengthProduct = a.Length() * b.Length();
+		if (lengthProduct == 0.0f) { return 0.0f; }	// ゼロ除算防止
+
+		float cosTheta = dot / lengthProduct;
+		cosTheta = (std::max)(-1.0f, (std::min)(1.0f, cosTheta));
+		return std::acos(cosTheta);
+	}
+
+	static float Distance(const Vector3& a, const Vector3& b)
+	{
+		XMVECTOR v1 = XMLoadFloat3(&a.vec);
+		XMVECTOR v2 = XMLoadFloat3(&b.vec);
+		return XMVectorGetX(XMVector3Length(XMVectorSubtract(v1, v2)));
+	}
+};
