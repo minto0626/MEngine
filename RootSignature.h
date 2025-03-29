@@ -9,6 +9,7 @@ class RootSignature
 {
 private:
 	ComPtr<ID3D12RootSignature> _rootSignature;
+	std::vector<D3D12_DESCRIPTOR_RANGE> _ranges;
 	std::vector<D3D12_ROOT_PARAMETER> _parameters;
 	std::vector<D3D12_STATIC_SAMPLER_DESC> _samplers;
 

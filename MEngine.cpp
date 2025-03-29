@@ -531,13 +531,18 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     //ToggleFullScreen();
 
     // ★ポリゴンの表示テスト★
-    const Vector3 vertexData[] = {
-        { -0.4f, -0.7f, 1.0f }, // 左下
-        { -0.4f,  0.7f, 1.0f }, // 左上
-        {  0.4f, -0.7f, 1.0f }, // 右下
-        {  0.4f,  0.7f, 1.0f }, // 右上
+    struct MeshVertex
+    {
+        Vector3 pos;
+        Vector2 uv;
     };
-    vertexBuffer.Init(_device.Get(), _commandList.Get(), &vertexData, _countof(vertexData), sizeof(Vector3));
+    const MeshVertex vertexData[] = {
+        {{ -0.4f, -0.7f, 1.0f }, { 0.0f, 1.0f }},   // 左下
+        {{ -0.4f,  0.7f, 1.0f }, { 0.0f, 0.0f }},   // 左上
+        {{  0.4f, -0.7f, 1.0f }, { 1.0f, 1.0f }},   // 右下
+        {{  0.4f,  0.7f, 1.0f }, { 1.0f, 0.0f }},   // 右上
+    };
+    vertexBuffer.Init(_device.Get(), _commandList.Get(), &vertexData, _countof(vertexData), sizeof(MeshVertex));
 
     const unsigned short indices[] = {
         0, 1, 2,
@@ -545,10 +550,16 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     };
     indexBuffer.Init(_device.Get(), _commandList.Get(), &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
 
-    rootSignature.Build(_device.Get());
-
     vertexShader.LoadVS(L"BasicVertexShader.hlsl", "vs");
     pixelShader.LoadPS(L"BasicPixelShader.hlsl", "ps");
+
+    texLoader.Init(_device.Get());
+    const char* texfilePath = "Assets/texture/free_ei.png";
+    texBuffer.Init(_device.Get(), texLoader.GetTextureByPath(texfilePath));
+
+    rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
+    rootSignature.AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootSignature.Build(_device.Get());
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
     pipelineStateDesc.pRootSignature = rootSignature.Get();
@@ -557,6 +568,7 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     auto inputLayout = InputLayoutHelper::CreateInputLayout(
         {
             { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
         }
     );
     pipelineStateDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
@@ -594,6 +606,9 @@ void MEngine::Draw()
     _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->IASetVertexBuffers(0, 1, &vertexBuffer.GetView());
     _commandList->IASetIndexBuffer(&indexBuffer.GetView());
+    ID3D12DescriptorHeap* heaps[] = { texBuffer.GetHeap() };
+    _commandList->SetDescriptorHeaps(1, heaps);
+    _commandList->SetGraphicsRootDescriptorTable(0, texBuffer.GetGPUHandle());
     _commandList->DrawIndexedInstanced(indexBuffer.GetIndexNum(), 1, 0, 0, 0);
 
     EndRender();

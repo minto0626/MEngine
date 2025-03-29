@@ -45,6 +45,12 @@
     <ClCompile Include="InputLayoutHelper.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -80,6 +86,12 @@
     <ClInclude Include="RootSignature.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MEngine.rc">
@@ -98,5 +110,8 @@
     <FxCompile Include="BasicPixelShader.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BasicShaderHeader.hlsli" />
   </ItemGroup>
 </Project>

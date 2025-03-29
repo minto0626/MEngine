@@ -9,6 +9,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "TextureLoader.h"
+#include "Texture.h"
 #include "InputLayoutHelper.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
@@ -61,6 +63,8 @@ private:
 	IndexBuffer indexBuffer;
 	Shader vertexShader;
 	Shader pixelShader;
+	TextureLoader texLoader;
+	Texture texBuffer;
 	PipelineState pipelineState;
 	RootSignature rootSignature;
 
