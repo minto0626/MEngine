@@ -4,6 +4,7 @@
 
 RootSignature::RootSignature()
 {
+	_ranges.clear();
 	_parameters.clear();
 	_samplers.clear();
 }
@@ -12,9 +13,10 @@ void RootSignature::AddDescriptorTable(UINT numDescriptors, UINT shaderRegister,
 {
 	CD3DX12_DESCRIPTOR_RANGE range = {};
 	range.Init(rangeType, numDescriptors, shaderRegister);
+	_ranges.push_back(range);
 
 	CD3DX12_ROOT_PARAMETER param = {};
-	param.InitAsDescriptorTable(1, &range, visibility);
+	param.InitAsDescriptorTable(1, &_ranges.back(), visibility);
 
 	_parameters.push_back(param);
 }
