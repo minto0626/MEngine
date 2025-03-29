@@ -550,10 +550,10 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     };
     indexBuffer.Init(_device.Get(), _commandList.Get(), &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
 
-    rootSignature.Build(_device.Get());
-
     vertexShader.LoadVS(L"BasicVertexShader.hlsl", "vs");
     pixelShader.LoadPS(L"BasicPixelShader.hlsl", "ps");
+
+    rootSignature.Build(_device.Get());
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
     pipelineStateDesc.pRootSignature = rootSignature.Get();
@@ -562,6 +562,7 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     auto inputLayout = InputLayoutHelper::CreateInputLayout(
         {
             { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
         }
     );
     pipelineStateDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
