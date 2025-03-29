@@ -531,13 +531,18 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     //ToggleFullScreen();
 
     // ★ポリゴンの表示テスト★
-    const Vector3 vertexData[] = {
-        { -0.4f, -0.7f, 1.0f }, // 左下
-        { -0.4f,  0.7f, 1.0f }, // 左上
-        {  0.4f, -0.7f, 1.0f }, // 右下
-        {  0.4f,  0.7f, 1.0f }, // 右上
+    struct MeshVertex
+    {
+        Vector3 pos;
+        Vector2 uv;
     };
-    vertexBuffer.Init(_device.Get(), _commandList.Get(), &vertexData, _countof(vertexData), sizeof(Vector3));
+    const MeshVertex vertexData[] = {
+        {{ -0.4f, -0.7f, 1.0f }, { 0.0f, 1.0f }},   // 左下
+        {{ -0.4f,  0.7f, 1.0f }, { 0.0f, 0.0f }},   // 左上
+        {{  0.4f, -0.7f, 1.0f }, { 1.0f, 1.0f }},   // 右下
+        {{  0.4f,  0.7f, 1.0f }, { 1.0f, 0.0f }},   // 右上
+    };
+    vertexBuffer.Init(_device.Get(), _commandList.Get(), &vertexData, _countof(vertexData), sizeof(MeshVertex));
 
     const unsigned short indices[] = {
         0, 1, 2,
