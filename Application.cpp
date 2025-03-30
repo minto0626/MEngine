@@ -51,6 +51,25 @@ bool Application::CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& 
 	return true;
 }
 
+bool Application::DispatchWindowMessage()
+{
+	MSG msg = {};
+	while (WM_QUIT != msg.message)
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return msg.message != WM_QUIT;
+}
+
 bool Application::Init(HINSTANCE& hInstance)
 {
 	HWND hwnd = {};
@@ -73,11 +92,8 @@ bool Application::Init(HINSTANCE& hInstance)
 void Application::Run()
 {
 	MSG msg = {};
-	while (GetMessage(&msg, nullptr, 0, 0))
+	while (DispatchWindowMessage())
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-
 		_engine->Update();
 		_engine->Draw();
 	}

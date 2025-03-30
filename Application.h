@@ -10,6 +10,7 @@ class Application
 private:
 	WNDCLASSW _windowClass;
 	bool CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& wc);
+	bool DispatchWindowMessage();
 
 	std::shared_ptr<MEngine> _engine;
 
