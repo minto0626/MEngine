@@ -16,7 +16,7 @@ void RootSignature::AddDescriptorTable(UINT numDescriptors, UINT shaderRegister,
 	_ranges.push_back(range);
 
 	CD3DX12_ROOT_PARAMETER param = {};
-	param.InitAsDescriptorTable(1, &_ranges.back(), visibility);
+	param.InitAsDescriptorTable(1, nullptr, visibility);	// BulidéûÇ…ÉåÉìÉWÇê›íËÇ∑ÇÈ
 
 	_parameters.push_back(param);
 }
@@ -32,6 +32,18 @@ void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILIT
 
 void RootSignature::Build(ID3D12Device* device)
 {
+	if (!_ranges.empty())
+	{
+		size_t index = 0;
+		for (auto& param : _parameters)
+		{
+			if (param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+			{
+				param.DescriptorTable.pDescriptorRanges = &_ranges[index++];
+			}
+		}
+	}
+
 	D3D12_ROOT_SIGNATURE_DESC desc = {};
 	desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	desc.pParameters = _parameters.empty() ? nullptr : _parameters.data();

@@ -6,11 +6,13 @@
 
 // ポリゴンの表示テスト
 #include "Vector.h"
+#include "Transform.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "TextureLoader.h"
 #include "Texture.h"
+#include "ConstantBuffer.h"
 #include "InputLayoutHelper.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
@@ -59,12 +61,14 @@ private:
 	void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 
 	// ★ポリゴンの表示テスト★
+	Transform transform;
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
 	Shader vertexShader;
 	Shader pixelShader;
 	TextureLoader texLoader;
 	Texture texBuffer;
+	ConstantBuffer transformBuffer;
 	PipelineState pipelineState;
 	RootSignature rootSignature;
 
