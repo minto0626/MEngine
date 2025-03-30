@@ -557,6 +557,11 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     const char* texfilePath = "Assets/texture/free_ei.png";
     texBuffer.Init(_device.Get(), texLoader.GetTextureByPath(texfilePath));
 
+    transformBuffer.Init(_device.Get(), sizeof(transform.GetWorldMatrix()));
+    auto world = transform.GetWorldMatrix();
+    transformBuffer.Update(&world, sizeof(world));
+
+    rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
     rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
     rootSignature.AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSignature.Build(_device.Get());
@@ -594,6 +599,11 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
 
 void MEngine::Update()
 {
+    auto pos = transform.GetPos();
+    pos.SetX(pos.GetX() + (1.0f / 30.0f) * 0.1f);
+    transform.SetPos(pos);
+    auto world = transform.GetWorldMatrix();
+    transformBuffer.Update(&world, sizeof(world));
 }
 
 void MEngine::Draw()
@@ -606,9 +616,12 @@ void MEngine::Draw()
     _commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->IASetVertexBuffers(0, 1, &vertexBuffer.GetView());
     _commandList->IASetIndexBuffer(&indexBuffer.GetView());
-    ID3D12DescriptorHeap* heaps[] = { texBuffer.GetHeap() };
-    _commandList->SetDescriptorHeaps(1, heaps);
-    _commandList->SetGraphicsRootDescriptorTable(0, texBuffer.GetGPUHandle());
+    ID3D12DescriptorHeap* transHeaps[] = { transformBuffer.GetHeap() };
+    _commandList->SetDescriptorHeaps(1, transHeaps);
+    _commandList->SetGraphicsRootDescriptorTable(0, transformBuffer.GetGPUHandle());
+    ID3D12DescriptorHeap* texHeaps[] = { texBuffer.GetHeap() };
+    _commandList->SetDescriptorHeaps(1, texHeaps);
+    _commandList->SetGraphicsRootDescriptorTable(1, texBuffer.GetGPUHandle());
     _commandList->DrawIndexedInstanced(indexBuffer.GetIndexNum(), 1, 0, 0, 0);
 
     EndRender();
