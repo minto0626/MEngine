@@ -2,6 +2,7 @@
 #include "d3dx12.h"
 #include <string>
 #include <assert.h>
+#include "StringUtility.h"
 
 #if _DEBUG
 #include <iostream>
@@ -10,21 +11,6 @@
 
 using namespace std;
 using namespace Microsoft::WRL;
-
-namespace
-{
-    string wchar_to_string(wchar_t* wstr)
-    {
-        if (!wstr) { return ""; }
-
-        int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, nullptr, 0, nullptr, nullptr);
-        if (size == 0) { return ""; }
-
-        string str(size - 1, 0);
-        WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &str[0], size, nullptr, nullptr);
-        return str;
-    }
-}
 
 IDXGIFactory6* MEngine::CreateDXGIFactory()
 {
@@ -62,7 +48,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
 
 #if _DEBUG
         ostringstream oss;
-        string gpuName = wchar_to_string(desc.Description);
+        string gpuName = StringUtility::ToUTF8String(desc.Description);
         oss << "アダプター" << (i + 1) << " 名前: " << gpuName << endl;
         oss << "  製造元ID: " << desc.VendorId << endl;
         oss << "  デバイスの特定ID: " << desc.DeviceId << endl;
@@ -80,7 +66,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
             DXGI_OUTPUT_DESC opDesc = {};
             outputTmp->GetDesc(&opDesc);
 
-            oss << "モニター名: " << wchar_to_string(opDesc.DeviceName) << endl;
+            oss << "モニター名: " << StringUtility::ToUTF8String(opDesc.DeviceName) << endl;
             oss << "  モニターサイズ" << endl;
             oss << "   width: " << opDesc.DesktopCoordinates.right - opDesc.DesktopCoordinates.left << endl;
             oss << "   height: " << opDesc.DesktopCoordinates.bottom - opDesc.DesktopCoordinates.top << endl;
