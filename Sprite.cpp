@@ -51,9 +51,6 @@ void Sprite::Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, 
 
 void Sprite::Update()
 {
-    auto pos = _transform.GetPos();
-    pos.SetX(pos.GetX() + (1.0f / 30.0f) * 0.1f);
-    _transform.SetPos(pos);
     auto world = _transform.GetWorldMatrix();
     _constantBuffer.Update(&world, sizeof(world));
 }

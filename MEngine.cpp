@@ -530,6 +530,9 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
 void MEngine::Update()
 {
     // ★ポリゴンの表示テスト★
+    auto pos = sprite.Transform()->GetPos();
+    pos.SetX(pos.GetX() + (1.0f / 30.0f) * 0.1f);
+    sprite.Transform()->SetPos(pos);
     sprite.Update();
     //
 }

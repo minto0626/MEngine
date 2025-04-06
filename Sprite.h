@@ -26,5 +26,5 @@ public:
 	void Update();
 	void Draw(ID3D12GraphicsCommandList* commandList);
 
-	const Transform* Transform() const { return &_transform; }
+	Transform* Transform() { return &_transform; }
 };
