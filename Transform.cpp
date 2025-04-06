@@ -5,7 +5,7 @@ Transform::Transform() :
 	_pos(0.0f, 0.0f, 0.0f),
 	_rot(0.0f, 0.0f, 0.0f),
 	_scale(1.0f, 1.0f, 1.0f),
-	_world(XMMatrixIdentity()),
+	_world(),
 	_isDirty(false)
 {
 }
@@ -14,12 +14,9 @@ void Transform::UpdateMatrix()
 {
 	if (!_isDirty) { return; }
 
-	XMMATRIX scaleMatrix = XMMatrixScaling(_scale.GetX(), _scale.GetY(), _scale.GetZ());
-	XMMATRIX rotMatrix = XMMatrixRotationRollPitchYaw(
-		XMConvertToRadians(_rot.GetX()),
-		XMConvertToRadians(_rot.GetY()),
-		XMConvertToRadians(_rot.GetZ()));
-	XMMATRIX transMatrix = XMMatrixTranslation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
+	Matrix scaleMatrix = Matrix::Scaling(_scale.GetX(), _scale.GetY(), _scale.GetZ());
+	Matrix rotMatrix = Matrix::RotationRollPitchYaw(_rot.GetX(), _rot.GetY(), _rot.GetZ());
+	Matrix transMatrix = Matrix::Translation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
 	_world = scaleMatrix * rotMatrix * transMatrix;
 
 	_isDirty = false;
@@ -27,17 +24,16 @@ void Transform::UpdateMatrix()
 
 Vector3 Transform::TransformPoint(const Vector3& point)
 {
-	XMVECTOR v = point.ToXMVECTOR();
-	XMFLOAT3 ret;
-	XMStoreFloat3(&ret, XMVector3Transform(v, GetWorldMatrix()));
-	return Vector3(ret);
+	UpdateMatrix();
+	return _world.TransformPoint(point);
 }
 
 Vector3 Transform::TrasnformDirection(const Vector3& dir)
 {
+	UpdateMatrix();
 	XMVECTOR v = dir.ToXMVECTOR();
 	XMFLOAT3 ret;
-	XMStoreFloat3(&ret, XMVector3TransformNormal(v, GetWorldMatrix()));
+	XMStoreFloat3(&ret, XMVector3TransformNormal(v, _world.ToXMMatrix()));
 	return Vector3(ret);
 }
 

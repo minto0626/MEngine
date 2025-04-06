@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include "Matrix.h"
 #include <string>
 
 class Transform
@@ -8,7 +9,7 @@ private:
 	Vector3 _pos;
 	Vector3 _rot;
 	Vector3 _scale;
-	alignas(16) XMMATRIX _world;
+	Matrix _world;
 	bool _isDirty;
 
 	void UpdateMatrix();
@@ -23,7 +24,7 @@ public:
 	Vector3 GetPos() const { return _pos; }
 	Vector3 GetRot() const { return _rot; }
 	Vector3 GetScale() const { return _scale; }
-	XMMATRIX GetWorldMatrix() { UpdateMatrix(); return _world; }
+	Matrix GetWorldMatrix() { UpdateMatrix(); return _world; }
 
 	Vector3 TransformPoint(const Vector3& point);
 	Vector3 TrasnformDirection(const Vector3& dir);

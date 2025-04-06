@@ -158,6 +158,7 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayoutHelper.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="resource.h" />
