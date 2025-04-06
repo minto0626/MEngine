@@ -10,6 +10,7 @@ private:
 	static std::mutex s_mutex;
 
 	static void OutputLine(const std::wstring& message);
+	static void ShowMessageBox(const std::wstring& message, const std::wstring& title, unsigned int type);
 
 public:
 	static void Log(const std::wstring& message);
@@ -37,6 +38,15 @@ public:
 	static void LogAssertFormat(bool condition, const wchar_t* format, Args... args);
 	template<typename... Args>
 	static void LogAssertFormat(bool condition, const char* format, Args... args);
+
+public:
+	static void ShowMessageBox(const std::wstring& message, const std::wstring& title);
+	static void ShowMessageBox(const std::string& message, const std::string& title);
+	static void ShowErrorMessageBox(const std::wstring& message, const std::wstring& title);
+	static void ShowErrorMessageBox(const std::string& message, const std::string& title);
+	static void ShowWarningMessageBox(const std::wstring& message, const std::wstring& title);
+	static void ShowWarningMessageBox(const std::string& message, const std::string& title);
+
 };
 
 #include "Debug.inl"

@@ -10,6 +10,11 @@ void Debug::OutputLine(const std::wstring& message)
 	::OutputDebugStringW(output.c_str());
 }
 
+void Debug::ShowMessageBox(const std::wstring& message, const std::wstring& title, unsigned int type)
+{
+	MessageBoxW(nullptr, message.c_str(), title.c_str(), type);
+}
+
 void Debug::Log(const std::wstring& message)
 {
 #if _DEBUG
@@ -69,5 +74,53 @@ void Debug::LogAssert(bool condition, const std::string& message)
 	{
 		LogError(message);
 	}
+#endif
+}
+
+void Debug::ShowMessageBox(const std::wstring& message, const std::wstring& title)
+{
+#if _DEBUG
+	ShowMessageBox(message, title, MB_OK | MB_ICONINFORMATION);
+#endif
+}
+
+void Debug::ShowMessageBox(const std::string& message, const std::string& title)
+{
+#if _DEBUG
+	std::wstring _message = StringUtility::ToWideString(message);
+	std::wstring _title = StringUtility::ToWideString(title);
+	ShowMessageBox(_message, _title);
+#endif
+}
+
+void Debug::ShowErrorMessageBox(const std::wstring& message, const std::wstring& title)
+{
+#if _DEBUG
+	ShowMessageBox(message, title, MB_OK | MB_ICONERROR);
+#endif
+}
+
+void Debug::ShowErrorMessageBox(const std::string& message, const std::string& title)
+{
+#if _DEBUG
+	std::wstring _message = StringUtility::ToWideString(message);
+	std::wstring _title = StringUtility::ToWideString(title);
+	ShowErrorMessageBox(_message, _title);
+#endif
+}
+
+void Debug::ShowWarningMessageBox(const std::wstring& message, const std::wstring& title)
+{
+#if _DEBUG
+	ShowMessageBox(message, title, MB_OK | MB_ICONWARNING);
+#endif
+}
+
+void Debug::ShowWarningMessageBox(const std::string& message, const std::string& title)
+{
+#if _DEBUG
+	std::wstring _message = StringUtility::ToWideString(message);
+	std::wstring _title = StringUtility::ToWideString(title);
+	ShowWarningMessageBox(_message, _title);
 #endif
 }

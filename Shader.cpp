@@ -2,6 +2,7 @@
 #include <d3dcompiler.h>
 #include <cassert>
 #include <fstream>
+#include "Debug.h"
 
 using namespace Microsoft::WRL;
 
@@ -44,7 +45,7 @@ bool Shader::CheckShaderCompileResult(HRESULT result, const wchar_t* filePath, I
 	{
 		std::wstring errorMes = L"指定されたシェーダーファイルが見つかりませんでした。";
 		errorMes += filePath;
-		MessageBoxW(nullptr, errorMes.c_str(), L"エラー", MB_OK);
+		Debug::ShowErrorMessageBox(errorMes, L"エラー");
 	}
 	else
 	{
@@ -52,7 +53,7 @@ bool Shader::CheckShaderCompileResult(HRESULT result, const wchar_t* filePath, I
 		errorMes.resize(errorBlob->GetBufferSize());
 		copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errorMes.begin());
 		errorMes += "\n";
-		MessageBoxA(nullptr, errorMes.c_str(), "シェーダーコンパイルエラー", MB_OK);
+		Debug::ShowErrorMessageBox(errorMes, "シェーダーコンパイルエラー");
 	}
 	return false;
 }
