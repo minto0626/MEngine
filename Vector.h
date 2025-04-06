@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
-#include <windows.h>
+#include "Debug.h"
 
 using namespace DirectX;
 
@@ -57,7 +57,7 @@ public:
 	}
 	Vector2 operator /(float scalar) const
 	{
-		if (scalar == 0.0f) { ::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		if (scalar == 0.0f) { Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
 		XMVECTOR v = XMLoadFloat2(&vec);
 		XMFLOAT2 ret;
 		XMStoreFloat2(&ret, XMVectorScale(v, 1.0f / scalar));
@@ -68,7 +68,7 @@ public:
 		XMVECTOR v1 = XMLoadFloat2(&vec);
 		XMVECTOR v2 = XMLoadFloat2(&other.vec);
 		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector2NotEqual(zeroCheck, XMVectorZero())) { ::OutputDebugStringA("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		if (XMVector2NotEqual(zeroCheck, XMVectorZero())) { Debug::LogError("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
 		XMFLOAT2 ret;
 		XMStoreFloat2(&ret, XMVectorDivide(v1, v2));
 		return Vector2(ret);
@@ -103,7 +103,7 @@ public:
 	Vector2 operator /=(float scalar)
 	{
 		if (scalar == 0.0f) {
-			::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n");
+			Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.0f, 0.0f};
 		}
 		else {
@@ -118,7 +118,7 @@ public:
 		XMVECTOR v2 = XMLoadFloat2(&other.vec);
 		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
 		if (XMVector2NotEqual(zeroCheck, XMVectorZero())) {
-			::OutputDebugStringA("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n");
+			Debug::LogError("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.0f, 0.0f};
 		}
 		else {
@@ -216,7 +216,7 @@ public:
 	}
 	Vector3 operator /(const float scalar) const
 	{
-		if (scalar == 0.0f) { ::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		if (scalar == 0.0f) { Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
 		XMVECTOR v = XMLoadFloat3(&vec);
 		XMFLOAT3 ret;
 		XMStoreFloat3(&ret, XMVectorScale(v, 1.0f / scalar));
@@ -227,7 +227,7 @@ public:
 		XMVECTOR v1 = XMLoadFloat3(&vec);
 		XMVECTOR v2 = XMLoadFloat3(&other.vec);
 		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) { ::OutputDebugStringA("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n"); return Zero(); }
+		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) { Debug::LogError("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
 		XMFLOAT3 ret;
 		XMStoreFloat3(&ret, XMVectorDivide(v1, v2));
 		return Vector3(ret);
@@ -262,7 +262,7 @@ public:
 	Vector3 operator /=(const float scalar)
 	{
 		if (scalar == 0.0f) {
-			::OutputDebugStringA("0で除算しようとしました。大きさ0のベクトルを返します\n");
+			Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.f, 0.0f, 0.0f};
 		}
 		else {
@@ -277,7 +277,7 @@ public:
 		XMVECTOR v2 = XMLoadFloat3(&other.vec);
 		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
 		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) {
-			::OutputDebugStringA("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します\n");
+			Debug::LogError("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.0f, 0.0f, 0.0f };
 		}
 		else {

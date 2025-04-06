@@ -1,6 +1,7 @@
 #include "RootSignature.h"
 #include "d3dx12.h"
 #include <cassert>
+#include "Debug.h"
 
 RootSignature::RootSignature()
 {
@@ -63,7 +64,7 @@ void RootSignature::Build(ID3D12Device* device)
 		if (errorBlob != nullptr)
 		{
 			std::string error(static_cast<char*>(errorBlob->GetBufferPointer()), errorBlob->GetBufferSize());
-			MessageBoxA(nullptr, error.c_str(), "ルートシグネチャのシリアライズに失敗!", MB_OK);
+			Debug::ShowErrorMessageBox(error, "ルートシグネチャのシリアライズに失敗!");
 		}
 		assert(0);
 		return;
@@ -76,7 +77,7 @@ void RootSignature::Build(ID3D12Device* device)
 		IID_PPV_ARGS(_rootSignature.ReleaseAndGetAddressOf()));
 	if (FAILED(result))
 	{
-		assert(0, "ルートシグネチャの生成に失敗!");
+		Debug::ShowErrorMessageBox("ルートシグネチャの生成に失敗!", "エラー");
 		return;
 	}
 }

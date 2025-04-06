@@ -3,6 +3,7 @@
 #include <string>
 #include <assert.h>
 #include "StringUtility.h"
+#include "Debug.h"
 
 #if _DEBUG
 #include <iostream>
@@ -55,7 +56,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
         oss << "  専用VRAM: " << desc.DedicatedVideoMemory / (1024 * 1024) << " MB" << endl;
         oss << "  システムメモリとして割り当て可能なメモリ: " << desc.DedicatedSystemMemory / (1024 * 1024) << " MB" << endl;
         oss << "  共有可能なシステムメモリ: " << desc.SharedSystemMemory / (1024 * 1024) << " MB" << endl;
-        ::OutputDebugStringA(oss.str().c_str());
+        Debug::Log(oss.str().c_str());
         oss.str("");
 
         ComPtr<IDXGIOutput> outputTmp;
@@ -70,7 +71,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
             oss << "  モニターサイズ" << endl;
             oss << "   width: " << opDesc.DesktopCoordinates.right - opDesc.DesktopCoordinates.left << endl;
             oss << "   height: " << opDesc.DesktopCoordinates.bottom - opDesc.DesktopCoordinates.top << endl;
-            ::OutputDebugStringA(oss.str().c_str());
+            Debug::Log(oss.str().c_str());
             oss.str("");
 
             UINT numModes = 0;
@@ -85,7 +86,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
                 UINT refreshRate = (mode.RefreshRate.Numerator + mode.RefreshRate.Denominator - 1) / mode.RefreshRate.Denominator;
                 oss << "   " << mode.Width << "x" << mode.Height << " @ " << refreshRate << " Hz" << endl;
             }
-            ::OutputDebugStringA(oss.str().c_str());
+            Debug::Log(oss.str().c_str());
             oss.str("");
         }
 #endif
@@ -304,7 +305,7 @@ void MEngine::PresentFrame()
     {
         if (ret == DXGI_ERROR_INVALID_CALL) // エラー#117
         {
-            ::OutputDebugStringA("Present処理に失敗。回復を試みます...\n");
+            Debug::Log("Present処理に失敗。回復を試みます...");
 
             // フルスクリーン時にアプリケーション外部からウィンドウ化されてしまった場合（例えばスクショを撮ろうとしたとき）に
             // フルスクリーンを維持するように試みる
@@ -312,18 +313,18 @@ void MEngine::PresentFrame()
             _swapchain->GetFullscreenState(&isFullScreen, nullptr);
             if (!isFullScreen)
             {
-                ::OutputDebugStringA("フルスクリーン状態が解除れているため、もとに戻します\n");
+                Debug::Log("フルスクリーン状態が解除れているため、もとに戻します");
 
                 ComPtr<IDXGIAdapter> adapter;
                 ret = _dxgiFactory->EnumAdapters(0, &adapter);
                 if (FAILED(ret)) {
-                    ::OutputDebugStringA("アダプタが見つからない\n");
+                    Debug::LogError("アダプタが見つからない");
                     return;
                 }
                 ComPtr<IDXGIOutput> output;
                 ret = adapter->EnumOutputs(0, &output);
                 if (FAILED(ret)) {
-                    ::OutputDebugStringA("モニターが見つからない\n");
+                    Debug::LogError("モニターが見つからない");
                     return;
                 }
 
@@ -344,7 +345,7 @@ void MEngine::PresentFrame()
                 // フルスクリーンに戻す
                 ret = _swapchain->SetFullscreenState(true, output.Get());
                 if (FAILED(ret)) {
-                    ::OutputDebugStringA("フルスクリーン化に失敗\n");
+                    Debug::LogError("フルスクリーン化に失敗");
                     return;
                 }
 
@@ -355,8 +356,8 @@ void MEngine::PresentFrame()
                     closestMode.Format,
                     DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
                 if (FAILED(ret)){
-                    string error = "バッファのリサイズに失敗。" + to_string(ret) + "\n";
-                    ::OutputDebugStringA(error.c_str());
+                    string error = "バッファのリサイズに失敗。" + to_string(ret);
+                    Debug::LogError(error.c_str());
                     return;
                 }
 
@@ -376,8 +377,8 @@ void MEngine::PresentFrame()
                 }
 
                 string log = "Restored fullscreen: " + to_string(closestMode.Width) + "x" + to_string(closestMode.Height);
-                log += " @ " + to_string(closestMode.RefreshRate.Numerator) + "/" + to_string(closestMode.RefreshRate.Denominator) + "Hz\n";
-                ::OutputDebugStringA(log.c_str());
+                log += " @ " + to_string(closestMode.RefreshRate.Numerator) + "/" + to_string(closestMode.RefreshRate.Denominator) + "Hz";
+                Debug::Log(log.c_str());
             }
             else
             {
@@ -391,7 +392,7 @@ void MEngine::PresentFrame()
                     swapDesc.BufferDesc.Format,
                     swapDesc.Flags);
                 if (FAILED(ret)) {
-                    ::OutputDebugStringA("バッファのリサイズに失敗\n");
+                    Debug::LogError("バッファのリサイズに失敗");
                 }
 
                 // リソースを再初期化
@@ -409,21 +410,21 @@ void MEngine::PresentFrame()
                     rtvHandle.ptr += _rtvDescriptorSize;
                 }
 
-                ::OutputDebugStringA("スワップチェィンのモードでフルスクリーン状態を維持\n");
+                Debug::Log("スワップチェィンのモードでフルスクリーン状態を維持");
             }
 
             // 再試行
             ret = _swapchain->Present(1, 0);
             if (FAILED(ret))
             {
-                string error = "Presentをリトライしても失敗。" + to_string(ret) + "\n";
-                ::OutputDebugStringA(error.c_str());
+                string error = "Presentをリトライしても失敗。" + to_string(ret);
+                Debug::LogError(error.c_str());
             }
         }
         else
         {
-            string error = "予期せぬエラーでPresentに失敗。" + to_string(ret) + "\n";
-            ::OutputDebugStringA(error.c_str());
+            string error = "予期せぬエラーでPresentに失敗。" + to_string(ret);
+            Debug::LogError(error.c_str());
         }
     }
 }
@@ -457,7 +458,7 @@ MEngine::~MEngine()
         auto ret = _swapchain->SetFullscreenState(false, nullptr);
         if (FAILED(ret))
         {
-            ::OutputDebugStringA("アプリケーション終了時、ウィンドウモードへのスイッチに失敗");
+            Debug::LogError("アプリケーション終了時、ウィンドウモードへのスイッチに失敗");
         }
     }
 
@@ -637,21 +638,21 @@ void MEngine::ToggleFullScreen()
         ComPtr<IDXGIAdapter> adapter;
         ret = _dxgiFactory->EnumAdapters(0, &adapter);
         if (FAILED(ret)) {
-            ::OutputDebugStringA("アダプタが見つからない\n");
+            Debug::LogError("アダプタが見つからない");
             return;
         }
         ComPtr<IDXGIOutput> output;
         ret = adapter->EnumOutputs(0, &output);
         if (FAILED(ret)) {
-            ::OutputDebugStringA("モニターが見つからない\n");
+            Debug::LogError("モニターが見つからない");
             return;
         }
         DXGI_OUTPUT_DESC outputDesc = {};
         output->GetDesc(&outputDesc);
         UINT width = outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left;
         UINT height = outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top;
-        string op = "setting fullscreen to " + to_string(width) + "x" + to_string(height) + "\n";
-        OutputDebugStringA(op.c_str());
+        string op = "setting fullscreen to " + to_string(width) + "x" + to_string(height);
+        Debug::Log(op.c_str());
 
         // モニターのモードを取得
         DXGI_MODE_DESC modeDesc = {};
@@ -688,14 +689,14 @@ void MEngine::ToggleFullScreen()
             nullptr,
             (IDXGISwapChain1**)_swapchain.ReleaseAndGetAddressOf());
         if (FAILED(ret)) {
-            ::OutputDebugStringA("スワップチェィンの再作成に失敗\n");
+            Debug::LogError("スワップチェィンの再作成に失敗");
             return;
         }
 
         // フルスクリーン状態を設定
         ret = _swapchain->SetFullscreenState(true, output.Get());
         if (FAILED(ret)) {
-            ::OutputDebugStringA("フルスクリーン化に失敗\n");
+            Debug::LogError("フルスクリーン化に失敗");
             return;
         }
 
@@ -708,7 +709,7 @@ void MEngine::ToggleFullScreen()
             closestMode.Format,
             DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
         if (FAILED(ret)) {
-            ::OutputDebugStringA("スワップチェインのバッファリサイズに失敗\n");
+            Debug::LogError("スワップチェインのバッファリサイズに失敗");
             return;
         }
 
@@ -721,7 +722,7 @@ void MEngine::ToggleFullScreen()
         sw += "fullscreen resolution: ";
         sw += fullScreenDesc.Windowed ? "Windowed" : "FullScreen";
         sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
-        OutputDebugStringA(sw.c_str());
+        Debug::Log(sw.c_str());
 
         // 新しいバックバッファを取得してRTVを再生成
         _renderTargets.resize(FRAME_BUFFER_COUNT);
@@ -758,8 +759,8 @@ void MEngine::ToggleFullScreen()
         ShowWindow(_hwnd, SW_SHOW);
         UpdateWindow(_hwnd);
 
-        string ws = "フルスクリーンにスイッチ: " + to_string(width) + "x" + to_string(height) + "\n";
-        ::OutputDebugStringA(ws.c_str());
+        string ws = "フルスクリーンにスイッチ: " + to_string(width) + "x" + to_string(height);
+        Debug::Log(ws.c_str());
     }
     else
     {
@@ -779,7 +780,7 @@ void MEngine::ToggleFullScreen()
         auto ret = _swapchain->SetFullscreenState(false, nullptr);
         if (FAILED(ret))
         {
-            ::OutputDebugStringA("ウィンドウ化に失敗\n");
+            Debug::LogError("ウィンドウ化に失敗");
             return;
         }
 
@@ -795,7 +796,7 @@ void MEngine::ToggleFullScreen()
             DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
         if (FAILED(ret))
         {
-            ::OutputDebugStringA("スワップチェインのバッファリサイズに失敗\n");
+            Debug::LogError("スワップチェインのバッファリサイズに失敗");
             return;
         }
 
@@ -808,7 +809,7 @@ void MEngine::ToggleFullScreen()
         sw += "fullscreen resolution: ";
         sw += fullScreenDesc.Windowed ? "Windowed" : "FullScreen";
         sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
-        OutputDebugStringA(sw.c_str());
+        Debug::Log(sw.c_str());
 
         // RTVを再生成
         _renderTargets.resize(FRAME_BUFFER_COUNT);
@@ -843,7 +844,7 @@ void MEngine::ToggleFullScreen()
         ShowWindow(_hwnd, SW_SHOW);
         UpdateWindow(_hwnd);
 
-        string ws = "ウィンドウモードにスイッチ: " + to_string(width) + "x" + to_string(height) + "\n";
-        ::OutputDebugStringA(ws.c_str());
+        string ws = "ウィンドウモードにスイッチ: " + to_string(width) + "x" + to_string(height);
+        Debug::Log(ws.c_str());
     }
 }

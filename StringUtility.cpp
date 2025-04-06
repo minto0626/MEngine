@@ -8,14 +8,16 @@ std::wstring StringUtility::ToWideString(std::string_view utf8Str)
         return std::wstring();
     }
 
-    int size = MultiByteToWideChar(CP_UTF8, 0, utf8Str.data(), static_cast<int>(utf8Str.size()), nullptr, 0);
+    // ïœä∑å≥Ç™Shift-JISëOíÒÇ»Ç±Ç∆Ç…íçà”[CP_ACP]
+
+    int size = MultiByteToWideChar(CP_ACP, 0, utf8Str.data(), static_cast<int>(utf8Str.size()), nullptr, 0);
     if (size == 0)
     {
         return std::wstring();
     }
 
     std::wstring result(size, L'\0');
-    int converted = MultiByteToWideChar(CP_UTF8, 0, utf8Str.data(), static_cast<int>(utf8Str.size()), result.data(), size);
+    int converted = MultiByteToWideChar(CP_ACP, 0, utf8Str.data(), static_cast<int>(utf8Str.size()), result.data(), size);
     if (converted == 0)
     {
         return std::wstring();
