@@ -31,7 +31,6 @@ void Sprite::InitIndexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* co
 
 void Sprite::InitTexture(ID3D12Device* device, ID3D12Resource* texture)
 {
-    const char* texfilePath = "Assets/texture/free_ei.png";
     _texture.Init(device, texture);
 }
 
