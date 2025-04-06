@@ -366,3 +366,166 @@ public:
 		return XMVectorGetX(XMVector3Length(XMVectorSubtract(v1, v2)));
 	}
 };
+
+class Vector4
+{
+private:
+	XMFLOAT4 vec;
+
+public:
+	Vector4() : vec(0.0f, 0.0f, 0.0f, 0.0f) {}
+	Vector4(float x, float y, float z, float w) : vec(x, y, z, w) {}
+	explicit Vector4(const XMFLOAT4& v) : vec(v) {}
+
+	float GetX() const { return vec.x; }
+	float GetY() const { return vec.y; }
+	float GetZ() const { return vec.z; }
+	float GetW() const { return vec.w; }
+
+	void SetX(float x) { vec.x = x; }
+	void SetY(float y) { vec.y = y; }
+	void SetZ(float z) { vec.z = z; }
+	void SetW(float w) { vec.w = w; }
+
+	Vector4 operator +(const Vector4& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorAdd(v1, v2));
+		return Vector4(result);
+	}
+	Vector4 operator -(const Vector4& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorSubtract(v1, v2));
+		return Vector4(result);
+	}
+	Vector4 operator *(float scalar) const
+	{
+		XMVECTOR v = XMLoadFloat4(&vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorScale(v, scalar));
+		return Vector4(result);
+	}
+	Vector4 operator *(const Vector4& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorMultiply(v1, v2));
+		return Vector4(result);
+	}
+	Vector4 operator /(float scalar) const
+	{
+		if (scalar == 0.0f) {
+			Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します");
+			return Zero();
+		}
+		XMVECTOR v = XMLoadFloat4(&vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorScale(v, 1.0f / scalar));
+		return Vector4(result);
+	}
+	Vector4 operator /(const Vector4& other) const
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
+		if (XMVector4NotEqual(zeroCheck, XMVectorZero())) {
+			Debug::LogError("Vector4のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
+			return Zero();
+		}
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVectorDivide(v1, v2));
+		return Vector4(result);
+	}
+	Vector4& operator +=(const Vector4& other)
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMStoreFloat4(&vec, XMVectorAdd(v1, v2));
+		return *this;
+	}
+	Vector4& operator -=(const Vector4& other)
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMStoreFloat4(&vec, XMVectorSubtract(v1, v2));
+		return *this;
+	}
+	Vector4 operator *=(float scalar)
+	{
+		XMVECTOR v = XMLoadFloat4(&vec);
+		XMStoreFloat4(&vec, XMVectorScale(v, scalar));
+		return *this;
+	}
+	Vector4& operator *=(const Vector4& other)
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMStoreFloat4(&vec, XMVectorMultiply(v1, v2));
+		return *this;
+	}
+	Vector4& operator /(float scalar)
+	{
+		if (scalar == 0.0f) {
+			Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します");
+			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
+			return *this;
+		}
+		XMVECTOR v = XMLoadFloat4(&vec);
+		XMStoreFloat4(&vec, XMVectorScale(v, 1.0f / scalar));
+		return *this;
+	}
+	Vector4& operator /=(const Vector4& other)
+	{
+		XMVECTOR v1 = XMLoadFloat4(&vec);
+		XMVECTOR v2 = XMLoadFloat4(&other.vec);
+		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
+		if (XMVector4NotEqual(zeroCheck, XMVectorZero())) {
+			Debug::LogError("Vector4のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
+			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
+		}
+		else {
+			XMStoreFloat4(&vec, XMVectorDivide(v1, v2));
+		}
+		return *this;
+	}
+
+	float Length() const
+	{
+		XMVECTOR v = XMLoadFloat4(&vec);
+		return XMVectorGetX(XMVector4Length(v));
+	}
+	float LengthSquared() const {
+		XMVECTOR v = XMLoadFloat4(&vec);
+		return XMVectorGetX(XMVector4LengthSq(v));
+	}
+	Vector4 Normalized() const
+	{
+		XMVECTOR v = XMLoadFloat4(&vec);
+		XMFLOAT4 result;
+		XMStoreFloat4(&result, XMVector4Normalize(v));
+		return Vector4(result);
+	}
+
+	std::string ToString() const
+	{
+		std::stringstream ss;
+		ss << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")";
+		return ss.str();
+	}
+
+	XMVECTOR ToXMVECTOR() const
+	{
+		return XMLoadFloat4(&vec);
+	}
+
+public:
+public:
+	static Vector4 Zero() { return Vector4(0.0f, 0.0f, 0.0f, 0.0f); }
+
+};
