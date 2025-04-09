@@ -1,6 +1,8 @@
 #include "Transform.h"
 #include <sstream>
 
+using namespace DirectX;
+
 Transform::Transform() :
 	_pos(0.0f, 0.0f, 0.0f),
 	_rot(0.0f, 0.0f, 0.0f),

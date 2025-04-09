@@ -3,12 +3,10 @@
 #include <wrl.h>
 #include "d3dx12.h"
 
-using namespace Microsoft::WRL;
-
 class Shader
 {
 private:
-	ComPtr<ID3DBlob> _blob;
+	Microsoft::WRL::ComPtr<ID3DBlob> _blob;
 
 	void Load(const wchar_t* filePath, const char* entryPoint, const char* shaderModel);
 	bool CheckShaderCompileResult(HRESULT result, const wchar_t* filePath, ID3DBlob* errorBlob);

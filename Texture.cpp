@@ -1,6 +1,8 @@
 #include "Texture.h"
 #include <cassert>
 
+using namespace Microsoft::WRL;
+
 void Texture::Init(ID3D12Device* device, ComPtr<ID3D12Resource> texture)
 {
 	_texture = texture;

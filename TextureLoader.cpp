@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace DirectX;
+using namespace Microsoft::WRL;
 
 namespace
 {

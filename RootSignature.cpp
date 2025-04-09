@@ -3,6 +3,8 @@
 #include <cassert>
 #include "Debug.h"
 
+using namespace Microsoft::WRL;
+
 RootSignature::RootSignature()
 {
 	_ranges.clear();

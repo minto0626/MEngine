@@ -2,13 +2,11 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-using namespace Microsoft::WRL;
-
 class IndexBuffer
 {
 private:
-	ComPtr<ID3D12Resource> _indexBuffer;
-	ComPtr<ID3D12Resource> _uploadBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _indexBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _uploadBuffer;
 	D3D12_INDEX_BUFFER_VIEW _indexBufferView;
 	UINT _indexNum;
 	DXGI_FORMAT _format;
