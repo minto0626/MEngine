@@ -15,7 +15,7 @@ void Texture::Init(ID3D12Device* device, ComPtr<ID3D12Resource> texture)
 	auto result = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(_descHeap.ReleaseAndGetAddressOf()));
 	if (FAILED(result))
 	{
-		assert(0, "ƒq[ƒv‚Ìì¬‚É¸”s!");
+		assert(0 && "ƒq[ƒv‚Ìì¬‚É¸”s!");
 		return;
 	}
 
