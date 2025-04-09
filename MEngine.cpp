@@ -214,7 +214,7 @@ bool MEngine::CreateFinalRenderTarget()
     ret = _swapchain->GetDesc(&scDesc);
     _renderTargets.resize(scDesc.BufferCount);
     auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
-    for (int i = 0; i < scDesc.BufferCount; i++)
+    for (unsigned int i = 0; i < scDesc.BufferCount; i++)
     {
         ret = _swapchain->GetBuffer(i, IID_PPV_ARGS(_renderTargets[i].ReleaseAndGetAddressOf()));
         assert(SUCCEEDED(ret));

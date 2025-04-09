@@ -2,12 +2,10 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-using namespace Microsoft::WRL;
-
 class PipelineState
 {
 private:
-	ComPtr<ID3D12PipelineState> _pipelineState;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> _pipelineState;
 
 public:
 	void Init(

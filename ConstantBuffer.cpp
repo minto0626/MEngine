@@ -51,7 +51,7 @@ void ConstantBuffer::Init(ID3D12Device* device, UINT size)
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 	cbvDesc.BufferLocation = _buffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = _buffer->GetDesc().Width;
+	cbvDesc.SizeInBytes = _bufferSize;
 	device->CreateConstantBufferView(&cbvDesc, _descHeap->GetCPUDescriptorHandleForHeapStart());
 }
 

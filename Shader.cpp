@@ -75,7 +75,7 @@ void Shader::LoadCSO(const wchar_t* csoFilePath)
 	std::ifstream file(csoFilePath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
-		assert(0, "csoファイルの読み込みに失敗!");
+		assert(0 && "csoファイルの読み込みに失敗!");
 		return;
 	}
 
@@ -86,7 +86,7 @@ void Shader::LoadCSO(const wchar_t* csoFilePath)
 	auto result = D3DCreateBlob(fileSize, &_blob);
 	if (FAILED(result))
 	{
-		assert(0, "シェーダーオブジェクトの作成に失敗!");
+		assert(0 && "シェーダーオブジェクトの作成に失敗!");
 		return;
 	}
 

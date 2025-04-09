@@ -6,17 +6,15 @@
 #include <string>
 #include "Debug.h"
 
-using namespace DirectX;
-
 class Vector2
 {
 private:
-	XMFLOAT2 vec;
+	DirectX::XMFLOAT2 vec;
 
 public:
 	Vector2() : vec(0.0f, 0.0f) {}
 	Vector2(float x, float y) : vec(x, y) {}
-	explicit Vector2(const XMFLOAT2& v) : vec(v) {}
+	explicit Vector2(const DirectX::XMFLOAT2& v) : vec(v) {}
 
 	float GetX() const { return vec.x; }
 	float GetY() const { return vec.y; }
@@ -26,78 +24,78 @@ public:
 
 	Vector2 operator +(const Vector2& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorAdd(v1, v2));
 		return Vector2(ret);
 	}
 	Vector2 operator -(const Vector2& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorSubtract(v1, v2));
 		return Vector2(ret);
 	}
 	Vector2 operator *(float scalar) const
 	{
-		XMVECTOR v = XMLoadFloat2(&vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorScale(v, scalar));
 		return Vector2(ret);
 	}
 	Vector2 operator *(const Vector2& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorMultiply(v1, v2));
 		return Vector2(ret);
 	}
 	Vector2 operator /(float scalar) const
 	{
 		if (scalar == 0.0f) { Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
-		XMVECTOR v = XMLoadFloat2(&vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorScale(v, 1.0f / scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorScale(v, 1.0f / scalar));
 		return Vector2(ret);
 	}
 	Vector2 operator /(const Vector2& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector2NotEqual(zeroCheck, XMVectorZero())) { Debug::LogError("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVectorDivide(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector2NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorDivide(v1, v2));
 		return Vector2(ret);
 	}
 	Vector2 operator +=(const Vector2& other)
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMStoreFloat2(&vec, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMStoreFloat2(&vec, DirectX::XMVectorAdd(v1, v2));
 		return *this;
 	}
 	Vector2 operator -=(const Vector2& other)
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMStoreFloat2(&vec, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMStoreFloat2(&vec, DirectX::XMVectorSubtract(v1, v2));
 		return *this;
 	}
 	Vector2 operator *=(float scalar)
 	{
-		XMVECTOR v = XMLoadFloat2(&vec);
-		XMStoreFloat2(&vec, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMStoreFloat2(&vec, DirectX::XMVectorScale(v, scalar));
 		return *this;
 	}
 	Vector2 operator *=(const Vector2& other)
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMStoreFloat2(&vec, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMStoreFloat2(&vec, DirectX::XMVectorMultiply(v1, v2));
 		return *this;
 	}
 	Vector2 operator /=(float scalar)
@@ -107,48 +105,48 @@ public:
 			vec = {0.0f, 0.0f};
 		}
 		else {
-			XMVECTOR v = XMLoadFloat2(&vec);
-			XMStoreFloat2(&vec, XMVectorScale(v, 1.0f / scalar));
+			DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+			DirectX::XMStoreFloat2(&vec, DirectX::XMVectorScale(v, 1.0f / scalar));
 		}
 		return *this;
 	}
 	Vector2 operator /=(const Vector2& other)
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector2NotEqual(zeroCheck, XMVectorZero())) {
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector2NotEqual(zeroCheck, DirectX::XMVectorZero())) {
 			Debug::LogError("Vector2のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.0f, 0.0f};
 		}
 		else {
-			XMStoreFloat2(&vec, XMVectorDivide(v1, v2));
+			DirectX::XMStoreFloat2(&vec, DirectX::XMVectorDivide(v1, v2));
 		}
 		return *this;
 	}
 
 	float Length() const
 	{
-		XMVECTOR v = XMLoadFloat2(&vec);
-		return XMVectorGetX(XMVector2Length(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector2Length(v));
 	}
 	float LengthSquared() const
 	{
-		XMVECTOR v = XMLoadFloat2(&vec);
-		return XMVectorGetX(XMVector2LengthSq(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector2LengthSq(v));
 	}
 	Vector2 Normalized() const
 	{
-		XMVECTOR v = XMLoadFloat2(&vec);
-		XMFLOAT2 ret;
-		XMStoreFloat2(&ret, XMVector2Normalize(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMFLOAT2 ret;
+		DirectX::XMStoreFloat2(&ret, DirectX::XMVector2Normalize(v));
 		return Vector2(ret);
 	}
 	float Dot(const Vector2& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat2(&vec);
-		XMVECTOR v2 = XMLoadFloat2(&other.vec);
-		return XMVectorGetX(XMVector2Dot(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector2Dot(v1, v2));
 	}
 
 	std::string ToString() const
@@ -158,7 +156,7 @@ public:
 		return ss.str();
 	}
 
-	const XMFLOAT2& ToXMFLOAT2() const { return vec; }
+	const DirectX::XMFLOAT2& ToXMFLOAT2() const { return vec; }
 
 public:
 	static Vector2 Zero() { return Vector2(0.0f, 0.0f); }
@@ -168,12 +166,12 @@ public:
 class Vector3
 {
 private:
-	XMFLOAT3 vec;
+	DirectX::XMFLOAT3 vec;
 
 public:
 	Vector3() : vec(0.0f, 0.0f, 0.0f) {}
 	Vector3(float x, float y, float z) : vec(x, y, z) {}
-	explicit Vector3(const XMFLOAT3& v) : vec(v) {}
+	explicit Vector3(const DirectX::XMFLOAT3& v) : vec(v) {}
 
 	float GetX() const { return vec.x; }
 	float GetY() const { return vec.y; }
@@ -185,78 +183,78 @@ public:
 
 	Vector3 operator +(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorAdd(v1, v2));
 		return Vector3(ret);
 	}
 	Vector3 operator -(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorSubtract(v1, v2));
 		return Vector3(ret);
 	}
 	Vector3 operator *(const float scalar) const
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorScale(v, scalar));
 		return Vector3(ret);
 	}
 	Vector3 operator *(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorMultiply(v1, v2));
 		return Vector3(ret);
 	}
 	Vector3 operator /(const float scalar) const
 	{
 		if (scalar == 0.0f) { Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
-		XMVECTOR v = XMLoadFloat3(&vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorScale(v, 1.0f / scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorScale(v, 1.0f / scalar));
 		return Vector3(ret);
 	}
 	Vector3 operator /(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) { Debug::LogError("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVectorDivide(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector3NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します"); return Zero(); }
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorDivide(v1, v2));
 		return Vector3(ret);
 	}
 	Vector3 operator +=(const Vector3& other)
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMStoreFloat3(&vec, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMStoreFloat3(&vec, DirectX::XMVectorAdd(v1, v2));
 		return *this;
 	}
 	Vector3 operator -=(const Vector3& other)
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMStoreFloat3(&vec, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMStoreFloat3(&vec, DirectX::XMVectorSubtract(v1, v2));
 		return *this;
 	}
 	Vector3 operator *=(const float scalar)
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		XMStoreFloat3(&vec, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMStoreFloat3(&vec, DirectX::XMVectorScale(v, scalar));
 		return *this;
 	}
 	Vector3 operator *=(const Vector3& other)
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMStoreFloat3(&vec, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMStoreFloat3(&vec, DirectX::XMVectorMultiply(v1, v2));
 		return *this;
 	}
 	Vector3 operator /=(const float scalar)
@@ -266,61 +264,61 @@ public:
 			vec = {0.f, 0.0f, 0.0f};
 		}
 		else {
-			XMVECTOR v = XMLoadFloat3(&vec);
-			XMStoreFloat3(&vec, XMVectorScale(v, 1.0f / scalar));
+			DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+			DirectX::XMStoreFloat3(&vec, DirectX::XMVectorScale(v, 1.0f / scalar));
 		}
 		return *this;
 	}
 	Vector3 operator /=(const Vector3& other)
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector3NotEqual(zeroCheck, XMVectorZero())) {
+		DirectX::XMVECTOR v1 = XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = XMLoadFloat3(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector3NotEqual(zeroCheck, DirectX::XMVectorZero())) {
 			Debug::LogError("Vector3のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			vec = {0.0f, 0.0f, 0.0f };
 		}
 		else {
-			XMStoreFloat3(&vec, XMVectorDivide(v1, v2));
+			DirectX::XMStoreFloat3(&vec, DirectX::XMVectorDivide(v1, v2));
 		}
 		return *this;
 	}
 
 	float Length() const
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		return XMVectorGetX(XMVector3Length(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector3Length(v));
 	}
 	float LengthSquared() const
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		return XMVectorGetX(XMVector3LengthSq(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(v));
 	}
 	Vector3 Normalized() const
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVector3Normalize(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVector3Normalize(v));
 		return Vector3(ret);
 	}
 	void Normalize()
 	{
-		XMVECTOR v = XMLoadFloat3(&vec);
-		XMStoreFloat3(&vec, XMVector3Normalize(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMStoreFloat3(&vec, DirectX::XMVector3Normalize(v));
 	}
 
 	float Dot(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		return XMVectorGetX(XMVector3Dot(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector3Dot(v1, v2));
 	}
 	Vector3 Cross(const Vector3& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat3(&vec);
-		XMVECTOR v2 = XMLoadFloat3(&other.vec);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, XMVector3Cross(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, DirectX::XMVector3Cross(v1, v2));
 		return Vector3(ret);
 	}
 
@@ -331,15 +329,15 @@ public:
 		return ss.str();
 	}
 
-	XMVECTOR ToXMVECTOR() const
+	DirectX::XMVECTOR ToXMVECTOR() const
 	{
-		return XMLoadFloat3(&vec);
+		return DirectX::XMLoadFloat3(&vec);
 	}
-	Vector3 Transform(const XMMATRIX& matrix) const
+	Vector3 Transform(const DirectX::XMMATRIX& matrix) const
 	{
-		XMVECTOR transform = XMVector3Transform(XMLoadFloat3(&vec), matrix);
-		XMFLOAT3 ret;
-		XMStoreFloat3(&ret, transform);
+		DirectX::XMVECTOR transform = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&vec), matrix);
+		DirectX::XMFLOAT3 ret;
+		DirectX::XMStoreFloat3(&ret, transform);
 		return Vector3(ret);
 	}
 
@@ -361,21 +359,21 @@ public:
 
 	static float Distance(const Vector3& a, const Vector3& b)
 	{
-		XMVECTOR v1 = XMLoadFloat3(&a.vec);
-		XMVECTOR v2 = XMLoadFloat3(&b.vec);
-		return XMVectorGetX(XMVector3Length(XMVectorSubtract(v1, v2)));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&a.vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&b.vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(v1, v2)));
 	}
 };
 
 class Vector4
 {
 private:
-	XMFLOAT4 vec;
+	DirectX::XMFLOAT4 vec;
 
 public:
 	Vector4() : vec(0.0f, 0.0f, 0.0f, 0.0f) {}
 	Vector4(float x, float y, float z, float w) : vec(x, y, z, w) {}
-	explicit Vector4(const XMFLOAT4& v) : vec(v) {}
+	explicit Vector4(const DirectX::XMFLOAT4& v) : vec(v) {}
 
 	float GetX() const { return vec.x; }
 	float GetY() const { return vec.y; }
@@ -389,33 +387,33 @@ public:
 
 	Vector4 operator +(const Vector4& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorAdd(v1, v2));
 		return Vector4(result);
 	}
 	Vector4 operator -(const Vector4& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorSubtract(v1, v2));
 		return Vector4(result);
 	}
 	Vector4 operator *(float scalar) const
 	{
-		XMVECTOR v = XMLoadFloat4(&vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorScale(v, scalar));
 		return Vector4(result);
 	}
 	Vector4 operator *(const Vector4& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorMultiply(v1, v2));
 		return Vector4(result);
 	}
 	Vector4 operator /(float scalar) const
@@ -424,49 +422,49 @@ public:
 			Debug::LogError("0で除算しようとしました。大きさ0のベクトルを返します");
 			return Zero();
 		}
-		XMVECTOR v = XMLoadFloat4(&vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorScale(v, 1.0f / scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorScale(v, 1.0f / scalar));
 		return Vector4(result);
 	}
 	Vector4 operator /(const Vector4& other) const
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector4NotEqual(zeroCheck, XMVectorZero())) {
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector4NotEqual(zeroCheck, DirectX::XMVectorZero())) {
 			Debug::LogError("Vector4のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			return Zero();
 		}
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVectorDivide(v1, v2));
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVectorDivide(v1, v2));
 		return Vector4(result);
 	}
 	Vector4& operator +=(const Vector4& other)
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMStoreFloat4(&vec, XMVectorAdd(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMStoreFloat4(&vec, DirectX::XMVectorAdd(v1, v2));
 		return *this;
 	}
 	Vector4& operator -=(const Vector4& other)
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMStoreFloat4(&vec, XMVectorSubtract(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMStoreFloat4(&vec, DirectX::XMVectorSubtract(v1, v2));
 		return *this;
 	}
 	Vector4 operator *=(float scalar)
 	{
-		XMVECTOR v = XMLoadFloat4(&vec);
-		XMStoreFloat4(&vec, XMVectorScale(v, scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMStoreFloat4(&vec, DirectX::XMVectorScale(v, scalar));
 		return *this;
 	}
 	Vector4& operator *=(const Vector4& other)
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMStoreFloat4(&vec, XMVectorMultiply(v1, v2));
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMStoreFloat4(&vec, DirectX::XMVectorMultiply(v1, v2));
 		return *this;
 	}
 	Vector4& operator /(float scalar)
@@ -476,39 +474,39 @@ public:
 			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
 			return *this;
 		}
-		XMVECTOR v = XMLoadFloat4(&vec);
-		XMStoreFloat4(&vec, XMVectorScale(v, 1.0f / scalar));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMStoreFloat4(&vec, DirectX::XMVectorScale(v, 1.0f / scalar));
 		return *this;
 	}
 	Vector4& operator /=(const Vector4& other)
 	{
-		XMVECTOR v1 = XMLoadFloat4(&vec);
-		XMVECTOR v2 = XMLoadFloat4(&other.vec);
-		XMVECTOR zeroCheck = XMVectorEqual(v2, XMVectorZero());
-		if (XMVector4NotEqual(zeroCheck, XMVectorZero())) {
+		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
+		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
+		if (DirectX::XMVector4NotEqual(zeroCheck, DirectX::XMVectorZero())) {
 			Debug::LogError("Vector4のいずれかの要素で0除算しようとしました。大きさ0のベクトルを返します");
 			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
 		}
 		else {
-			XMStoreFloat4(&vec, XMVectorDivide(v1, v2));
+			DirectX::XMStoreFloat4(&vec, DirectX::XMVectorDivide(v1, v2));
 		}
 		return *this;
 	}
 
 	float Length() const
 	{
-		XMVECTOR v = XMLoadFloat4(&vec);
-		return XMVectorGetX(XMVector4Length(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector4Length(v));
 	}
 	float LengthSquared() const {
-		XMVECTOR v = XMLoadFloat4(&vec);
-		return XMVectorGetX(XMVector4LengthSq(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		return DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(v));
 	}
 	Vector4 Normalized() const
 	{
-		XMVECTOR v = XMLoadFloat4(&vec);
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMVector4Normalize(v));
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
+		DirectX::XMFLOAT4 result;
+		DirectX::XMStoreFloat4(&result, DirectX::XMVector4Normalize(v));
 		return Vector4(result);
 	}
 
@@ -519,9 +517,9 @@ public:
 		return ss.str();
 	}
 
-	XMVECTOR ToXMVECTOR() const
+	DirectX::XMVECTOR ToXMVECTOR() const
 	{
-		return XMLoadFloat4(&vec);
+		return DirectX::XMLoadFloat4(&vec);
 	}
 
 public:

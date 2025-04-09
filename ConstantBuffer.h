@@ -2,15 +2,13 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-using namespace Microsoft::WRL;
-
 class ConstantBuffer
 {
 private:
-	ComPtr<ID3D12Resource> _buffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> _buffer;
 	UINT _bufferSize;
 	void* _mappedData;
-	ComPtr<ID3D12DescriptorHeap> _descHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _descHeap;
 
 public:
 	~ConstantBuffer();
