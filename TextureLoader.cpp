@@ -12,7 +12,7 @@ namespace
 	// @return 拡張子
 	string GetExtension(const string& path)
 	{
-		int idx = path.rfind('.');
+		size_t idx = path.rfind('.');
 		return path.substr(idx + 1, path.length() - idx - 1);
 	}
 
@@ -101,9 +101,9 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 	D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		metadata.format,
 		metadata.width,
-		metadata.height,
-		metadata.arraySize,
-		metadata.mipLevels);
+		static_cast<UINT>(metadata.height),
+		static_cast<UINT16>(metadata.arraySize),
+		static_cast<UINT16>(metadata.mipLevels));
 
 	// バッファー作成
 	ID3D12Resource* texBuffer = nullptr;
@@ -123,8 +123,8 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 		0,
 		nullptr,			// 全領域コピー
 		image->pixels,		// 元データアドレス
-		image->rowPitch,	// １ラインサイズ
-		image->slicePitch);	// 全サイズ
+		static_cast<UINT>(image->rowPitch),	// １ラインサイズ
+		static_cast<UINT>(image->slicePitch));	// 全サイズ
 	if (FAILED(result))
 	{
 		return nullptr;
@@ -137,7 +137,7 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 ID3D12Resource* TextureLoader::CreateDefaultTexture(size_t width, size_t height)
 {
 	auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
-	auto resDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, height);
+	auto resDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, static_cast<UINT>(height));
 
 	ID3D12Resource* buffer = nullptr;
 	auto result = _device->CreateCommittedResource(
@@ -169,7 +169,7 @@ ID3D12Resource* TextureLoader::CreateWhiteTexture()
 		nullptr,
 		data.data(),
 		4 * 4,
-		data.size());
+		static_cast<UINT>(data.size()));
 
 	assert(SUCCEEDED(result));
 
@@ -188,7 +188,7 @@ ID3D12Resource* TextureLoader::CreateBlackTexture()
 		nullptr,
 		data.data(),
 		4 * 4,
-		data.size());
+		static_cast<UINT>(data.size()));
 
 	assert(SUCCEEDED(result));
 
@@ -215,7 +215,7 @@ ID3D12Resource* TextureLoader::CreateGrayGradationTexture()
 		nullptr,
 		data.data(),
 		4 * sizeof(unsigned int),
-		sizeof(unsigned int) * data.size());
+		sizeof(unsigned int) * static_cast<UINT>(data.size()));
 
 	assert(SUCCEEDED(result));
 
