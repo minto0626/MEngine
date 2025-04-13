@@ -1,4 +1,4 @@
-#include "SpriteRenderer.h"
+ï»¿#include "SpriteRenderer.h"
 #include "d3dx12.h"
 #include "Sprite.h"
 
@@ -12,8 +12,8 @@ void SpriteRenderer::InitRootSignature(ID3D12Device* device)
 
 void SpriteRenderer::InitPipelineState(ID3D12Device* device)
 {
-    _vertexShader.LoadVS(L"BasicVertexShader.hlsl", "vs");
-    _pixelShader.LoadPS(L"BasicPixelShader.hlsl", "ps");
+    _vertexShader.LoadVS(L"Assets/shader/BasicVertexShader.hlsl", "vs");
+    _pixelShader.LoadPS(L"Assets/shader/BasicPixelShader.hlsl", "ps");
 
     auto inputLayout = InputLayoutHelper::CreateInputLayout(
         {
@@ -29,12 +29,12 @@ void SpriteRenderer::InitPipelineState(ID3D12Device* device)
     pipelineStateDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
     pipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
     pipelineStateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    pipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // ƒJƒŠƒ“ƒO‚µ‚È‚¢
+    pipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // ã‚«ãƒªãƒ³ã‚°ã—ãªã„
     pipelineStateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    pipelineStateDesc.BlendState.AlphaToCoverageEnable = true;  // ƒAƒ‹ƒtƒ@ƒeƒXƒg‚·‚é
-    pipelineStateDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // ƒJƒbƒg‚È‚µ
-    pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // OŠpŒ`‚Å•`‰æ
-    pipelineStateDesc.NumRenderTargets = 1; // ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Íˆê‚Â
+    pipelineStateDesc.BlendState.AlphaToCoverageEnable = true;  // ã‚¢ãƒ«ãƒ•ã‚¡ãƒ†ã‚¹ãƒˆã™ã‚‹
+    pipelineStateDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // ã‚«ãƒƒãƒˆãªã—
+    pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // ä¸‰è§’å½¢ã§æç”»
+    pipelineStateDesc.NumRenderTargets = 1; // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¯ä¸€ã¤
     pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
     pipelineStateDesc.SampleDesc.Count = 1;
     pipelineStateDesc.SampleDesc.Quality = 0;

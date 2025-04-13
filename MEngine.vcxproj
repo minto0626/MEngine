@@ -70,6 +70,16 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)/include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)/include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -135,83 +145,79 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="GamePad.cpp" />
-    <ClCompile Include="IndexBuffer.cpp" />
-    <ClCompile Include="InputLayoutHelper.cpp" />
-    <ClCompile Include="InputSystem.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MEngine.cpp" />
-    <ClCompile Include="PipelineState.cpp" />
-    <ClCompile Include="RootSignature.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteRenderer.cpp" />
-    <ClCompile Include="StringUtility.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureLoader.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="d3dx12.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="GamePad.h" />
-    <ClInclude Include="IInputDevice.h" />
-    <ClInclude Include="IndexBuffer.h" />
-    <ClInclude Include="InputLayoutHelper.h" />
-    <ClInclude Include="InputSystem.h" />
-    <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Matrix.h" />
-    <ClInclude Include="MEngine.h" />
-    <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="RootSignature.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteRenderer.h" />
-    <ClInclude Include="StringUtility.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureLoader.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="Vector.h" />
-    <ClInclude Include="VertexBuffer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MEngine.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="icon\ME_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicPixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\ConstantBuffer.h" />
+    <ClInclude Include="include\d3dx12.h" />
+    <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\GamePad.h" />
+    <ClInclude Include="include\IInputDevice.h" />
+    <ClInclude Include="include\IndexBuffer.h" />
+    <ClInclude Include="include\InputLayoutHelper.h" />
+    <ClInclude Include="include\InputSystem.h" />
+    <ClInclude Include="include\Keyboard.h" />
+    <ClInclude Include="include\Matrix.h" />
+    <ClInclude Include="include\MEngine.h" />
+    <ClInclude Include="include\PipelineState.h" />
+    <ClInclude Include="include\resource.h" />
+    <ClInclude Include="include\RootSignature.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\Sprite.h" />
+    <ClInclude Include="include\SpriteRenderer.h" />
+    <ClInclude Include="include\StringUtility.h" />
+    <ClInclude Include="include\Texture.h" />
+    <ClInclude Include="include\TextureLoader.h" />
+    <ClInclude Include="include\Transform.h" />
+    <ClInclude Include="include\Vector.h" />
+    <ClInclude Include="include\VertexBuffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\ConstantBuffer.cpp" />
+    <ClCompile Include="src\Debug.cpp" />
+    <ClCompile Include="src\GamePad.cpp" />
+    <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\InputLayoutHelper.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\Keyboard.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MEngine.cpp" />
+    <ClCompile Include="src\PipelineState.cpp" />
+    <ClCompile Include="src\RootSignature.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Sprite.cpp" />
+    <ClCompile Include="src\SpriteRenderer.cpp" />
+    <ClCompile Include="src\StringUtility.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureLoader.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="include\MEngine.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\shader\BasicPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ps</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ps</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="BasicVertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    <FxCompile Include="Assets\shader\BasicVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BasicShaderHeader.hlsli" />
+    <None Include="Assets\shader\BasicShaderHeader.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
