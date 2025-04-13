@@ -138,8 +138,11 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="GamePad.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayoutHelper.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MEngine.cpp" />
     <ClCompile Include="PipelineState.cpp" />
@@ -158,8 +161,12 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="GamePad.h" />
+    <ClInclude Include="IInputDevice.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayoutHelper.h" />
+    <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MEngine.h" />
     <ClInclude Include="PipelineState.h" />

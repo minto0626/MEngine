@@ -1,4 +1,4 @@
-#include "Application.h"
+﻿#include "Application.h"
 #include "resource.h"
 
 const unsigned int window_width = 1280;
@@ -81,7 +81,7 @@ bool Application::Init(HINSTANCE& hInstance)
 	SIZE windowSize = { window_width, window_height };
 
 	_engine.reset(new MEngine());
-	if (!_engine->Init(hwnd, windowSize))
+	if (!_engine->Init(hwnd, hInstance, windowSize))
 	{
 		return false;
 	}

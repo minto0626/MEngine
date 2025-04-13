@@ -1,14 +1,16 @@
-#pragma once
+ï»¿#pragma once
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <vector>
 
-// ƒ|ƒŠƒSƒ“‚Ì•\¦ƒeƒXƒg
+// ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤ºãƒ†ã‚¹ãƒˆ
 #include "TextureLoader.h"
 #include "Sprite.h"
 #include "SpriteRenderer.h"
 //
+
+#include "InputSystem.h"
 
 class MEngine
 {
@@ -52,16 +54,18 @@ private:
 
 	void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 
-	// šƒ|ƒŠƒSƒ“‚Ì•\¦ƒeƒXƒgš
+	// â˜…ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤ºãƒ†ã‚¹ãƒˆâ˜…
 	TextureLoader texLoader;
 	Sprite sprite;
 	SpriteRenderer spriteRenderer;
 	//
 
+	InputSystem input;
+
 public:
 	~MEngine();
 
-	bool Init(HWND hwnd, SIZE& windowSize);
+	bool Init(HWND hwnd, HINSTANCE hInstance, SIZE& windowSize);
 	void Update();
 	void Draw();
 

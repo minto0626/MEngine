@@ -1,4 +1,4 @@
-#include "MEngine.h"
+ï»¿#include "MEngine.h"
 #include "d3dx12.h"
 #include <string>
 #include <assert.h>
@@ -38,7 +38,7 @@ IDXGIFactory6* MEngine::CreateDXGIFactory()
 
 bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
 {
-    // ƒrƒfƒIƒƒ‚ƒŠ‚Ì—Ê‚ªˆê”Ô‘½‚¢ƒAƒ_ƒvƒ^[‚ğ’T‚·
+    // ãƒ“ãƒ‡ã‚ªãƒ¡ãƒ¢ãƒªã®é‡ãŒä¸€ç•ªå¤šã„ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ã‚’æ¢ã™
     ComPtr<IDXGIAdapter> adapterTmp;
     ComPtr<IDXGIAdapter> useAdapter;
     SIZE_T maxVideoMemorySize = 0;
@@ -50,12 +50,12 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
 #if _DEBUG
         ostringstream oss;
         string gpuName = StringUtility::ToUTF8String(desc.Description);
-        oss << "ƒAƒ_ƒvƒ^[" << (i + 1) << " –¼‘O: " << gpuName << endl;
-        oss << "  »‘¢Œ³ID: " << desc.VendorId << endl;
-        oss << "  ƒfƒoƒCƒX‚Ì“Á’èID: " << desc.DeviceId << endl;
-        oss << "  ê—pVRAM: " << desc.DedicatedVideoMemory / (1024 * 1024) << " MB" << endl;
-        oss << "  ƒVƒXƒeƒ€ƒƒ‚ƒŠ‚Æ‚µ‚ÄŠ„‚è“–‚Ä‰Â”\‚Èƒƒ‚ƒŠ: " << desc.DedicatedSystemMemory / (1024 * 1024) << " MB" << endl;
-        oss << "  ‹¤—L‰Â”\‚ÈƒVƒXƒeƒ€ƒƒ‚ƒŠ: " << desc.SharedSystemMemory / (1024 * 1024) << " MB" << endl;
+        oss << "ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼" << (i + 1) << " åå‰: " << gpuName << endl;
+        oss << "  è£½é€ å…ƒID: " << desc.VendorId << endl;
+        oss << "  ãƒ‡ãƒã‚¤ã‚¹ã®ç‰¹å®šID: " << desc.DeviceId << endl;
+        oss << "  å°‚ç”¨VRAM: " << desc.DedicatedVideoMemory / (1024 * 1024) << " MB" << endl;
+        oss << "  ã‚·ã‚¹ãƒ†ãƒ ãƒ¡ãƒ¢ãƒªã¨ã—ã¦å‰²ã‚Šå½“ã¦å¯èƒ½ãªãƒ¡ãƒ¢ãƒª: " << desc.DedicatedSystemMemory / (1024 * 1024) << " MB" << endl;
+        oss << "  å…±æœ‰å¯èƒ½ãªã‚·ã‚¹ãƒ†ãƒ ãƒ¡ãƒ¢ãƒª: " << desc.SharedSystemMemory / (1024 * 1024) << " MB" << endl;
         Debug::Log(oss.str().c_str());
         oss.str("");
 
@@ -67,8 +67,8 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
             DXGI_OUTPUT_DESC opDesc = {};
             outputTmp->GetDesc(&opDesc);
 
-            oss << "ƒ‚ƒjƒ^[–¼: " << StringUtility::ToUTF8String(opDesc.DeviceName) << endl;
-            oss << "  ƒ‚ƒjƒ^[ƒTƒCƒY" << endl;
+            oss << "ãƒ¢ãƒ‹ã‚¿ãƒ¼å: " << StringUtility::ToUTF8String(opDesc.DeviceName) << endl;
+            oss << "  ãƒ¢ãƒ‹ã‚¿ãƒ¼ã‚µã‚¤ã‚º" << endl;
             oss << "   width: " << opDesc.DesktopCoordinates.right - opDesc.DesktopCoordinates.left << endl;
             oss << "   height: " << opDesc.DesktopCoordinates.bottom - opDesc.DesktopCoordinates.top << endl;
             Debug::Log(oss.str().c_str());
@@ -79,10 +79,10 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
             vector<DXGI_MODE_DESC> modeLists(numModes);
             outputTmp->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, modeLists.data());
 
-            oss << "  ƒTƒ|[ƒgƒ‚[ƒh " << numModes << "ŒÂ" << endl;
+            oss << "  ã‚µãƒãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰ " << numModes << "å€‹" << endl;
             for (const auto& mode : modeLists)
             {
-                // •ª”->®”‚É‹ß—
+                // åˆ†æ•°->æ•´æ•°ã«è¿‘ä¼¼
                 UINT refreshRate = (mode.RefreshRate.Numerator + mode.RefreshRate.Denominator - 1) / mode.RefreshRate.Denominator;
                 oss << "   " << mode.Width << "x" << mode.Height << " @ " << refreshRate << " Hz" << endl;
             }
@@ -98,7 +98,7 @@ bool MEngine::CreateDevice(IDXGIFactory6* dxgiFactory)
         }
     }
 
-    // ƒtƒB[ƒ`ƒƒ[ƒŒƒxƒ‹‚Ì‘I’è
+    // ãƒ•ã‚£ãƒ¼ãƒãƒ£ãƒ¼ãƒ¬ãƒ™ãƒ«ã®é¸å®š
     D3D_FEATURE_LEVEL levels[] =
     {
         D3D_FEATURE_LEVEL_12_1,
@@ -119,7 +119,7 @@ bool MEngine::CreateCommandList()
 {
     HRESULT ret;
 
-    // ƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚Ìì¬
+    // ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã®ä½œæˆ
     ret = _device->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         IID_PPV_ARGS(_commandAllocator.ReleaseAndGetAddressOf()));
@@ -127,7 +127,7 @@ bool MEngine::CreateCommandList()
     {
         return false;
     }
-    // ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬
+    // ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆ
     ret = _device->CreateCommandList(
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -144,10 +144,10 @@ bool MEngine::CreateCommandList()
 
 bool MEngine::CreateCommandQueue()
 {
-    // ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬
+    // ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆ
     D3D12_COMMAND_QUEUE_DESC desc = {};
-    desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE; // ƒ^ƒCƒ€ƒAƒEƒg–³‚µ
-    desc.NodeMask = 0;  // ƒAƒ_ƒvƒ^[‚P‚Â
+    desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE; // ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆç„¡ã—
+    desc.NodeMask = 0;  // ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ï¼‘ã¤
     desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
     desc.Type = _commandList.Get()->GetType();
 
@@ -164,7 +164,7 @@ bool MEngine::CreateCommandQueue()
 
 bool MEngine::CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFactory)
 {
-    // ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬
+    // ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆ
     DXGI_SWAP_CHAIN_DESC1 desc = {};
     desc.Width = windowSize.cx;
     desc.Height = windowSize.cy;
@@ -196,7 +196,7 @@ bool MEngine::CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFa
 
 bool MEngine::CreateFinalRenderTarget()
 {
-    // ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg—p‚Ìƒq[ƒv‚ğì¬
+    // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆç”¨ã®ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆ
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
     heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     heapDesc.NodeMask = 0;
@@ -209,7 +209,7 @@ bool MEngine::CreateFinalRenderTarget()
         return false;
     }
 
-    // ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìƒƒ‚ƒŠ‚Æ•R‚Ã‚¯‚é
+    // ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ãƒ¡ãƒ¢ãƒªã¨ç´ã¥ã‘ã‚‹
     DXGI_SWAP_CHAIN_DESC scDesc = {};
     ret = _swapchain->GetDesc(&scDesc);
     _renderTargets.resize(scDesc.BufferCount);
@@ -227,14 +227,14 @@ bool MEngine::CreateFinalRenderTarget()
 
 bool MEngine::CreateSynchronizationWithGPUObject()
 {
-    // ƒtƒFƒ“ƒX‚Ìì¬
+    // ãƒ•ã‚§ãƒ³ã‚¹ã®ä½œæˆ
     HRESULT ret = _device->CreateFence(_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(_fence.ReleaseAndGetAddressOf()));
     if (FAILED(ret))
     {
         return false;
     }
 
-    // GPU‚Æ“¯Šú‚ğæ‚é‚Æ‚«‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‹‚ğì¬
+    // GPUã¨åŒæœŸã‚’å–ã‚‹ã¨ãã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ«ã‚’ä½œæˆ
     _fenceEvent = CreateEvent(nullptr, false, false, nullptr);
     if (_fenceEvent == nullptr)
     {
@@ -247,7 +247,7 @@ void MEngine::BegineRender()
 {
     auto frameIndex = _swapchain->GetCurrentBackBufferIndex();
 
-    // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚Ì‰e‹¿‚ÅAƒoƒŠƒA‚ªŠù‚ÉƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgó‘Ô‚É‚È‚Á‚Ä‚¢‚é‰Â”\«‚ª‚ ‚é
+    // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å½±éŸ¿ã§ã€ãƒãƒªã‚¢ãŒæ—¢ã«ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆçŠ¶æ…‹ã«ãªã£ã¦ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹
     if (_renderTargetStates[frameIndex] != D3D12_RESOURCE_STATE_RENDER_TARGET)
     {
         ResourceBarrier(
@@ -257,7 +257,7 @@ void MEngine::BegineRender()
     }
     _renderTargetStates[frameIndex] = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-    // ƒrƒ…[ƒ|[ƒg‚ÆƒVƒU[ƒŒƒNƒg‚ğİ’è
+    // ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã¨ã‚·ã‚¶ãƒ¼ãƒ¬ã‚¯ãƒˆã‚’è¨­å®š
     auto viewport = CD3DX12_VIEWPORT(_renderTargets[frameIndex].Get());
     DXGI_SWAP_CHAIN_DESC1 desc = {};
     auto result = _swapchain->GetDesc1(&desc);
@@ -265,12 +265,12 @@ void MEngine::BegineRender()
     _commandList->RSSetViewports(1, &viewport);
     _commandList->RSSetScissorRects(1, &scissorRect);
 
-    // ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ìİ’è
+    // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è¨­å®š
     auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
     rtvHandle.ptr += frameIndex * _rtvDescriptorSize;
     _commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
 
-    // ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒNƒŠƒA
+    // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¯ãƒªã‚¢
     float cc[] = { .0f, .0f, 1.0f, 1.0f };
     _commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
 }
@@ -303,28 +303,28 @@ void MEngine::PresentFrame()
     auto ret = _swapchain->Present(1, 0);
     if (FAILED(ret))
     {
-        if (ret == DXGI_ERROR_INVALID_CALL) // ƒGƒ‰[#117
+        if (ret == DXGI_ERROR_INVALID_CALL) // ã‚¨ãƒ©ãƒ¼#117
         {
-            Debug::Log("Presentˆ—‚É¸”sB‰ñ•œ‚ğ‚İ‚Ü‚·...");
+            Debug::Log("Presentå‡¦ç†ã«å¤±æ•—ã€‚å›å¾©ã‚’è©¦ã¿ã¾ã™...");
 
-            // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚ÉƒAƒvƒŠƒP[ƒVƒ‡ƒ“ŠO•”‚©‚çƒEƒBƒ“ƒhƒE‰»‚³‚ê‚Ä‚µ‚Ü‚Á‚½ê‡i—á‚¦‚ÎƒXƒNƒVƒ‡‚ğB‚ë‚¤‚Æ‚µ‚½‚Æ‚«j‚É
-            // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚ğˆÛ‚·‚é‚æ‚¤‚É‚İ‚é
+            // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³æ™‚ã«ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å¤–éƒ¨ã‹ã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åŒ–ã•ã‚Œã¦ã—ã¾ã£ãŸå ´åˆï¼ˆä¾‹ãˆã°ã‚¹ã‚¯ã‚·ãƒ§ã‚’æ’®ã‚ã†ã¨ã—ãŸã¨ãï¼‰ã«
+            // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚’ç¶­æŒã™ã‚‹ã‚ˆã†ã«è©¦ã¿ã‚‹
             BOOL isFullScreen;
             _swapchain->GetFullscreenState(&isFullScreen, nullptr);
             if (!isFullScreen)
             {
-                Debug::Log("ƒtƒ‹ƒXƒNƒŠ[ƒ“ó‘Ô‚ª‰ğœ‚ê‚Ä‚¢‚é‚½‚ßA‚à‚Æ‚É–ß‚µ‚Ü‚·");
+                Debug::Log("ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³çŠ¶æ…‹ãŒè§£é™¤ã‚Œã¦ã„ã‚‹ãŸã‚ã€ã‚‚ã¨ã«æˆ»ã—ã¾ã™");
 
                 ComPtr<IDXGIAdapter> adapter;
                 ret = _dxgiFactory->EnumAdapters(0, &adapter);
                 if (FAILED(ret)) {
-                    Debug::LogError("ƒAƒ_ƒvƒ^‚ªŒ©‚Â‚©‚ç‚È‚¢");
+                    Debug::LogError("ã‚¢ãƒ€ãƒ—ã‚¿ãŒè¦‹ã¤ã‹ã‚‰ãªã„");
                     return;
                 }
                 ComPtr<IDXGIOutput> output;
                 ret = adapter->EnumOutputs(0, &output);
                 if (FAILED(ret)) {
-                    Debug::LogError("ƒ‚ƒjƒ^[‚ªŒ©‚Â‚©‚ç‚È‚¢");
+                    Debug::LogError("ãƒ¢ãƒ‹ã‚¿ãƒ¼ãŒè¦‹ã¤ã‹ã‚‰ãªã„");
                     return;
                 }
 
@@ -342,10 +342,10 @@ void MEngine::PresentFrame()
                 DXGI_MODE_DESC closestMode;
                 output->FindClosestMatchingMode(&modeDesc, &closestMode, nullptr);
 
-                // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚É–ß‚·
+                // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«æˆ»ã™
                 ret = _swapchain->SetFullscreenState(true, output.Get());
                 if (FAILED(ret)) {
-                    Debug::LogError("ƒtƒ‹ƒXƒNƒŠ[ƒ“‰»‚É¸”s");
+                    Debug::LogError("ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åŒ–ã«å¤±æ•—");
                     return;
                 }
 
@@ -356,12 +356,12 @@ void MEngine::PresentFrame()
                     closestMode.Format,
                     DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
                 if (FAILED(ret)){
-                    string error = "ƒoƒbƒtƒ@‚ÌƒŠƒTƒCƒY‚É¸”sB" + to_string(ret);
+                    string error = "ãƒãƒƒãƒ•ã‚¡ã®ãƒªã‚µã‚¤ã‚ºã«å¤±æ•—ã€‚" + to_string(ret);
                     Debug::LogError(error.c_str());
                     return;
                 }
 
-                // ƒŠƒ\[ƒX‚ğÄ‰Šú‰»
+                // ãƒªã‚½ãƒ¼ã‚¹ã‚’å†åˆæœŸåŒ–
                 for (auto& buffer : _renderTargets)
                 {
                     buffer.Reset();
@@ -382,7 +382,7 @@ void MEngine::PresentFrame()
             }
             else
             {
-                // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚È‚Ì‚ÉƒGƒ‰[‚È‚çA’Pƒ‚ÈƒŠƒTƒCƒY
+                // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãªã®ã«ã‚¨ãƒ©ãƒ¼ãªã‚‰ã€å˜ç´”ãªãƒªã‚µã‚¤ã‚º
                 DXGI_SWAP_CHAIN_DESC swapDesc;
                 _swapchain->GetDesc(&swapDesc);
                 ret = _swapchain->ResizeBuffers(
@@ -392,10 +392,10 @@ void MEngine::PresentFrame()
                     swapDesc.BufferDesc.Format,
                     swapDesc.Flags);
                 if (FAILED(ret)) {
-                    Debug::LogError("ƒoƒbƒtƒ@‚ÌƒŠƒTƒCƒY‚É¸”s");
+                    Debug::LogError("ãƒãƒƒãƒ•ã‚¡ã®ãƒªã‚µã‚¤ã‚ºã«å¤±æ•—");
                 }
 
-                // ƒŠƒ\[ƒX‚ğÄ‰Šú‰»
+                // ãƒªã‚½ãƒ¼ã‚¹ã‚’å†åˆæœŸåŒ–
                 for (auto& buffer : _renderTargets)
                 {
                     buffer.Reset();
@@ -410,20 +410,20 @@ void MEngine::PresentFrame()
                     rtvHandle.ptr += _rtvDescriptorSize;
                 }
 
-                Debug::Log("ƒXƒƒbƒvƒ`ƒFƒBƒ“‚Ìƒ‚[ƒh‚Åƒtƒ‹ƒXƒNƒŠ[ƒ“ó‘Ô‚ğˆÛ");
+                Debug::Log("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚£ãƒ³ã®ãƒ¢ãƒ¼ãƒ‰ã§ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³çŠ¶æ…‹ã‚’ç¶­æŒ");
             }
 
-            // Äs
+            // å†è©¦è¡Œ
             ret = _swapchain->Present(1, 0);
             if (FAILED(ret))
             {
-                string error = "Present‚ğƒŠƒgƒ‰ƒC‚µ‚Ä‚à¸”sB" + to_string(ret);
+                string error = "Presentã‚’ãƒªãƒˆãƒ©ã‚¤ã—ã¦ã‚‚å¤±æ•—ã€‚" + to_string(ret);
                 Debug::LogError(error.c_str());
             }
         }
         else
         {
-            string error = "—\Šú‚¹‚ÊƒGƒ‰[‚ÅPresent‚É¸”sB" + to_string(ret);
+            string error = "äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ã§Presentã«å¤±æ•—ã€‚" + to_string(ret);
             Debug::LogError(error.c_str());
         }
     }
@@ -450,7 +450,7 @@ MEngine::~MEngine()
 {
     WaitDraw();
 
-    // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹‚ÉAƒtƒ‹ƒXƒNƒŠ[ƒ“ó‘Ô‚È‚çƒEƒBƒ“ƒhƒE‚É‚µ‚Ä‚©‚çƒXƒƒbƒvƒ`ƒFƒBƒ“‚ğ‰ğ•ú‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢
+    // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã«ã€ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³çŠ¶æ…‹ãªã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ã—ã¦ã‹ã‚‰ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚£ãƒ³ã‚’è§£æ”¾ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„
     BOOL isFullScreen;
     _swapchain->GetFullscreenState(&isFullScreen, nullptr);
     if (isFullScreen)
@@ -458,7 +458,7 @@ MEngine::~MEngine()
         auto ret = _swapchain->SetFullscreenState(false, nullptr);
         if (FAILED(ret))
         {
-            Debug::LogError("ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹AƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Ö‚ÌƒXƒCƒbƒ`‚É¸”s");
+            Debug::LogError("ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã¸ã®ã‚¹ã‚¤ãƒƒãƒã«å¤±æ•—");
         }
     }
 
@@ -466,11 +466,11 @@ MEngine::~MEngine()
     CoUninitialize();
 }
 
-bool MEngine::Init(HWND hwnd, SIZE& windowSize)
+bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 {
     _hwnd = hwnd;
 
-    // Windows‚ÌƒXƒP[ƒŠƒ“ƒOİ’è‚ğ–³Œø
+    // Windowsã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°è¨­å®šã‚’ç„¡åŠ¹
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE);
 
     HRESULT ret = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -482,56 +482,72 @@ bool MEngine::Init(HWND hwnd, SIZE& windowSize)
     auto dxgiFactory = CreateDXGIFactory();
     if (!CreateDevice(dxgiFactory))
     {
-        assert("ƒfƒoƒCƒX‚Ìì¬‚É¸”sI");
+        assert("ãƒ‡ãƒã‚¤ã‚¹ã®ä½œæˆã«å¤±æ•—ï¼");
         return false;
     }
-    // RTV—pƒq[ƒv‚ÌƒTƒCƒY‚ğæ“¾
+    // RTVç”¨ãƒ’ãƒ¼ãƒ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
     _rtvDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
     if (!CreateCommandList())
     {
-        assert("ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬‚É¸”sI");
+        assert("ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆã«å¤±æ•—ï¼");
         return false;
     }
     if (!CreateCommandQueue())
     {
-        assert("ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬‚É¸”s!");
+        assert("ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆã«å¤±æ•—!");
         return false;
     }
     if (!CreateSwapchain(hwnd, windowSize, dxgiFactory))
     {
-        assert("ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬‚É¸”sI");
+        assert("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆã«å¤±æ•—ï¼");
         return false;
     }
     if (!CreateFinalRenderTarget())
     {
-        assert("ÅI“I‚È•`‰ææ‚Ìì¬‚É¸”sI");
+        assert("æœ€çµ‚çš„ãªæç”»å…ˆã®ä½œæˆã«å¤±æ•—ï¼");
         return false;
     }
     if (!CreateSynchronizationWithGPUObject())
     {
-        assert("ƒtƒFƒ“ƒX‚Ìì¬‚É¸”sI");
+        assert("ãƒ•ã‚§ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ï¼");
         return false;
     }
 
     //ToggleFullScreen();
     //ToggleFullScreen();
 
-    // šƒ|ƒŠƒSƒ“‚Ì•\¦ƒeƒXƒgš
+    // â˜…ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤ºãƒ†ã‚¹ãƒˆâ˜…
     texLoader.Init(_device.Get());
     const char* texfilePath = "Assets/texture/free_ei.png";
     sprite.Init(_device.Get(), _commandList.Get(), texLoader.GetTextureByPath(texfilePath).Get());
     spriteRenderer.Init(_device.Get());
     //
 
+    input.Init(hInstancce, hwnd);
+
     return true;
 }
 
 void MEngine::Update()
 {
-    // šƒ|ƒŠƒSƒ“‚Ì•\¦ƒeƒXƒgš
+    input.Update();
+
+    // deviceType 0:keyboard, 1:gamepad
+    //if (!input.IsButtonDown(0, DIK_D)) { return; }
+    //if (!input.IsButtonDown(1, 0)) { return; }  // [ps4] 0:â–¡, 1:x, 2:o, 3:â–³,
+    //if (!(std::abs(input.GetAxis(1, 0)) > 0.1f)) { return; }  // [ps4] 0:LX, 1:LY, 2:RX, 3:RY
+    //if (!(input.GetAxis(1, 5) > 0.1f)) { return; }    // [ps4] 4:L2, 5:R2 ã†ã¾ãã„ã‹ãªã„
+
+    Vector2 move = { input.GetAxis(1, 0), -input.GetAxis(1, 1) };
+    if (std::abs(move.GetX()) < 0.3f && std::abs(move.GetY()) < 0.3f) { return; }
+
+    // â˜…ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤ºãƒ†ã‚¹ãƒˆâ˜…
+    const float FPS = 30.0f;
+    const float speed = 0.1f;
     auto pos = sprite.Transform()->GetPos();
-    pos.SetX(pos.GetX() + (1.0f / 30.0f) * 0.1f);
+    pos.SetX(pos.GetX() + (move.GetX() / FPS) * speed);
+    pos.SetY(pos.GetY() + (move.GetY() / FPS) * speed);
     sprite.Transform()->SetPos(pos);
     sprite.Update();
     //
@@ -541,7 +557,7 @@ void MEngine::Draw()
 {
     BegineRender();
 
-    // šƒ|ƒŠƒSƒ“‚Ì•\¦ƒeƒXƒgš
+    // â˜…ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤ºãƒ†ã‚¹ãƒˆâ˜…
     spriteRenderer.Render(_commandList.Get());
     sprite.Draw(_commandList.Get());
     //
@@ -557,12 +573,12 @@ void MEngine::ToggleFullScreen()
     if (!isFullScreen)
     {
         HRESULT ret;
-        // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚ÉØ‚è‘Ö‚¦‚é
+        // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«åˆ‡ã‚Šæ›¿ãˆã‚‹
 
-        // GPU‚ªŒ»İ‚Ìƒoƒbƒtƒ@g—p‚ğI‚¦‚é‚Ì‚ğ‘Ò‚Â
+        // GPUãŒç¾åœ¨ã®ãƒãƒƒãƒ•ã‚¡ä½¿ç”¨ã‚’çµ‚ãˆã‚‹ã®ã‚’å¾…ã¤
         WaitDraw();
 
-        // ƒoƒbƒNƒoƒbƒtƒ@‚ÌQÆ‚ğ‰ğ•ú
+        // ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã®å‚ç…§ã‚’è§£æ”¾
         for (auto& buffer : _renderTargets)
         {
             buffer.Reset();
@@ -573,13 +589,13 @@ void MEngine::ToggleFullScreen()
         ComPtr<IDXGIAdapter> adapter;
         ret = _dxgiFactory->EnumAdapters(0, &adapter);
         if (FAILED(ret)) {
-            Debug::LogError("ƒAƒ_ƒvƒ^‚ªŒ©‚Â‚©‚ç‚È‚¢");
+            Debug::LogError("ã‚¢ãƒ€ãƒ—ã‚¿ãŒè¦‹ã¤ã‹ã‚‰ãªã„");
             return;
         }
         ComPtr<IDXGIOutput> output;
         ret = adapter->EnumOutputs(0, &output);
         if (FAILED(ret)) {
-            Debug::LogError("ƒ‚ƒjƒ^[‚ªŒ©‚Â‚©‚ç‚È‚¢");
+            Debug::LogError("ãƒ¢ãƒ‹ã‚¿ãƒ¼ãŒè¦‹ã¤ã‹ã‚‰ãªã„");
             return;
         }
         DXGI_OUTPUT_DESC outputDesc = {};
@@ -589,18 +605,18 @@ void MEngine::ToggleFullScreen()
         string op = "setting fullscreen to " + to_string(width) + "x" + to_string(height);
         Debug::Log(op.c_str());
 
-        // ƒ‚ƒjƒ^[‚Ìƒ‚[ƒh‚ğæ“¾
+        // ãƒ¢ãƒ‹ã‚¿ãƒ¼ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—
         DXGI_MODE_DESC modeDesc = {};
         modeDesc.Width = width;
         modeDesc.Height = height;
-        modeDesc.RefreshRate.Numerator = 144;   // ƒ‚ƒjƒ^[‚ª‘Î‰‚µ‚Ä‚¢‚éÅ‚ƒŠƒtƒŒƒbƒVƒ…ƒŒ[ƒg
+        modeDesc.RefreshRate.Numerator = 144;   // ãƒ¢ãƒ‹ã‚¿ãƒ¼ãŒå¯¾å¿œã—ã¦ã„ã‚‹æœ€é«˜ãƒªãƒ•ãƒ¬ãƒƒã‚·ãƒ¥ãƒ¬ãƒ¼ãƒˆ
         modeDesc.RefreshRate.Denominator = 1;
         modeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        // ƒ‚ƒjƒ^[‚ªƒTƒ|[ƒg‚·‚éƒ‚[ƒh‚É’²®
+        // ãƒ¢ãƒ‹ã‚¿ãƒ¼ãŒã‚µãƒãƒ¼ãƒˆã™ã‚‹ãƒ¢ãƒ¼ãƒ‰ã«èª¿æ•´
         DXGI_MODE_DESC closestMode;
         output->FindClosestMatchingMode(&modeDesc, &closestMode, nullptr);
 
-        // ƒXƒƒbƒvƒ`ƒFƒBƒ“Äì¬
+        // ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚£ãƒ³å†ä½œæˆ
         DXGI_SWAP_CHAIN_DESC1 scDesc = {};
         scDesc.Width = closestMode.Width;
         scDesc.Height = closestMode.Height;
@@ -611,7 +627,7 @@ void MEngine::ToggleFullScreen()
         scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-        // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚É‘Î‰
+        // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«å¯¾å¿œ
         DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc{};
         fsDesc.RefreshRate.Numerator = closestMode.RefreshRate.Numerator;
         fsDesc.RefreshRate.Denominator = closestMode.RefreshRate.Denominator;
@@ -624,19 +640,19 @@ void MEngine::ToggleFullScreen()
             nullptr,
             (IDXGISwapChain1**)_swapchain.ReleaseAndGetAddressOf());
         if (FAILED(ret)) {
-            Debug::LogError("ƒXƒƒbƒvƒ`ƒFƒBƒ“‚ÌÄì¬‚É¸”s");
+            Debug::LogError("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚£ãƒ³ã®å†ä½œæˆã«å¤±æ•—");
             return;
         }
 
-        // ƒtƒ‹ƒXƒNƒŠ[ƒ“ó‘Ô‚ğİ’è
+        // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³çŠ¶æ…‹ã‚’è¨­å®š
         ret = _swapchain->SetFullscreenState(true, output.Get());
         if (FAILED(ret)) {
-            Debug::LogError("ƒtƒ‹ƒXƒNƒŠ[ƒ“‰»‚É¸”s");
+            Debug::LogError("ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åŒ–ã«å¤±æ•—");
             return;
         }
 
-        // ƒtƒ‹ƒXƒNƒŠ[ƒ“‚Ì‰ğ‘œ“x‚É‡‚í‚¹‚ÄAƒoƒbƒtƒ@‚ğƒŠƒTƒCƒY
-        // memo: ƒtƒŠƒbƒvƒ‚ƒfƒ‹iDXGI_SWAP_EFFECT_FLIP_DISCARDj‚Ì—vŒ‚ğ–‚½‚·‚½‚ßAƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦Œã‚Éƒoƒbƒtƒ@‚ğXV‚·‚é•K—v‚ª‚ ‚é
+        // ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®è§£åƒåº¦ã«åˆã‚ã›ã¦ã€ãƒãƒƒãƒ•ã‚¡ã‚’ãƒªã‚µã‚¤ã‚º
+        // memo: ãƒ•ãƒªãƒƒãƒ—ãƒ¢ãƒ‡ãƒ«ï¼ˆDXGI_SWAP_EFFECT_FLIP_DISCARDï¼‰ã®è¦ä»¶ã‚’æº€ãŸã™ãŸã‚ã€ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆå¾Œã«ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
         ret = _swapchain->ResizeBuffers(
             FRAME_BUFFER_COUNT,
             closestMode.Width,
@@ -644,7 +660,7 @@ void MEngine::ToggleFullScreen()
             closestMode.Format,
             DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
         if (FAILED(ret)) {
-            Debug::LogError("ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìƒoƒbƒtƒ@ƒŠƒTƒCƒY‚É¸”s");
+            Debug::LogError("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ãƒãƒƒãƒ•ã‚¡ãƒªã‚µã‚¤ã‚ºã«å¤±æ•—");
             return;
         }
 
@@ -659,7 +675,7 @@ void MEngine::ToggleFullScreen()
         sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
         Debug::Log(sw.c_str());
 
-        // V‚µ‚¢ƒoƒbƒNƒoƒbƒtƒ@‚ğæ“¾‚µ‚ÄRTV‚ğÄ¶¬
+        // æ–°ã—ã„ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã—ã¦RTVã‚’å†ç”Ÿæˆ
         _renderTargets.resize(FRAME_BUFFER_COUNT);
         auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
         for (int i = 0; i <_renderTargets.size(); i++)
@@ -669,9 +685,9 @@ void MEngine::ToggleFullScreen()
             rtvHandle.ptr += _rtvDescriptorSize;
         }
 
-        // ƒŠƒ\[ƒX‚Ìó‘Ô‚ğ‘JˆÚ
-        // ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğ•Â‚¶‚Ü‚·B‚±‚ê‚ğ‚µ‚È‚¢‚ÆƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚ÌƒŠƒZƒbƒg‚Å¸”s‚µ‚Ü‚·
-        // (‚¨‚»‚ç‚­ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğì¬‚µ‚½AƒfƒtƒHƒ‹ƒg‚ÅƒI[ƒvƒ“ó‘Ô‚É‚È‚Á‚Ä‚¢‚é‚©‚ç‚¾‚Æv‚í‚ê‚é)
+        // ãƒªã‚½ãƒ¼ã‚¹ã®çŠ¶æ…‹ã‚’é·ç§»
+        // ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’é–‰ã˜ã¾ã™ã€‚ã“ã‚Œã‚’ã—ãªã„ã¨ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã®ãƒªã‚»ãƒƒãƒˆã§å¤±æ•—ã—ã¾ã™
+        // (ãŠãã‚‰ãã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’ä½œæˆã—ãŸæ™‚ã€ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ã‚ªãƒ¼ãƒ—ãƒ³çŠ¶æ…‹ã«ãªã£ã¦ã„ã‚‹ã‹ã‚‰ã ã¨æ€ã‚ã‚Œã‚‹)
         _commandList->Close();
         _commandAllocator->Reset();
         _commandList->Reset(_commandAllocator.Get(), nullptr);
@@ -688,39 +704,39 @@ void MEngine::ToggleFullScreen()
         _commandAllocator->Reset();
         _commandList->Reset(_commandAllocator.Get(), nullptr);
 
-        // ƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹‚ğ’²®iƒ{[ƒ_[”ñ•\¦j
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã‚’èª¿æ•´ï¼ˆãƒœãƒ¼ãƒ€ãƒ¼éè¡¨ç¤ºï¼‰
         SetWindowLong(_hwnd, GWL_STYLE, WS_POPUP);
         SetWindowPos(_hwnd, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
         ShowWindow(_hwnd, SW_SHOW);
         UpdateWindow(_hwnd);
 
-        string ws = "ƒtƒ‹ƒXƒNƒŠ[ƒ“‚ÉƒXƒCƒbƒ`: " + to_string(width) + "x" + to_string(height);
+        string ws = "ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«ã‚¹ã‚¤ãƒƒãƒ: " + to_string(width) + "x" + to_string(height);
         Debug::Log(ws.c_str());
     }
     else
     {
-        // ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚É–ß‚·
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã«æˆ»ã™
 
-        // GPU‚Ìˆ—‘Ò‹@
+        // GPUã®å‡¦ç†å¾…æ©Ÿ
         WaitDraw();
 
-        // ƒoƒbƒNƒoƒbƒtƒ@‰ğ•ú
+        // ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡è§£æ”¾
         for (auto& buffer : _renderTargets)
         {
             buffer.Reset();
         }
         _renderTargets.clear();
 
-        // ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚É–ß‚·
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã«æˆ»ã™
         auto ret = _swapchain->SetFullscreenState(false, nullptr);
         if (FAILED(ret))
         {
-            Debug::LogError("ƒEƒBƒ“ƒhƒE‰»‚É¸”s");
+            Debug::LogError("ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åŒ–ã«å¤±æ•—");
             return;
         }
 
-        // ƒoƒbƒtƒ@‚ğƒEƒBƒ“ƒhƒEƒTƒCƒY‚ÉƒŠƒTƒCƒY
-        // memo: ƒtƒŠƒbƒvƒ‚ƒfƒ‹iDXGI_SWAP_EFFECT_FLIP_DISCARDj‚Ì—vŒ‚ğ–‚½‚·‚½‚ßAƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦Œã‚Éƒoƒbƒtƒ@‚ğXV‚·‚é•K—v‚ª‚ ‚é
+        // ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã«ãƒªã‚µã‚¤ã‚º
+        // memo: ãƒ•ãƒªãƒƒãƒ—ãƒ¢ãƒ‡ãƒ«ï¼ˆDXGI_SWAP_EFFECT_FLIP_DISCARDï¼‰ã®è¦ä»¶ã‚’æº€ãŸã™ãŸã‚ã€ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆå¾Œã«ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
         UINT width = 1280;
         UINT height = 720;
         ret = _swapchain->ResizeBuffers(
@@ -731,7 +747,7 @@ void MEngine::ToggleFullScreen()
             DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
         if (FAILED(ret))
         {
-            Debug::LogError("ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìƒoƒbƒtƒ@ƒŠƒTƒCƒY‚É¸”s");
+            Debug::LogError("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ãƒãƒƒãƒ•ã‚¡ãƒªã‚µã‚¤ã‚ºã«å¤±æ•—");
             return;
         }
 
@@ -746,7 +762,7 @@ void MEngine::ToggleFullScreen()
         sw += " @ " + to_string(fullScreenDesc.RefreshRate.Numerator) + "/" + to_string(fullScreenDesc.RefreshRate.Denominator) + "Hz\n";
         Debug::Log(sw.c_str());
 
-        // RTV‚ğÄ¶¬
+        // RTVã‚’å†ç”Ÿæˆ
         _renderTargets.resize(FRAME_BUFFER_COUNT);
         auto rtvHandle = _rtvHeap->GetCPUDescriptorHandleForHeapStart();
         for (int i = 0; i < _renderTargets.size(); i++)
@@ -756,7 +772,7 @@ void MEngine::ToggleFullScreen()
             rtvHandle.ptr += _rtvDescriptorSize;
         }
 
-        // ƒŠƒ\[ƒX‚Ìó‘Ô‚ğ‘JˆÚ
+        // ãƒªã‚½ãƒ¼ã‚¹ã®çŠ¶æ…‹ã‚’é·ç§»
         _commandList->Close();
         _commandAllocator->Reset();
         _commandList->Reset(_commandAllocator.Get(), nullptr);
@@ -773,13 +789,13 @@ void MEngine::ToggleFullScreen()
         _commandAllocator->Reset();
         _commandList->Reset(_commandAllocator.Get(), nullptr);
 
-        // ƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹‚ğŒ³‚É–ß‚·
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã‚’å…ƒã«æˆ»ã™
         SetWindowLong(_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
         SetWindowPos(_hwnd, HWND_TOP, 200, 200, width, height, SWP_FRAMECHANGED);
         ShowWindow(_hwnd, SW_SHOW);
         UpdateWindow(_hwnd);
 
-        string ws = "ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚ÉƒXƒCƒbƒ`: " + to_string(width) + "x" + to_string(height);
+        string ws = "ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã«ã‚¹ã‚¤ãƒƒãƒ: " + to_string(width) + "x" + to_string(height);
         Debug::Log(ws.c_str());
     }
 }
