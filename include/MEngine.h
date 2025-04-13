@@ -8,6 +8,7 @@
 #include "TextureLoader.h"
 #include "Sprite.h"
 #include "SpriteRenderer.h"
+#include "Camera.h"
 //
 
 #include "InputSystem.h"
@@ -58,6 +59,7 @@ private:
 	TextureLoader texLoader;
 	Sprite sprite;
 	SpriteRenderer spriteRenderer;
+	Camera camera2D;
 	//
 
 	InputSystem input;

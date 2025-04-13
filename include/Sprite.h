@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <d3d12.h>
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -23,7 +23,7 @@ private:
 
 public:
 	void Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12Resource* texture);
-	void Update();
+	void Update(Matrix cameraView);
 	void Draw(ID3D12GraphicsCommandList* commandList);
 
 	Transform* Transform() { return &_transform; }

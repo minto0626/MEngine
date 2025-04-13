@@ -522,6 +522,8 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     const char* texfilePath = "Assets/texture/free_ei.png";
     sprite.Init(_device.Get(), _commandList.Get(), texLoader.GetTextureByPath(texfilePath).Get());
     spriteRenderer.Init(_device.Get());
+
+    camera2D.Init(windowSize.cx, windowSize.cy);
     //
 
     input.Init(hInstancce, hwnd);
@@ -539,17 +541,39 @@ void MEngine::Update()
     //if (!(std::abs(input.GetAxis(1, 0)) > 0.1f)) { return; }  // [ps4] 0:LX, 1:LY, 2:RX, 3:RY
     //if (!(input.GetAxis(1, 5) > 0.1f)) { return; }    // [ps4] 4:L2, 5:R2 うまくいかない
 
-    Vector2 move = { input.GetAxis(1, 0), -input.GetAxis(1, 1) };
-    if (std::abs(move.GetX()) < 0.3f && std::abs(move.GetY()) < 0.3f) { return; }
+    Vector2 move;
+    if (std::abs(input.GetAxis(1, 0)) > 0.3f)
+    {
+        move.SetX(input.GetAxis(1, 0));
+    }
+    if (std::abs(input.GetAxis(1, 1)) > 0.3f)
+    {
+        move.SetY(input.GetAxis(1, 1));
+    }
+    if (input.IsButtonDown(0, DIK_D))
+    {
+        move.SetX(1);
+    }
+    if (input.IsButtonDown(0, DIK_A))
+    {
+        move.SetX(-1);
+    }
+    if (input.IsButtonDown(0, DIK_S))
+    {
+        move.SetY(1);
+    }
+    if (input.IsButtonDown(0, DIK_W))
+    {
+        move.SetY(-1);
+    }
 
     // ★ポリゴンの表示テスト★
-    const float FPS = 30.0f;
-    const float speed = 0.1f;
+    const float speed = 3.0f;
     auto pos = sprite.Transform()->GetPos();
-    pos.SetX(pos.GetX() + (move.GetX() / FPS) * speed);
-    pos.SetY(pos.GetY() + (move.GetY() / FPS) * speed);
+    pos.SetX(pos.GetX() + move.GetX() * speed);
+    pos.SetY(pos.GetY() + move.GetY() * speed);
     sprite.Transform()->SetPos(pos);
-    sprite.Update();
+    sprite.Update(camera2D.GetViewMatrix());
     //
 }
 

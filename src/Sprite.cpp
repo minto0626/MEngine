@@ -1,4 +1,4 @@
-#include "Sprite.h"
+Ôªø#include "Sprite.h"
 
 namespace
 {
@@ -12,10 +12,10 @@ namespace
 void Sprite::InitVertexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
     const MeshVertex vertexData[] = {
-        {{ -0.4f, -0.7f, 1.0f }, { 0.0f, 1.0f }},   // ç∂â∫
-        {{ -0.4f,  0.7f, 1.0f }, { 0.0f, 0.0f }},   // ç∂è„
-        {{  0.4f, -0.7f, 1.0f }, { 1.0f, 1.0f }},   // âEâ∫
-        {{  0.4f,  0.7f, 1.0f }, { 1.0f, 0.0f }},   // âEè„
+        {{  0.0f,100.0f, 0.0f }, { 0.0f, 1.0f }},   // Â∑¶‰∏ã
+        {{  0.0f,  0.0f, 0.0f }, { 0.0f, 0.0f }},   // Â∑¶‰∏ä
+        {{100.0f,100.0f, 0.0f }, { 1.0f, 1.0f }},   // Âè≥‰∏ã
+        {{100.0f,  0.0f, 0.0f }, { 1.0f, 0.0f }},   // Âè≥‰∏ä
     };
     _vertexBuffer.Init(device, commandList, &vertexData, _countof(vertexData), sizeof(MeshVertex));
 }
@@ -49,9 +49,10 @@ void Sprite::Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, 
     InitConstantBuffer(device);
 }
 
-void Sprite::Update()
+void Sprite::Update(Matrix cameraView)
 {
     auto world = _transform.GetWorldMatrix();
+    world *= cameraView;
     _constantBuffer.Update(&world, sizeof(world));
 }
 
