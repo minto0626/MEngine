@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "Vector.h"
 
 class Matrix
@@ -81,7 +81,7 @@ public:
         return m;
     }
 
-    static Matrix RotationRollPitchYaw(float pitch, float yaw, float roll) // ìxêîñ@
+    static Matrix RotationRollPitchYaw(float pitch, float yaw, float roll) // Â∫¶Êï∞Ê≥ï
     {
         Matrix m;
         m.SetFromXMMatrix(DirectX::XMMatrixRotationRollPitchYaw(

@@ -1,9 +1,10 @@
-#pragma once
+﻿#pragma once
 #include <d3d12.h>
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Texture.h"
 #include "Transform.h"
+#include "Vector.h"
 #include "ConstantBuffer.h"
 
 class Sprite
@@ -13,6 +14,7 @@ private:
 	IndexBuffer _indexBuffer;
 	Texture _texture;
 	Transform _transform;
+	Vector2 _size;
 
 	ConstantBuffer _constantBuffer;
 
@@ -22,8 +24,8 @@ private:
 	void InitConstantBuffer(ID3D12Device* device);
 
 public:
-	void Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12Resource* texture);
-	void Update();
+	void Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12Resource* texture, bool setNativeSize, float width = 0.0f, float height = 0.0f);
+	void Update(Matrix cameraView);
 	void Draw(ID3D12GraphicsCommandList* commandList);
 
 	Transform* Transform() { return &_transform; }
