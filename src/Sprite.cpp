@@ -1,4 +1,5 @@
 ﻿#include "Sprite.h"
+#include "Debug.h"
 
 namespace
 {
@@ -12,10 +13,10 @@ namespace
 void Sprite::InitVertexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
     const MeshVertex vertexData[] = {
-        {{  0.0f,100.0f, 0.0f }, { 0.0f, 1.0f }},   // 左下
-        {{  0.0f,  0.0f, 0.0f }, { 0.0f, 0.0f }},   // 左上
-        {{100.0f,100.0f, 0.0f }, { 1.0f, 1.0f }},   // 右下
-        {{100.0f,  0.0f, 0.0f }, { 1.0f, 0.0f }},   // 右上
+        {{         0.0f, _size.GetY(), 0.0f }, { 0.0f, 1.0f }},   // 左下
+        {{         0.0f,         0.0f, 0.0f }, { 0.0f, 0.0f }},   // 左上
+        {{ _size.GetX(), _size.GetY(), 0.0f }, { 1.0f, 1.0f }},   // 右下
+        {{ _size.GetX(),         0.0f, 0.0f }, { 1.0f, 0.0f }},   // 右上
     };
     _vertexBuffer.Init(device, commandList, &vertexData, _countof(vertexData), sizeof(MeshVertex));
 }
@@ -41,8 +42,22 @@ void Sprite::InitConstantBuffer(ID3D12Device* device)
     _constantBuffer.Update(&world, sizeof(world));
 }
 
-void Sprite::Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12Resource* texture)
+void Sprite::Init(
+    ID3D12Device* device,
+    ID3D12GraphicsCommandList* commandList,
+    ID3D12Resource* texture,
+    bool setNativeSize, float width, float height)
 {
+    if (setNativeSize)
+    {
+        auto desc = texture->GetDesc();
+        _size = { static_cast<float>(desc.Width), static_cast<float>(desc.Height) };
+    }
+    else
+    {
+        _size = { width, height };
+    }
+
     InitVertexBuffer(device, commandList);
     InitIndexBuffer(device, commandList);
     InitTexture(device, texture);
