@@ -568,12 +568,25 @@ void MEngine::Update()
         move.SetY(-1);
     }
 
+    float angle = 0.0f;
+    if (input.IsButtonDown(0, DIK_Z))
+    {
+        angle = -1.0f;
+    }
+    else if (input.IsButtonDown(0, DIK_X))
+    {
+        angle = 1.0f;
+    }
+
     // ★ポリゴンの表示テスト★
     const float speed = 3.0f;
     auto pos = sprite.Transform()->GetPos();
     pos.SetX(pos.GetX() + move.GetX() * speed);
     pos.SetY(pos.GetY() + move.GetY() * speed);
     sprite.Transform()->SetPos(pos);
+    auto rot = sprite.Transform()->GetRot();
+    rot *= Quaternion::FromEulerAngles(0, 0, angle);
+    sprite.Transform()->SetRot(rot);
     sprite.Update(camera2D.GetViewMatrix());
     //
 }

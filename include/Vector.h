@@ -558,18 +558,16 @@ public:
 	static Quaternion FromAxisAngle(const Vector3& axis, float angleDeg)
 	{
 		DirectX::XMVECTOR axisVec = axis.ToXMVECTOR();
-		// 時計回り回転にするため、角度を反転
-		DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axisVec, DirectX::XMConvertToRadians(-angleDeg));
+		DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axisVec, DirectX::XMConvertToRadians(angleDeg));
 		return Quaternion(q);
 	}
 
 	static Quaternion FromEulerAngles(float pitch, float yaw, float roll)	// 度数法
 	{
 		DirectX::XMVECTOR q = DirectX::XMQuaternionRotationRollPitchYaw(
-			// 時計回り回転にするため、角度を反転
-			DirectX::XMConvertToRadians(-pitch),
-			DirectX::XMConvertToRadians(-yaw),
-			DirectX::XMConvertToRadians(-roll)
+			DirectX::XMConvertToRadians(pitch),
+			DirectX::XMConvertToRadians(yaw),
+			DirectX::XMConvertToRadians(roll)
 		);
 		return Quaternion(q);
 	}
