@@ -12,11 +12,14 @@ namespace
 
 void Sprite::InitVertexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
+    auto halfW = _size.GetX() * 0.5f;
+    auto halfH = _size.GetY() * 0.5f;
+
     const MeshVertex vertexData[] = {
-        {{         0.0f, _size.GetY(), 0.0f }, { 0.0f, 1.0f }},   // 左下
-        {{         0.0f,         0.0f, 0.0f }, { 0.0f, 0.0f }},   // 左上
-        {{ _size.GetX(), _size.GetY(), 0.0f }, { 1.0f, 1.0f }},   // 右下
-        {{ _size.GetX(),         0.0f, 0.0f }, { 1.0f, 0.0f }},   // 右上
+        {{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
+        {{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
+        {{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
+        {{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
     };
     _vertexBuffer.Init(device, commandList, &vertexData, _countof(vertexData), sizeof(MeshVertex));
 }
