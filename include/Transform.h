@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Vector.h"
 #include "Matrix.h"
 #include <string>
@@ -7,7 +7,7 @@ class Transform
 {
 private:
 	Vector3 _pos;
-	Vector3 _rot;
+	Quaternion _rot;
 	Vector3 _scale;
 	Matrix _world;
 	bool _isDirty;
@@ -18,11 +18,11 @@ public:
 	Transform();
 
 	void SetPos(const Vector3& pos) { _pos = pos; _isDirty = true; }
-	void SetRot(const Vector3& rot) { _rot = rot; _isDirty = true; }
+	void SetRot(const Quaternion& rot) { _rot = rot; _isDirty = true; }
 	void SetScale(const Vector3& scale) { _scale = scale; _isDirty = true; }
 
 	Vector3 GetPos() const { return _pos; }
-	Vector3 GetRot() const { return _rot; }
+	Quaternion GetRot() const { return _rot; }
 	Vector3 GetScale() const { return _scale; }
 	Matrix GetWorldMatrix() { UpdateMatrix(); return _world; }
 

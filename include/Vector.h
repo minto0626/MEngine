@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <DirectXMath.h>
 #include <cassert>
 #include <stdexcept>
@@ -55,7 +55,7 @@ public:
 	}
 	Vector2 operator /(float scalar) const
 	{
-		if (scalar == 0.0f) { Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·"); return Zero(); }
+		if (scalar == 0.0f) { Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™"); return Zero(); }
 		DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&vec);
 		DirectX::XMFLOAT2 ret;
 		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorScale(v, 1.0f / scalar));
@@ -66,7 +66,7 @@ public:
 		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat2(&vec);
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
-		if (DirectX::XMVector2NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector2‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·"); return Zero(); }
+		if (DirectX::XMVector2NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector2ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™"); return Zero(); }
 		DirectX::XMFLOAT2 ret;
 		DirectX::XMStoreFloat2(&ret, DirectX::XMVectorDivide(v1, v2));
 		return Vector2(ret);
@@ -101,7 +101,7 @@ public:
 	Vector2 operator /=(float scalar)
 	{
 		if (scalar == 0.0f) {
-			Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = {0.0f, 0.0f};
 		}
 		else {
@@ -116,7 +116,7 @@ public:
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat2(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
 		if (DirectX::XMVector2NotEqual(zeroCheck, DirectX::XMVectorZero())) {
-			Debug::LogError("Vector2‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("Vector2ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = {0.0f, 0.0f};
 		}
 		else {
@@ -214,7 +214,7 @@ public:
 	}
 	Vector3 operator /(const float scalar) const
 	{
-		if (scalar == 0.0f) { Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·"); return Zero(); }
+		if (scalar == 0.0f) { Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™"); return Zero(); }
 		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&vec);
 		DirectX::XMFLOAT3 ret;
 		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorScale(v, 1.0f / scalar));
@@ -225,7 +225,7 @@ public:
 		DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vec);
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
-		if (DirectX::XMVector3NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector3‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·"); return Zero(); }
+		if (DirectX::XMVector3NotEqual(zeroCheck, DirectX::XMVectorZero())) { Debug::LogError("Vector3ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™"); return Zero(); }
 		DirectX::XMFLOAT3 ret;
 		DirectX::XMStoreFloat3(&ret, DirectX::XMVectorDivide(v1, v2));
 		return Vector3(ret);
@@ -260,7 +260,7 @@ public:
 	Vector3 operator /=(const float scalar)
 	{
 		if (scalar == 0.0f) {
-			Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = {0.f, 0.0f, 0.0f};
 		}
 		else {
@@ -275,7 +275,7 @@ public:
 		DirectX::XMVECTOR v2 = XMLoadFloat3(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
 		if (DirectX::XMVector3NotEqual(zeroCheck, DirectX::XMVectorZero())) {
-			Debug::LogError("Vector3‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("Vector3ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = {0.0f, 0.0f, 0.0f };
 		}
 		else {
@@ -350,7 +350,7 @@ public:
 	{
 		float dot = a.Dot(b);
 		float lengthProduct = a.Length() * b.Length();
-		if (lengthProduct == 0.0f) { return 0.0f; }	// ƒ[ƒœZ–h~
+		if (lengthProduct == 0.0f) { return 0.0f; }	// ã‚¼ãƒ­é™¤ç®—é˜²æ­¢
 
 		float cosTheta = dot / lengthProduct;
 		cosTheta = (std::max)(-1.0f, (std::min)(1.0f, cosTheta));
@@ -367,7 +367,7 @@ public:
 
 class Vector4
 {
-private:
+protected:
 	DirectX::XMFLOAT4 vec;
 
 public:
@@ -419,7 +419,7 @@ public:
 	Vector4 operator /(float scalar) const
 	{
 		if (scalar == 0.0f) {
-			Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			return Zero();
 		}
 		DirectX::XMVECTOR v = DirectX::XMLoadFloat4(&vec);
@@ -433,7 +433,7 @@ public:
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
 		if (DirectX::XMVector4NotEqual(zeroCheck, DirectX::XMVectorZero())) {
-			Debug::LogError("Vector4‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("Vector4ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			return Zero();
 		}
 		DirectX::XMFLOAT4 result;
@@ -470,7 +470,7 @@ public:
 	Vector4& operator /(float scalar)
 	{
 		if (scalar == 0.0f) {
-			Debug::LogError("0‚ÅœZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("0ã§é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
 			return *this;
 		}
@@ -484,7 +484,7 @@ public:
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat4(&other.vec);
 		DirectX::XMVECTOR zeroCheck = DirectX::XMVectorEqual(v2, DirectX::XMVectorZero());
 		if (DirectX::XMVector4NotEqual(zeroCheck, DirectX::XMVectorZero())) {
-			Debug::LogError("Vector4‚Ì‚¢‚¸‚ê‚©‚Ì—v‘f‚Å0œZ‚µ‚æ‚¤‚Æ‚µ‚Ü‚µ‚½B‘å‚«‚³0‚ÌƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·");
+			Debug::LogError("Vector4ã®ã„ãšã‚Œã‹ã®è¦ç´ ã§0é™¤ç®—ã—ã‚ˆã†ã¨ã—ã¾ã—ãŸã€‚å¤§ãã•0ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™");
 			vec = { 0.0f, 0.0f, 0.0f, 0.0f };
 		}
 		else {
@@ -526,4 +526,116 @@ public:
 public:
 	static Vector4 Zero() { return Vector4(0.0f, 0.0f, 0.0f, 0.0f); }
 
+};
+
+class Quaternion : public Vector4
+{
+private:
+	static float ClampToZero(float value) { return (std::abs(value) < 1e-6f) ? 0.0f : value; }
+	void Clean()
+	{
+		vec.x = ClampToZero(vec.x);
+		vec.y = ClampToZero(vec.y);
+		vec.z = ClampToZero(vec.z);
+		vec.w = ClampToZero(vec.w);
+	}
+
+public:
+	Quaternion() : Vector4(0.0f, 0.0f, 0.0f, 1.0f) {}
+	Quaternion(float x, float y, float z, float w) : Vector4(x, y, z, w)
+	{
+		Normalize();
+		Clean();
+	}
+	explicit Quaternion(DirectX::XMVECTOR& v)
+	{
+		DirectX::XMStoreFloat4(&vec, DirectX::XMQuaternionNormalize(v));
+		Clean();
+	}
+
+	static Quaternion Identity() { return Quaternion(0.0f, 0.0f, 0.0f, 1.0f); }
+
+	static Quaternion FromAxisAngle(const Vector3& axis, float angleDeg)
+	{
+		DirectX::XMVECTOR axisVec = axis.ToXMVECTOR();
+		// æ™‚è¨ˆå›ã‚Šå›è»¢ã«ã™ã‚‹ãŸã‚ã€è§’åº¦ã‚’åè»¢
+		DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axisVec, DirectX::XMConvertToRadians(-angleDeg));
+		return Quaternion(q);
+	}
+
+	static Quaternion FromEulerAngles(float pitch, float yaw, float roll)	// åº¦æ•°æ³•
+	{
+		DirectX::XMVECTOR q = DirectX::XMQuaternionRotationRollPitchYaw(
+			// æ™‚è¨ˆå›ã‚Šå›è»¢ã«ã™ã‚‹ãŸã‚ã€è§’åº¦ã‚’åè»¢
+			DirectX::XMConvertToRadians(-pitch),
+			DirectX::XMConvertToRadians(-yaw),
+			DirectX::XMConvertToRadians(-roll)
+		);
+		return Quaternion(q);
+	}
+
+	Quaternion operator *(const Quaternion& other) const
+	{
+		DirectX::XMVECTOR q1 = DirectX::XMQuaternionNormalize(ToXMVECTOR());
+		DirectX::XMVECTOR q2 = DirectX::XMQuaternionNormalize(other.ToXMVECTOR());
+		DirectX::XMVECTOR mul = DirectX::XMQuaternionMultiply(q1, q2);
+		Quaternion result(mul);
+		result.Clean();
+		return result;
+	}
+
+	Quaternion operator *=(const Quaternion& other)
+	{
+		DirectX::XMVECTOR q1 = DirectX::XMQuaternionNormalize(ToXMVECTOR());
+		DirectX::XMVECTOR q2 = DirectX::XMQuaternionNormalize(other.ToXMVECTOR());
+		DirectX::XMStoreFloat4(&vec, DirectX::XMQuaternionMultiply(q1, q2));
+		Clean();
+		return *this;
+	}
+
+	Quaternion Conjugate() const
+	{
+		DirectX::XMVECTOR q = ToXMVECTOR();
+		DirectX::XMVECTOR con = DirectX::XMQuaternionConjugate(q);
+		Quaternion result(con);
+		result.Clean();
+		return result;
+	}
+
+	Quaternion Normalized() const
+	{
+		DirectX::XMVECTOR q = DirectX::XMQuaternionNormalize(ToXMVECTOR());
+		Quaternion result(q);
+		result.Clean();
+		return result;
+	}
+
+	void Normalize()
+	{
+		DirectX::XMVECTOR q = ToXMVECTOR();
+		DirectX::XMStoreFloat4(&vec, DirectX::XMQuaternionNormalize(q));
+		Clean();
+	}
+
+	Quaternion Inverse() const
+	{
+		DirectX::XMVECTOR q = ToXMVECTOR();
+		DirectX::XMVECTOR inv = DirectX::XMQuaternionInverse(q);
+		Quaternion result(inv);
+		result.Clean();
+		return result;
+	}
+
+	Vector3 Rotate(const Vector3& v) const
+	{
+		DirectX::XMVECTOR q = DirectX::XMQuaternionNormalize(ToXMVECTOR());
+		DirectX::XMVECTOR vec = v.ToXMVECTOR();
+		DirectX::XMVECTOR result = DirectX::XMVector3Rotate(vec, q);
+		DirectX::XMFLOAT3 out;
+		DirectX::XMStoreFloat3(&out, result);
+		out.x = ClampToZero(out.x);
+		out.y = ClampToZero(out.y);
+		out.z = ClampToZero(out.z);
+		return Vector3(out.x, out.y, out.z);
+	}
 };
