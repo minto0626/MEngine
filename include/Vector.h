@@ -179,7 +179,7 @@ public:
 
 	void SetX(float x) { vec.x = x; }
 	void SetY(float y) { vec.y = y; }
-	void SetZ(float z) { vec.y = z; }
+	void SetZ(float z) { vec.z = z; }
 
 	Vector3 operator +(const Vector3& other) const
 	{
