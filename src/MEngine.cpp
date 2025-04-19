@@ -521,7 +521,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     texLoader.Init(_device.Get());
     const char* texfilePath = "Assets/texture/free_ei.png";
     sprite.Init(_device.Get(), _commandList.Get(), texLoader.GetTextureByPath(texfilePath).Get(), true);
-    sprite.Transform()->SetPos({ 400, 100, 0 });
+    sprite.Transform()->SetPos({ 640, 360, 0 });
     spriteRenderer.Init(_device.Get());
 
     camera2D.Init(windowSize.cx, windowSize.cy);
