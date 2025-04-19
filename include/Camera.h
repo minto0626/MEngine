@@ -12,7 +12,7 @@ private:
 public:
 	void Init(uint32_t viewportWidth, uint32_t viewportHeight);
 	void SetPos(Vector3 pos);
-	void SetRot(Vector3 rot);
+	void SetRot(Quaternion rot);
 
 	Matrix GetViewMatrix() const;
 };

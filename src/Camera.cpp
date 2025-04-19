@@ -11,7 +11,7 @@ void Camera::SetPos(Vector3 pos)
 	_transform.SetPos(pos);
 }
 
-void Camera::SetRot(Vector3 rot)
+void Camera::SetRot(Quaternion rot)
 {
 	_transform.SetRot(rot);
 }

@@ -1,11 +1,11 @@
-#include "Transform.h"
+﻿#include "Transform.h"
 #include <sstream>
 
 using namespace DirectX;
 
 Transform::Transform() :
 	_pos(0.0f, 0.0f, 0.0f),
-	_rot(0.0f, 0.0f, 0.0f),
+	_rot(0.0f, 0.0f, 0.0f, 1.0),
 	_scale(1.0f, 1.0f, 1.0f),
 	_world(),
 	_isDirty(false)
@@ -17,7 +17,8 @@ void Transform::UpdateMatrix()
 	if (!_isDirty) { return; }
 
 	Matrix scaleMatrix = Matrix::Scaling(_scale.GetX(), _scale.GetY(), _scale.GetZ());
-	Matrix rotMatrix = Matrix::RotationRollPitchYaw(_rot.GetX(), _rot.GetY(), _rot.GetZ());
+	Matrix rotMatrix;
+	rotMatrix.SetFromXMMatrix(XMMatrixRotationQuaternion(_rot.ToXMVECTOR()));
 	Matrix transMatrix = Matrix::Translation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
 	_world = scaleMatrix * rotMatrix * transMatrix;
 
