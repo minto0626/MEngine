@@ -17,8 +17,7 @@ void Transform::UpdateMatrix()
 	if (!_isDirty) { return; }
 
 	Matrix scaleMatrix = Matrix::Scaling(_scale.GetX(), _scale.GetY(), _scale.GetZ());
-	Matrix rotMatrix;
-	rotMatrix.SetFromXMMatrix(XMMatrixRotationQuaternion(_rot.ToXMVECTOR()));
+	Matrix rotMatrix = Matrix::RotationQuaternion(_rot);
 	Matrix transMatrix = Matrix::Translation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
 	_world = scaleMatrix * rotMatrix * transMatrix;
 

@@ -99,4 +99,11 @@ public:
         return m;
     }
 
+    static Matrix RotationQuaternion(const Quaternion& q)
+    {
+        Matrix m;
+        m.SetFromXMMatrix(DirectX::XMMatrixRotationQuaternion(q.ToXMVECTOR()));
+        return m;
+    }
+
 };
