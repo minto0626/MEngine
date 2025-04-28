@@ -12,6 +12,7 @@
 //
 
 #include "InputSystem.h"
+#include "GameTime.h"
 
 class MEngine
 {
@@ -63,6 +64,7 @@ private:
 	//
 
 	InputSystem input;
+	Engine::Time time;
 
 public:
 	~MEngine();
