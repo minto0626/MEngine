@@ -155,6 +155,7 @@
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Debug.h" />
     <ClInclude Include="include\GamePad.h" />
+    <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\IInputDevice.h" />
     <ClInclude Include="include\IndexBuffer.h" />
     <ClInclude Include="include\InputLayoutHelper.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\Debug.cpp" />
     <ClCompile Include="src\GamePad.cpp" />
+    <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputLayoutHelper.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
