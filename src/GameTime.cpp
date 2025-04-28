@@ -11,6 +11,9 @@ namespace Engine
         _frameCount = 0;
         _fixedDeltaTime = 1.0f / 60.0f;
         _timeScale = 1.0f;
+
+        _deltaTimeHistory.clear();
+        _accumulatedTime = 0.0f;
     }
 
     void Time::Update()
@@ -29,7 +32,34 @@ namespace Engine
         // フレームカウントをインクリメント
         _frameCount++;
 
+        // 平均FPS計算用のデルタタイム履歴を更新
+        _deltaTimeHistory.push_back(_deltaTime);
+        _accumulatedTime += _deltaTime;
+
+        // 時間窓（１秒）を超えた古いデータを削除
+        while (_accumulatedTime > _fpsWindow && !_deltaTimeHistory.empty())
+        {
+            _accumulatedTime -= _deltaTimeHistory.front();
+            _deltaTimeHistory.erase(_deltaTimeHistory.begin());
+        }
+
         // 前フレームの時刻を更新
         _lastFrameTime = currentTime;
-	}
+    }
+
+    float Time::GetInstantFPS() const
+    {
+        return (_deltaTime > 0.0f) ? 1.0f / _deltaTime : 0.0f;
+    }
+
+    float Time::GetAverageFPS() const
+    {
+        if (_deltaTimeHistory.empty())
+        {
+            return 0.0f;
+        }
+
+        float averageDeltaTime = _accumulatedTime / static_cast<float>(_deltaTimeHistory.size());
+        return (averageDeltaTime > 0.0f) ? 1.0f / averageDeltaTime : 0.0f;
+    }
 }
