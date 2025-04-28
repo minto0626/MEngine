@@ -528,6 +528,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     //
 
     input.Init(hInstancce, hwnd);
+    time.Init();
 
     return true;
 }
@@ -535,6 +536,8 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 void MEngine::Update()
 {
     input.Update();
+    time.Update();
+    const float deltaTime = time.GetScaledDeltaTime();
 
     // deviceType 0:keyboard, 1:gamepad
     //if (!input.IsButtonDown(0, DIK_D)) { return; }
@@ -542,7 +545,7 @@ void MEngine::Update()
     //if (!(std::abs(input.GetAxis(1, 0)) > 0.1f)) { return; }  // [ps4] 0:LX, 1:LY, 2:RX, 3:RY
     //if (!(input.GetAxis(1, 5) > 0.1f)) { return; }    // [ps4] 4:L2, 5:R2 うまくいかない
 
-    Vector2 move;
+    Vector3 move;
     if (std::abs(input.GetAxis(1, 0)) > 0.3f)
     {
         move.SetX(input.GetAxis(1, 0));
@@ -579,12 +582,14 @@ void MEngine::Update()
     }
 
     // ★ポリゴンの表示テスト★
-    const float speed = 3.0f;
+    const float moveSpeed = 200.0f;
+    move *= moveSpeed * deltaTime;
     auto pos = sprite.Transform()->GetPos();
-    pos.SetX(pos.GetX() + move.GetX() * speed);
-    pos.SetY(pos.GetY() + move.GetY() * speed);
+    pos += move;
     sprite.Transform()->SetPos(pos);
+    const float rotSpeed = 60.0f;
     auto rot = sprite.Transform()->GetRot();
+    angle *= rotSpeed * deltaTime;
     rot *= Quaternion::FromEulerAngles(0, 0, angle);
     sprite.Transform()->SetRot(rot);
     sprite.Update(camera2D.GetViewMatrix());
