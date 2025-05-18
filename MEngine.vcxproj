@@ -164,6 +164,7 @@
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\MEngine.h" />
     <ClInclude Include="include\PipelineState.h" />
+    <ClInclude Include="include\Random.h" />
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\RootSignature.h" />
     <ClInclude Include="include\Shader.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MEngine.cpp" />
     <ClCompile Include="src\PipelineState.cpp" />
+    <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
