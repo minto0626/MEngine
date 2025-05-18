@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "StringUtility.h"
 #include "Debug.h"
+#include "Random.h"
 
 #if _DEBUG
 #include <iostream>
@@ -529,6 +530,13 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
     input.Init(hInstancce, hwnd);
     time.Init();
+
+    // 乱数生成テスト
+    //Random::InitState(1001);
+    int randInt = Random::Range(0, 100);
+    float randf = Random::Range(0.0f, 1.0f);
+    Debug::Log("rand(100) int: " + std::to_string(randInt));
+    Debug::Log("rand(1.0) float: " + std::to_string(randf));
 
     return true;
 }
