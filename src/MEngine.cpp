@@ -579,6 +579,12 @@ void MEngine::Update()
         move.SetY(-1);
     }
 
+    if (input.IsTriggered(0, DIK_SPACE) ||
+        input.IsTriggered(1, 1))
+    {
+        Debug::Log("僕はエイです。");
+    }
+
     float angle = 0.0f;
     if (input.IsButtonDown(0, DIK_Z))
     {

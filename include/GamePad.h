@@ -12,6 +12,7 @@ private:
 
 	ComPtr<IDirectInputDevice8> _device;
 	DIJOYSTATE2 _state = {};
+	DIJOYSTATE2 _previous_state = {};
 
 	static float NormalizeAxis(LONG value, LONG min, LONG max);
 	static float NormalizeTrigger(LONG value, LONG min, LONG max);
@@ -24,6 +25,8 @@ public:
 	void Update() override;
 	bool IsButtonDown(uint32_t button) const override;
 	bool IsButtonUp(uint32_t button) const override;
+	bool IsTriggered(uint32_t button) const override;
+	bool IsReleased(uint32_t button) const override;
 	float GetAxis(uint32_t axis) const override;
 	int32_t GetPOV() const override;
 };

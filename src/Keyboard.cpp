@@ -50,6 +50,9 @@ void KeyBoard::Init(ComPtr<IDirectInput8> directInput, HWND hwnd)
 
 void KeyBoard::Update()
 {
+	// 前回の状態を保存
+	_previous_state = _state;
+
 	HRESULT ret = _device->GetDeviceState(sizeof(_state), _state.data());
 	if (FAILED(ret))
 	{
@@ -69,6 +72,16 @@ bool KeyBoard::IsButtonDown(uint32_t button) const
 bool KeyBoard::IsButtonUp(uint32_t button) const
 {
 	return (_state[button] & 0x80) == 0;
+}
+
+bool KeyBoard::IsTriggered(uint32_t button) const
+{
+	return IsButtonDown(button) && (_previous_state[button] & 0x80) == 0;
+}
+
+bool KeyBoard::IsReleased(uint32_t button) const
+{
+	return IsButtonUp(button) && (_previous_state[button] & 0x80) != 0;
 }
 
 float KeyBoard::GetAxis(uint32_t axis) const

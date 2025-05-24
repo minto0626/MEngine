@@ -13,6 +13,7 @@ private:
 
 	ComPtr<IDirectInputDevice8> _device;
 	std::array<uint8_t, 256> _state = {};
+	std::array<uint8_t, 256> _previous_state = {};
 
 	void Init(ComPtr<IDirectInput8> directInput, HWND hwnd);
 
@@ -24,6 +25,8 @@ public:
 
 	bool IsButtonDown(uint32_t button) const override;
 	bool IsButtonUp(uint32_t button) const override;
+	bool IsTriggered(uint32_t button) const override;
+	bool IsReleased(uint32_t button) const override;
 	float GetAxis(uint32_t axis) const override;
 	int32_t GetPOV() const override;
 };
