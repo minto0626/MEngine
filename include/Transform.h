@@ -26,6 +26,10 @@ public:
 	Vector3 GetScale() const { return _scale; }
 	Matrix GetWorldMatrix() { UpdateMatrix(); return _world; }
 
+	Vector3 GetForward() const;
+	Vector3 GetRight() const;
+	Vector3 GetUp() const;
+
 	Vector3 TransformPoint(const Vector3& point);
 	Vector3 TrasnformDirection(const Vector3& dir);
 	std::string ToString()const;

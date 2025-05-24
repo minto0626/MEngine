@@ -24,6 +24,21 @@ void Transform::UpdateMatrix()
 	_isDirty = false;
 }
 
+Vector3 Transform::GetForward() const
+{
+	return _rot.Rotate(Vector3(0.0f, 0.0f, 1.0f));
+}
+
+Vector3 Transform::GetRight() const
+{
+	return _rot.Rotate(Vector3(1.0f, 0.0f, 0.0f));
+}
+
+Vector3 Transform::GetUp() const
+{
+	return _rot.Rotate(Vector3(0.0f, 1.0f, 0.0f));
+}
+
 Vector3 Transform::TransformPoint(const Vector3& point)
 {
 	UpdateMatrix();
