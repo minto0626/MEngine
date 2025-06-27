@@ -28,6 +28,8 @@ public:
 	
 	bool IsButtonDown(uint32_t deviceType, uint32_t button) const;
 	bool IsButtonUp(uint32_t deviceType, uint32_t button) const;
+	bool IsTriggered(uint32_t deviceType, uint32_t button) const;
+	bool IsReleased(uint32_t deviceType, uint32_t button) const;
 	float GetAxis(uint32_t deviceType, uint32_t axis) const;
 	int32_t GetPOV(uint32_t deviceType) const;
 };

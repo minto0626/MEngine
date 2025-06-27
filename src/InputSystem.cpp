@@ -79,6 +79,18 @@ bool InputSystem::IsButtonUp(uint32_t deviceType, uint32_t button) const
 	return _devices[deviceType]->IsButtonUp(button);
 }
 
+bool InputSystem::IsTriggered(uint32_t deviceType, uint32_t button) const
+{
+	if (deviceType >= _devices.size()) { return false; }
+	return _devices[deviceType]->IsTriggered(button);
+}
+
+bool InputSystem::IsReleased(uint32_t deviceType, uint32_t button) const
+{
+	if (deviceType >= _devices.size()) { return false; }
+	return _devices[deviceType]->IsReleased(button);
+}
+
 float InputSystem::GetAxis(uint32_t deviceType, uint32_t axis) const
 {
 	if (deviceType >= _devices.size()) { return 0.0f; }

@@ -83,6 +83,9 @@ void GamePad::Init(ComPtr<IDirectInput8> directInput, HWND hwnd, const DIDEVICEI
 
 void GamePad::Update()
 {
+	// 前回の状態を保存
+	_previous_state = _state;
+
 	HRESULT ret = _device->Poll();
 	if (FAILED(ret))
 	{
@@ -111,6 +114,16 @@ bool GamePad::IsButtonDown(uint32_t button) const
 bool GamePad::IsButtonUp(uint32_t button) const
 {
 	return (_state.rgbButtons[button] & 0x80) == 0;
+}
+
+bool GamePad::IsTriggered(uint32_t button) const
+{
+	return IsButtonDown(button) && (_previous_state.rgbButtons[button] & 0x80) == 0;
+}
+
+bool GamePad::IsReleased(uint32_t button) const
+{
+	return IsButtonUp(button) && (_previous_state.rgbButtons[button] & 0x80) != 0;
 }
 
 float GamePad::GetAxis(uint32_t axis) const
