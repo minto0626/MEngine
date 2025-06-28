@@ -1,4 +1,4 @@
-#include "ConstantBuffer.h"
+ï»¿#include "ConstantBuffer.h"
 #include "d3dx12.h"
 #include <cassert>
 
@@ -10,9 +10,9 @@ ConstantBuffer::~ConstantBuffer()
 	}
 }
 
-void ConstantBuffer::Init(ID3D12Device* device, UINT size)
+void ConstantBuffer::Init(ID3D12Device* device, DescriptorHeap* descHeap, UINT size)
 {
-	_bufferSize = (size + 0xff) & ~0xff;	// ƒTƒCƒY‚ð256ƒAƒ‰ƒCƒƒ“ƒg
+	_bufferSize = (size + 0xff) & ~0xff;	// ã‚µã‚¤ã‚ºã‚’256ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 
 	auto heapDesc = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	auto resDesc = CD3DX12_RESOURCE_DESC::Buffer(_bufferSize);
@@ -37,22 +37,12 @@ void ConstantBuffer::Init(ID3D12Device* device, UINT size)
 		return;
 	}
 
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	descHeapDesc.NodeMask = 0;
-	descHeapDesc.NumDescriptors = 1;
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(_descHeap.ReleaseAndGetAddressOf()));
-	if (FAILED(result))
-	{
-		assert(0);
-		return;
-	}
+	_descHandle = descHeap->Allocate();
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 	cbvDesc.BufferLocation = _buffer->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = _bufferSize;
-	device->CreateConstantBufferView(&cbvDesc, _descHeap->GetCPUDescriptorHandleForHeapStart());
+	device->CreateConstantBufferView(&cbvDesc, _descHandle.cpuHandle);
 }
 
 void ConstantBuffer::Update(const void* data, UINT size)

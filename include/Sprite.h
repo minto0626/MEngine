@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "Vector.h"
 #include "ConstantBuffer.h"
+#include "DescriptorHeap.h"
 
 class Sprite
 {
@@ -20,11 +21,16 @@ private:
 
 	void InitVertexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	void InitIndexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
-	void InitTexture(ID3D12Device* device, ID3D12Resource* texture);
-	void InitConstantBuffer(ID3D12Device* device);
+	void InitTexture(ID3D12Device* device, DescriptorHeap* descHeap, ID3D12Resource* texture);
+	void InitConstantBuffer(ID3D12Device* device, DescriptorHeap* descHeap);
 
 public:
-	void Init(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12Resource* texture, bool setNativeSize, float width = 0.0f, float height = 0.0f);
+	void Init(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		DescriptorHeap* descHeap,
+		ID3D12Resource* texture,
+		bool setNativeSize, float width = 0.0f, float height = 0.0f);
 	void Update(Matrix cameraView);
 	void Draw(ID3D12GraphicsCommandList* commandList);
 

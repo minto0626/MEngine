@@ -1,32 +1,20 @@
-#include "Texture.h"
+ï»¿#include "Texture.h"
 #include <cassert>
 
 using namespace Microsoft::WRL;
 
-void Texture::Init(ID3D12Device* device, ComPtr<ID3D12Resource> texture)
+void Texture::Init(ID3D12Device* device, DescriptorHeap* descHeap, ComPtr<ID3D12Resource> texture)
 {
 	_texture = texture;
+	_descHandle = descHeap->Allocate();
 
-	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	heapDesc.NodeMask = 0;	// GPU‚Íˆê‚Â‘O’ñ
-	heapDesc.NumDescriptors = 1;
-	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	auto result = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(_descHeap.ReleaseAndGetAddressOf()));
-	if (FAILED(result))
-	{
-		assert(0 && "ƒq[ƒv‚Ìì¬‚ÉŽ¸”s!");
-		return;
-	}
-
-	auto handle = _descHeap->GetCPUDescriptorHandleForHeapStart();
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = _texture->GetDesc().Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = 1;	// ƒ~ƒbƒvƒ}ƒbƒvŽg—p‚µ‚È‚¢
+	srvDesc.Texture2D.MipLevels = 1;	// ãƒŸãƒƒãƒ—ãƒžãƒƒãƒ—ä½¿ç”¨ã—ãªã„
 	device->CreateShaderResourceView(
 		_texture.Get(),
 		&srvDesc,
-		handle);
+		_descHandle.cpuHandle);
 }

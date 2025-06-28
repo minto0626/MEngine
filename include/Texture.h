@@ -1,17 +1,17 @@
-#pragma once
+﻿#pragma once
 #include <d3d12.h>
 #include <wrl.h>
+#include "DescriptorHeap.h"
 
 class Texture
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _texture;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _descHeap;
+	DescriptorHandle _descHandle;
 
 public:
-	void Init(ID3D12Device* device, Microsoft::WRL::ComPtr<ID3D12Resource> texture);
+	void Init(ID3D12Device* device, DescriptorHeap* descHeap, Microsoft::WRL::ComPtr<ID3D12Resource> texture);
 
-	ID3D12DescriptorHeap* GetHeap() const { return _descHeap.Get(); }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return _descHeap->GetCPUDescriptorHandleForHeapStart(); }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return _descHeap->GetGPUDescriptorHandleForHeapStart(); }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return _descHandle.cpuHandle; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return _descHandle.gpuHandle; }
 };

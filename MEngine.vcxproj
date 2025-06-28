@@ -154,6 +154,7 @@
     <ClInclude Include="include\ConstantBuffer.h" />
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\DescriptorHeap.h" />
     <ClInclude Include="include\GamePad.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\IInputDevice.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\Debug.cpp" />
+    <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\GamePad.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />

@@ -195,6 +195,13 @@ bool MEngine::CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFa
     return true;
 }
 
+bool MEngine::CreateResourceDescriptorHeap()
+{
+    resourceHeap = new DescriptorHeap(_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 512);
+
+    return true;
+}
+
 bool MEngine::CreateFinalRenderTarget()
 {
     // レンダーターゲット用のヒープを作成
@@ -274,6 +281,10 @@ void MEngine::BegineRender()
     // レンダーターゲットのクリア
     float cc[] = { .0f, .0f, 1.0f, 1.0f };
     _commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+
+    // 共有ヒープの設定
+    ID3D12DescriptorHeap* const heaps[] = { resourceHeap->GetHeap() };
+    _commandList->SetDescriptorHeaps(1, heaps);
 }
 
 void MEngine::EndRender()
@@ -463,6 +474,8 @@ MEngine::~MEngine()
         }
     }
 
+    delete resourceHeap;
+
     CloseHandle(_fenceEvent);
     CoUninitialize();
 }
@@ -504,6 +517,11 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         assert("スワップチェインの作成に失敗！");
         return false;
     }
+    if (!CreateResourceDescriptorHeap())
+    {
+        assert(0 && "リソース用ディスクリプタヒープの作成に失敗！");
+        return false;
+    }
     if (!CreateFinalRenderTarget())
     {
         assert("最終的な描画先の作成に失敗！");
@@ -521,7 +539,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     // ★ポリゴンの表示テスト★
     texLoader.Init(_device.Get());
     const char* texfilePath = "Assets/texture/free_ei.png";
-    sprite.Init(_device.Get(), _commandList.Get(), texLoader.GetTextureByPath(texfilePath).Get(), true);
+    sprite.Init(_device.Get(), _commandList.Get(), resourceHeap, texLoader.GetTextureByPath(texfilePath).Get(), true);
     sprite.Transform()->SetPos({ 640, 360, 0 });
     spriteRenderer.Init(_device.Get());
 
