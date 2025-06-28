@@ -11,6 +11,7 @@
 #include "Camera.h"
 //
 
+#include "DescriptorHeap.h"
 #include "InputSystem.h"
 #include "GameTime.h"
 
@@ -41,11 +42,14 @@ private:
 
 	D3D12_RESOURCE_STATES _renderTargetStates[2] = { D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COMMON };
 
+	DescriptorHeap* resourceHeap;
+
 	IDXGIFactory6* CreateDXGIFactory();
 	bool CreateDevice(IDXGIFactory6* dxgiFactory);
 	bool CreateCommandList();
 	bool CreateCommandQueue();
 	bool CreateSwapchain(HWND hwnd, SIZE& windowSize, IDXGIFactory6* dxgiFactory);
+	bool CreateResourceDescriptorHeap();
 	bool CreateFinalRenderTarget();
 	bool CreateSynchronizationWithGPUObject();
 

@@ -33,14 +33,14 @@ void Sprite::InitIndexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* co
     _indexBuffer.Init(device, commandList, &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
 }
 
-void Sprite::InitTexture(ID3D12Device* device, ID3D12Resource* texture)
+void Sprite::InitTexture(ID3D12Device* device, DescriptorHeap* descHeap, ID3D12Resource* texture)
 {
-    _texture.Init(device, texture);
+    _texture.Init(device, descHeap, texture);
 }
 
-void Sprite::InitConstantBuffer(ID3D12Device* device)
+void Sprite::InitConstantBuffer(ID3D12Device* device, DescriptorHeap* descHeap)
 {
-    _constantBuffer.Init(device, sizeof(_transform.GetWorldMatrix()));
+    _constantBuffer.Init(device, descHeap, sizeof(_transform.GetWorldMatrix()));
     auto world = _transform.GetWorldMatrix();
     _constantBuffer.Update(&world, sizeof(world));
 }
@@ -48,6 +48,7 @@ void Sprite::InitConstantBuffer(ID3D12Device* device)
 void Sprite::Init(
     ID3D12Device* device,
     ID3D12GraphicsCommandList* commandList,
+    DescriptorHeap* descHeap,
     ID3D12Resource* texture,
     bool setNativeSize, float width, float height)
 {
@@ -63,8 +64,8 @@ void Sprite::Init(
 
     InitVertexBuffer(device, commandList);
     InitIndexBuffer(device, commandList);
-    InitTexture(device, texture);
-    InitConstantBuffer(device);
+    InitTexture(device, descHeap, texture);
+    InitConstantBuffer(device, descHeap);
 }
 
 void Sprite::Update(Matrix cameraView)
@@ -81,12 +82,7 @@ void Sprite::Draw(ID3D12GraphicsCommandList* commandList)
     commandList->IASetVertexBuffers(0, 1, &_vertexBuffer.GetView());
     commandList->IASetIndexBuffer(&_indexBuffer.GetView());
 
-    ID3D12DescriptorHeap* constantHeaps[] = { _constantBuffer.GetHeap() };
-    commandList->SetDescriptorHeaps(1, constantHeaps);
     commandList->SetGraphicsRootDescriptorTable(0, _constantBuffer.GetGPUHandle());
-
-    ID3D12DescriptorHeap* textureHeaps[] = { _texture.GetHeap() };
-    commandList->SetDescriptorHeaps(1, textureHeaps);
     commandList->SetGraphicsRootDescriptorTable(1, _texture.GetGPUHandle());
 
     commandList->DrawIndexedInstanced(_indexBuffer.GetIndexNum(), 1, 0, 0, 0);
