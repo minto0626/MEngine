@@ -1,5 +1,6 @@
-#include "TextureLoader.h"
+ï»¿#include "TextureLoader.h"
 #include "d3dx12.h"
+#include "GraphicsContext.h"
 
 using namespace std;
 using namespace DirectX;
@@ -7,21 +8,21 @@ using namespace Microsoft::WRL;
 
 namespace
 {
-	// ƒtƒ@ƒCƒ‹–¼‚©‚çŠg’£q‚ğ“¾‚é
-	// @param path ‘ÎÛ‚ÌƒpƒX•¶š—ñ
-	// @return Šg’£q
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰æ‹¡å¼µå­ã‚’å¾—ã‚‹
+	// @param path å¯¾è±¡ã®ãƒ‘ã‚¹æ–‡å­—åˆ—
+	// @return æ‹¡å¼µå­
 	string GetExtension(const string& path)
 	{
 		size_t idx = path.rfind('.');
 		return path.substr(idx + 1, path.length() - idx - 1);
 	}
 
-	// std::stringiƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñj‚©‚ç std::wstringiƒƒCƒh•¶š—ñj‚ğ“¾‚é
-	// @param str ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ
-	// @return •ÏŠ·‚³‚ê‚½ƒƒCƒh•¶š—ñ
+	// std::stringï¼ˆãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ï¼‰ã‹ã‚‰ std::wstringï¼ˆãƒ¯ã‚¤ãƒ‰æ–‡å­—åˆ—ï¼‰ã‚’å¾—ã‚‹
+	// @param str ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—
+	// @return å¤‰æ›ã•ã‚ŒãŸãƒ¯ã‚¤ãƒ‰æ–‡å­—åˆ—
 	wstring GetWideStringFromString(const string& str)
 	{
-		// ŒÄ‚Ño‚µ‚P‰ñ–Úi•¶š—ñ”‚ğ“¾‚éj
+		// å‘¼ã³å‡ºã—ï¼‘å›ç›®ï¼ˆæ–‡å­—åˆ—æ•°ã‚’å¾—ã‚‹ï¼‰
 		auto num1 = MultiByteToWideChar(
 			CP_ACP,
 			MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
@@ -30,10 +31,10 @@ namespace
 			nullptr,
 			0);
 
-		wstring wstr;		// string‚Ìwchar_t”Å
-		wstr.resize(num1);	// “¾‚ç‚ê‚½•¶š—ñ”‚ÅƒŠƒTƒCƒY
+		wstring wstr;		// stringã®wchar_tç‰ˆ
+		wstr.resize(num1);	// å¾—ã‚‰ã‚ŒãŸæ–‡å­—åˆ—æ•°ã§ãƒªã‚µã‚¤ã‚º
 
-		// ŒÄ‚Ño‚µ‚Q‰ñ–ÚiŠm•ÛÏ‚Ìwstr‚É•ÏŠ·•¶š—ñ‚ğƒRƒs[j
+		// å‘¼ã³å‡ºã—ï¼’å›ç›®ï¼ˆç¢ºä¿æ¸ˆã®wstrã«å¤‰æ›æ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼ï¼‰
 		auto num2 = MultiByteToWideChar(
 			CP_ACP,
 			MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
@@ -49,7 +50,7 @@ namespace
 
 void TextureLoader::CreateTextureLoaderTable()
 {
-	// BMP‚âPNG‚È‚ÇAWindows‚ªƒfƒtƒHƒ‹ƒg‚Å“Ç‚ß‚éŠî–{“I‚È‰æ‘œŒ`®
+	// BMPã‚„PNGãªã©ã€WindowsãŒãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§èª­ã‚ã‚‹åŸºæœ¬çš„ãªç”»åƒå½¢å¼
 	_loadLamdaTable["sph"]
 		= _loadLamdaTable["spa"]
 		= _loadLamdaTable["bmp"]
@@ -60,13 +61,13 @@ void TextureLoader::CreateTextureLoaderTable()
 		{
 			return LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, meta, image);
 		};
-	// TGA‚È‚Ç‚Ìˆê•”‚Ì3Dƒ\ƒtƒg‚Åg—p‚³‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹Œ`®
+	// TGAãªã©ã®ä¸€éƒ¨ã®3Dã‚½ãƒ•ãƒˆã§ä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼
 	_loadLamdaTable["tga"] = [](const wstring& path, TexMetadata* meta, ScratchImage& image)
 		-> HRESULT
 		{
 			return LoadFromTGAFile(path.c_str(), meta, image);
 		};
-	// DirectX—p‚Ìˆ³kƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹Œ`®
+	// DirectXç”¨ã®åœ§ç¸®ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼
 	_loadLamdaTable["dds"] = [](const wstring& path, TexMetadata* meta, ScratchImage& image)
 		-> HRESULT
 		{
@@ -76,11 +77,11 @@ void TextureLoader::CreateTextureLoaderTable()
 
 ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 {
-	auto wtexPath = GetWideStringFromString(texPath);	// ƒeƒNƒXƒ`ƒƒ‚Ìƒtƒ@ƒCƒ‹ƒpƒX
-	auto ext = GetExtension(texPath);	// Šg’£q‚ğæ“¾
+	auto wtexPath = GetWideStringFromString(texPath);	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹
+	auto ext = GetExtension(texPath);	// æ‹¡å¼µå­ã‚’å–å¾—
 	TexMetadata metadata = {};
 	ScratchImage scratchImage = {};
-	// “Ç‚İ‚ß‚éŠg’£q‚ª‘¶İ‚µ‚È‚¢
+	// èª­ã¿è¾¼ã‚ã‚‹æ‹¡å¼µå­ãŒå­˜åœ¨ã—ãªã„
 	if (_loadLamdaTable.find(ext) == _loadLamdaTable.end())
 	{
 		return nullptr;
@@ -91,13 +92,14 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 		return nullptr;
 	}
 
-	auto image = scratchImage.GetImage(0, 0, 0);	// ¶ƒf[ƒ^’Šo
+	auto image = scratchImage.GetImage(0, 0, 0);	// ç”Ÿãƒ‡ãƒ¼ã‚¿æŠ½å‡º
 
-	// WriteToSubresource ‚Å“]‘—‚·‚é—p‚Ìƒq[ƒvİ’è
+#if false
+	// WriteToSubresource ã§è»¢é€ã™ã‚‹ç”¨ã®ãƒ’ãƒ¼ãƒ—è¨­å®š
 	D3D12_HEAP_PROPERTIES texHeapProp = CD3DX12_HEAP_PROPERTIES(
 		D3D12_CPU_PAGE_PROPERTY_WRITE_BACK,
 		D3D12_MEMORY_POOL_L0);
-	// ƒŠƒ\[ƒX‚Ìİ’è
+	// ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 	D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		metadata.format,
 		metadata.width,
@@ -105,7 +107,7 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 		static_cast<UINT16>(metadata.arraySize),
 		static_cast<UINT16>(metadata.mipLevels));
 
-	// ƒoƒbƒtƒ@[ì¬
+	// ãƒãƒƒãƒ•ã‚¡ãƒ¼ä½œæˆ
 	ID3D12Resource* texBuffer = nullptr;
 	result = _device->CreateCommittedResource(
 		&texHeapProp,
@@ -121,10 +123,10 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 
 	result = texBuffer->WriteToSubresource(
 		0,
-		nullptr,			// ‘S—ÌˆæƒRƒs[
-		image->pixels,		// Œ³ƒf[ƒ^ƒAƒhƒŒƒX
-		static_cast<UINT>(image->rowPitch),	// ‚Pƒ‰ƒCƒ“ƒTƒCƒY
-		static_cast<UINT>(image->slicePitch));	// ‘SƒTƒCƒY
+		nullptr,			// å…¨é ˜åŸŸã‚³ãƒ”ãƒ¼
+		image->pixels,		// å…ƒãƒ‡ãƒ¼ã‚¿ã‚¢ãƒ‰ãƒ¬ã‚¹
+		static_cast<UINT>(image->rowPitch),	// ï¼‘ãƒ©ã‚¤ãƒ³ã‚µã‚¤ã‚º
+		static_cast<UINT>(image->slicePitch));	// å…¨ã‚µã‚¤ã‚º
 	if (FAILED(result))
 	{
 		return nullptr;
@@ -132,6 +134,96 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 
 	_resourceTable[texPath] = texBuffer;
 	return texBuffer;
+#else
+	// CopyTextureRegion ã§è»¢é€ã™ã‚‹
+	// GPUç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
+	auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		metadata.format,
+		metadata.width,
+		static_cast<UINT>(metadata.height),
+		static_cast<UINT16>(metadata.arraySize),
+		static_cast<UINT16>(metadata.mipLevels));
+
+	ID3D12Resource* texBuffer = nullptr;
+	result = _graphicsContext->device->CreateCommittedResource(
+		&texHeapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&texDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(&texBuffer));
+	if (FAILED(result))
+	{
+		return nullptr;
+	}
+
+	// ä¸­é–“ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆ
+	auto uploadHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	UINT64 uploadBufferSize = 0;
+	_graphicsContext->device->GetCopyableFootprints(&texDesc, 0, 1, 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+	auto uploadDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+
+	ComPtr<ID3D12Resource> uploadBuffer;
+	result = _graphicsContext->device->CreateCommittedResource(
+		&uploadHeapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&uploadDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
+	if (FAILED(result))
+	{
+		return nullptr;
+	}
+
+	// CPUã‹ã‚‰ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
+	UINT numRows;
+	UINT64 rowSizeInBytes;
+	UINT64 totalBytes;
+	_graphicsContext->device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &totalBytes);
+
+	void* mappedData = nullptr;
+	uploadBuffer->Map(0, nullptr, &mappedData);
+
+	// 1ãƒ©ã‚¤ãƒ³ãšã¤ã‚³ãƒ”ãƒ¼ã™ã‚‹ï¼ˆRowPitchã®ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°å¯¾å¿œï¼‰
+	BYTE* destSlice = static_cast<BYTE*>(mappedData) + footprint.Offset;
+	const BYTE* srcSlice = image->pixels;
+	for (UINT y = 0; y < numRows; ++y)
+	{
+		memcpy(destSlice + y * footprint.Footprint.RowPitch,
+			srcSlice + y * image->rowPitch,
+			image->rowPitch);
+	}
+	uploadBuffer->Unmap(0, nullptr);
+
+	// GPUå´ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸è»¢é€
+	D3D12_TEXTURE_COPY_LOCATION dst = {};
+	dst.pResource = texBuffer;
+	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	dst.SubresourceIndex = 0;
+
+	D3D12_TEXTURE_COPY_LOCATION src = {};
+	src.pResource = uploadBuffer.Get();
+	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	src.PlacedFootprint = footprint;
+
+	_graphicsContext->commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		texBuffer,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	_graphicsContext->commandList->ResourceBarrier(1, &barrier);
+
+	_graphicsContext->ExecuteCommand();
+	_graphicsContext->WaitDraw();
+	_graphicsContext->ResetCommand();
+
+	_resourceTable[texPath] = texBuffer;
+	return texBuffer;
+#endif
 }
 
 ID3D12Resource* TextureLoader::CreateDefaultTexture(size_t width, size_t height)
@@ -140,7 +232,7 @@ ID3D12Resource* TextureLoader::CreateDefaultTexture(size_t width, size_t height)
 	auto resDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, static_cast<UINT>(height));
 
 	ID3D12Resource* buffer = nullptr;
-	auto result = _device->CreateCommittedResource(
+	auto result = _graphicsContext->device->CreateCommittedResource(
 		&texHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&resDesc,
@@ -162,8 +254,8 @@ ID3D12Resource* TextureLoader::CreateWhiteTexture()
 	ID3D12Resource* whiteBuffer = CreateDefaultTexture(4, 4);
 
 	vector<unsigned char> data(4 * 4 * 4);
-	fill(data.begin(), data.end(), 0xff);	// ‘S‚Ä255‚Å–„‚ß‚é
-	// ƒf[ƒ^“]‘—
+	fill(data.begin(), data.end(), 0xff);	// å…¨ã¦255ã§åŸ‹ã‚ã‚‹
+	// ãƒ‡ãƒ¼ã‚¿è»¢é€
 	auto result = whiteBuffer->WriteToSubresource(
 		0,
 		nullptr,
@@ -181,8 +273,8 @@ ID3D12Resource* TextureLoader::CreateBlackTexture()
 	ID3D12Resource* blackBuffer = CreateDefaultTexture(4, 4);
 
 	vector<unsigned char> data(4 * 4 * 4);
-	fill(data.begin(), data.end(), 0x00);	// ‘S‚Ä0‚Å–„‚ß‚é
-	// ƒf[ƒ^“]‘—
+	fill(data.begin(), data.end(), 0x00);	// å…¨ã¦0ã§åŸ‹ã‚ã‚‹
+	// ãƒ‡ãƒ¼ã‚¿è»¢é€
 	auto result = blackBuffer->WriteToSubresource(
 		0,
 		nullptr,
@@ -199,7 +291,7 @@ ID3D12Resource* TextureLoader::CreateGrayGradationTexture()
 {
 	ID3D12Resource* gradBuffer = CreateDefaultTexture(4, 256);
 
-	// ã‚ª”’‚­‚Ä‰º‚ª•‚¢ƒeƒNƒXƒ`ƒƒƒf[ƒ^‚ğì¬
+	// ä¸ŠãŒç™½ãã¦ä¸‹ãŒé»’ã„ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
 	vector<unsigned int> data(4 * 256);
 	auto iterator = data.begin();
 	unsigned int c = 0xff;
@@ -222,9 +314,9 @@ ID3D12Resource* TextureLoader::CreateGrayGradationTexture()
 	return gradBuffer;
 }
 
-void TextureLoader::Init(ID3D12Device* device)
+void TextureLoader::Init(GraphicsContext* graphicsContext)
 {
-	_device = device;
+	_graphicsContext = graphicsContext;
 
 	CreateTextureLoaderTable();
 	_whiteTexture = CreateWhiteTexture();
@@ -236,8 +328,8 @@ ComPtr<ID3D12Resource> TextureLoader::GetTextureByPath(const char* texPath)
 {
 	auto it = _resourceTable.find(texPath);
 	if (it != _resourceTable.end()) {
-		//ƒe[ƒuƒ‹‚É“à‚É‚ ‚Á‚½‚çƒ[ƒh‚·‚é‚Ì‚Å‚Í‚È‚­ƒ}ƒbƒv“à‚Ì
-		//ƒŠƒ\[ƒX‚ğ•Ô‚·
+		//ãƒ†ãƒ¼ãƒ–ãƒ«ã«å†…ã«ã‚ã£ãŸã‚‰ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã®ã§ã¯ãªããƒãƒƒãƒ—å†…ã®
+		//ãƒªã‚½ãƒ¼ã‚¹ã‚’è¿”ã™
 		return _resourceTable[texPath];
 	}
 	else {

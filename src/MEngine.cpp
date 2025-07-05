@@ -533,11 +533,16 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         return false;
     }
 
-    //ToggleFullScreen();
-    //ToggleFullScreen();
+    graphicsContext.device = _device.Get();
+    graphicsContext.commandList = _commandList.Get();
+    graphicsContext.commandAllocator = _commandAllocator.Get();
+    graphicsContext.commandQueue = _commandQueue.Get();
+    graphicsContext.fence = _fence.Get();
+    graphicsContext.fenceValue = &_fenceValue;
+    graphicsContext.fenceEvent = _fenceEvent;
 
     // ★ポリゴンの表示テスト★
-    texLoader.Init(_device.Get());
+    texLoader.Init(&graphicsContext);
     const char* texfilePath = "Assets/texture/free_ei.png";
     sprite.Init(_device.Get(), _commandList.Get(), resourceHeap, texLoader.GetTextureByPath(texfilePath).Get(), true);
     sprite.Transform()->SetPos({ 640, 360, 0 });

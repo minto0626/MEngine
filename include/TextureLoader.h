@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <d3d12.h>
 #include <map>
 #include <string>
@@ -6,26 +6,28 @@
 #include <DirectXTex.h>
 #include <wrl.h>
 
+class GraphicsContext;
+
 class TextureLoader
 {
 private:
 
-	ID3D12Device* _device;
+	GraphicsContext* _graphicsContext;
 
-	// ƒ[ƒh—pƒe[ƒuƒ‹
+	// ãƒ­ãƒ¼ãƒ‰ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	using LoadLamda_t = std::function<HRESULT(const std::wstring& path, DirectX::TexMetadata*, DirectX::ScratchImage&)>;
 	std::map<std::string, LoadLamda_t> _loadLamdaTable;
 
-	// ƒtƒ@ƒCƒ‹–¼ƒpƒX‚ÆƒŠƒ\[ƒX‚Ìƒ}ƒbƒvƒe[ƒuƒ‹
+	// ãƒ•ã‚¡ã‚¤ãƒ«åãƒ‘ã‚¹ã¨ãƒªã‚½ãƒ¼ã‚¹ã®ãƒãƒƒãƒ—ãƒ†ãƒ¼ãƒ–ãƒ«
 	std::map<std::string, ID3D12Resource*> _resourceTable;
 
-	// ƒeƒNƒXƒ`ƒƒƒ[ƒ_ƒe[ƒuƒ‹‚Ìì¬
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ­ãƒ¼ãƒ€ãƒ†ãƒ¼ãƒ–ãƒ«ã®ä½œæˆ
 	void CreateTextureLoaderTable();
 
-	// w’èƒeƒNƒXƒ`ƒƒ‚Ìƒ[ƒh
+	// æŒ‡å®šãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ­ãƒ¼ãƒ‰
 	ID3D12Resource* CreateTextureFromFile(const char* texPath);
 
-	// ƒfƒtƒHƒ‹ƒgƒeƒNƒXƒ`ƒƒ
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ†ã‚¯ã‚¹ãƒãƒ£
 	Microsoft::WRL::ComPtr<ID3D12Resource> _whiteTexture;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _blackTexture;
 	Microsoft::WRL::ComPtr<ID3D12Resource> _gradationTexture;
@@ -35,7 +37,7 @@ private:
 	ID3D12Resource* CreateGrayGradationTexture();
 
 public:
-	void Init(ID3D12Device* device);
+	void Init(GraphicsContext* graphicsContext);
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetTextureByPath(const char* texPath);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetWhiteTexture() const { return _whiteTexture.Get(); }
