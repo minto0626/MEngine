@@ -1,5 +1,6 @@
 ﻿#include "DescriptorHeap.h"
 #include <cassert>
+#include <string>
 
 DescriptorHeap::DescriptorHeap(
 	ID3D12Device* device,
@@ -22,6 +23,24 @@ DescriptorHeap::DescriptorHeap(
 		assert(0 && "ディスクリプタヒープの作成に失敗");
 		return;
 	}
+
+	std::wstring name = L"descriptor_heap";
+	switch (type)
+	{
+	case D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV:
+		name += L"_sbv_srv_uav";
+		break;
+	case D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER:
+		name += L"_sampler";
+		break;
+	case D3D12_DESCRIPTOR_HEAP_TYPE_RTV:
+		name += L"_rtv";
+		break;
+	case D3D12_DESCRIPTOR_HEAP_TYPE_DSV:
+		name += L"_dsv";
+		break;
+	}
+	_heap->SetName(name.c_str());
 
 	_descriptorSize = device->GetDescriptorHandleIncrementSize(type);
 

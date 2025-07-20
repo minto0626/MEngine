@@ -1,4 +1,4 @@
-#include "RootSignature.h"
+ï»¿#include "RootSignature.h"
 #include "d3dx12.h"
 #include <cassert>
 #include "Debug.h"
@@ -19,7 +19,7 @@ void RootSignature::AddDescriptorTable(UINT numDescriptors, UINT shaderRegister,
 	_ranges.push_back(range);
 
 	CD3DX12_ROOT_PARAMETER param = {};
-	param.InitAsDescriptorTable(1, nullptr, visibility);	// Bulid‚ÉƒŒƒ“ƒW‚ğİ’è‚·‚é
+	param.InitAsDescriptorTable(1, nullptr, visibility);	// Bulidæ™‚ã«ãƒ¬ãƒ³ã‚¸ã‚’è¨­å®šã™ã‚‹
 
 	_parameters.push_back(param);
 }
@@ -66,20 +66,22 @@ void RootSignature::Build(ID3D12Device* device)
 		if (errorBlob != nullptr)
 		{
 			std::string error(static_cast<char*>(errorBlob->GetBufferPointer()), errorBlob->GetBufferSize());
-			Debug::ShowErrorMessageBox(error, "ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ÌƒVƒŠƒAƒ‰ƒCƒY‚É¸”s!");
+			Debug::ShowErrorMessageBox(error, "ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã«å¤±æ•—!");
 		}
 		assert(0);
 		return;
 	}
 
 	result = device->CreateRootSignature(
-		0,	// GPU‚Í‚P‚Â‘O’ñ
+		0,	// GPUã¯ï¼‘ã¤å‰æ
 		rootSignatureBlob->GetBufferPointer(),
 		rootSignatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(_rootSignature.ReleaseAndGetAddressOf()));
 	if (FAILED(result))
 	{
-		Debug::ShowErrorMessageBox("ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ì¶¬‚É¸”s!", "ƒGƒ‰[");
+		Debug::ShowErrorMessageBox("ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ç”Ÿæˆã«å¤±æ•—!", "ã‚¨ãƒ©ãƒ¼");
 		return;
 	}
+
+	_rootSignature->SetName(L"root_signature");
 }

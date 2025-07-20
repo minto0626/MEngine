@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 #include <d3d12.h>
 #include <wrl.h>
+#include "GfxCommandContext.h"
 
 class IndexBuffer
 {
@@ -14,7 +15,7 @@ private:
 public:
 	void Init(
 		ID3D12Device* device,
-		ID3D12GraphicsCommandList* commndList,
+		Graphics::GfxCommandContext& commandContext,
 		const void* indexData,
 		UINT indexNum,
 		DXGI_FORMAT format);

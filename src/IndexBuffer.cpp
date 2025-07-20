@@ -1,10 +1,10 @@
-#include "IndexBuffer.h"
+ï»¿#include "IndexBuffer.h"
 #include "d3dx12.h"
 #include <cassert>
 
 void IndexBuffer::Init(
 	ID3D12Device* device,
-	ID3D12GraphicsCommandList* commndList,
+	Graphics::GfxCommandContext& commandContext,
 	const void* indexData,
 	UINT indexNum,
 	DXGI_FORMAT format)
@@ -23,9 +23,9 @@ void IndexBuffer::Init(
 		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS(_indexBuffer.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert("ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@[‚Ìì¬‚ÉŽ¸”s!"); return; }
+	if (FAILED(result)) { assert("ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ä½œæˆã«å¤±æ•—!"); return; }
 
-	// ƒAƒbƒvƒ[ƒh—p‚Ìƒq[ƒv‚É’†ŠÔƒoƒbƒtƒ@[‚ðì¬
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒ’ãƒ¼ãƒ—ã«ä¸­é–“ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’ä½œæˆ
 	auto upload_heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	result = device->CreateCommittedResource(
 		&upload_heapProp,
@@ -34,34 +34,32 @@ void IndexBuffer::Init(
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(_uploadBuffer.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert("ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@[‚Ìì¬‚ÉŽ¸”s!"); return; }
+	if (FAILED(result)) { assert("ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ä½œæˆã«å¤±æ•—!"); return; }
 
-	// CPU‚©‚çƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@[‚Éƒf[ƒ^‚ðƒRƒs[
+	// CPUã‹ã‚‰ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ãƒ¼ã«ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼
 	void* mappedData = nullptr;
 	result = _uploadBuffer->Map(0, nullptr, &mappedData);
-	if (FAILED(result)) { assert("ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@‚Ìƒ}ƒbƒv‚ÉŽ¸”s"); return; }
+	if (FAILED(result)) { assert("ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã®ãƒžãƒƒãƒ—ã«å¤±æ•—"); return; }
 	memcpy(mappedData, indexData, bufferSize);
 	_uploadBuffer->Unmap(0, nullptr);
 
-	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	commandContext.ResourceBarrier(
 		_indexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COMMON,
 		D3D12_RESOURCE_STATE_COPY_DEST);
-	commndList->ResourceBarrier(1, &barrier);
 
-	// ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@[‚©‚çƒfƒtƒHƒ‹ƒg—p‚Ìƒoƒbƒtƒ@[‚Éƒf[ƒ^‚ð“]‘—
-	commndList->CopyResource(_indexBuffer.Get(), _uploadBuffer.Get());
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‹ã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€
+	commandContext.CopyResource(_indexBuffer.Get(), _uploadBuffer.Get());
 
-	// ƒŠƒ\[ƒXó‘Ô‚ð’¸“_ƒoƒbƒtƒ@[—p‚É‘JˆÚ
-	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	// ãƒªã‚½ãƒ¼ã‚¹çŠ¶æ…‹ã‚’é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ç”¨ã«é·ç§»
+	commandContext.ResourceBarrier(
 		_indexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_INDEX_BUFFER);
-	commndList->ResourceBarrier(1, &barrier);
 
-	_indexBuffer->SetName(L"IndexBuffer");
+	_indexBuffer->SetName(L"index_buffer");
 
-	// ƒrƒ…[‚ðÝ’è
+	// ãƒ“ãƒ¥ãƒ¼ã‚’è¨­å®š
 	_indexBufferView.BufferLocation = _indexBuffer->GetGPUVirtualAddress();
 	_indexBufferView.SizeInBytes = bufferSize;
 	_indexBufferView.Format = format;

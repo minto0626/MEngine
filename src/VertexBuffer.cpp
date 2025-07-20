@@ -1,10 +1,10 @@
-#include "VertexBuffer.h"
+ï»¿#include "VertexBuffer.h"
 #include "d3dx12.h"
 #include <cassert>
 
 void VertexBuffer::Init(
 	ID3D12Device* device,
-	ID3D12GraphicsCommandList* commndList,
+	Graphics::GfxCommandContext& commandContext,
 	const void* vertexData,
 	UINT vertexNum,
 	UINT vertexStride)
@@ -14,7 +14,7 @@ void VertexBuffer::Init(
 
 	UINT bufferSize = vertexNum * vertexStride;
 
-	// ƒfƒtƒHƒ‹ƒg‚Ìƒq[ƒv‚É’¸“_ƒoƒbƒtƒ@[‚ðì¬
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ’ãƒ¼ãƒ—ã«é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’ä½œæˆ
 	auto def_heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	auto bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
 	auto result = device->CreateCommittedResource(
@@ -24,9 +24,9 @@ void VertexBuffer::Init(
 		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS(_vertexBuffer.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert("’¸“_ƒoƒbƒtƒ@[‚Ìì¬‚ÉŽ¸”s!"); return; }
+	if (FAILED(result)) { assert("é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ä½œæˆã«å¤±æ•—!"); return; }
 
-	// ƒAƒbƒvƒ[ƒh—p‚Ìƒq[ƒv‚É’†ŠÔƒoƒbƒtƒ@[‚ðì¬
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒ’ãƒ¼ãƒ—ã«ä¸­é–“ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’ä½œæˆ
 	auto upload_heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	result = device->CreateCommittedResource(
 		&upload_heapProp,
@@ -35,34 +35,33 @@ void VertexBuffer::Init(
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(_uploadBuffer.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert("ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@[‚Ìì¬‚ÉŽ¸”s!"); return; }
+	if (FAILED(result)) { assert("ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã®ä½œæˆã«å¤±æ•—!"); return; }
 
-	// CPU‚©‚çƒAƒbƒvƒ[ƒh—pƒoƒbƒtƒ@[‚Éƒf[ƒ^‚ðƒRƒs[
+	// CPUã‹ã‚‰ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡ãƒ¼ã«ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼
 	void* mappedData = nullptr;
 	result = _uploadBuffer->Map(0, nullptr, &mappedData);
-	if (FAILED(result)) { assert("ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@‚Ìƒ}ƒbƒv‚ÉŽ¸”s"); return; }
+	if (FAILED(result)) { assert("ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã®ãƒžãƒƒãƒ—ã«å¤±æ•—"); return; }
 	memcpy(mappedData, vertexData, bufferSize);
 	_uploadBuffer->Unmap(0, nullptr);
 
-	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	commandContext.ResourceBarrier(
 		_vertexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COMMON,
 		D3D12_RESOURCE_STATE_COPY_DEST);
-	commndList->ResourceBarrier(1, &barrier);
 
-	// ƒAƒbƒvƒ[ƒh—p‚Ìƒoƒbƒtƒ@[‚©‚çƒfƒtƒHƒ‹ƒg—p‚Ìƒoƒbƒtƒ@[‚Éƒf[ƒ^‚ð“]‘—
-	commndList->CopyResource(_vertexBuffer.Get(), _uploadBuffer.Get());
+	// ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‹ã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆç”¨ã®ãƒãƒƒãƒ•ã‚¡ãƒ¼ã«ãƒ‡ãƒ¼ã‚¿ã‚’è»¢é€
+	//commndList->CopyResource(_vertexBuffer.Get(), _uploadBuffer.Get());
+	commandContext.CopyResource(_vertexBuffer.Get(), _uploadBuffer.Get());
 
-	// ƒŠƒ\[ƒXó‘Ô‚ð’¸“_ƒoƒbƒtƒ@[—p‚É‘JˆÚ
-	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	// ãƒªã‚½ãƒ¼ã‚¹çŠ¶æ…‹ã‚’é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ç”¨ã«é·ç§»
+	commandContext.ResourceBarrier(
 		_vertexBuffer.Get(),
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	commndList->ResourceBarrier(1, &barrier);
 
-	_vertexBuffer->SetName(L"VertexBuffer");
+	_vertexBuffer->SetName(L"vertex_buffer");
 
-	// ƒrƒ…[‚ðÝ’è
+	// ãƒ“ãƒ¥ãƒ¼ã‚’è¨­å®š
 	_vertexBufferView.BufferLocation = _vertexBuffer->GetGPUVirtualAddress();
 	_vertexBufferView.SizeInBytes = bufferSize;
 	_vertexBufferView.StrideInBytes = vertexStride;

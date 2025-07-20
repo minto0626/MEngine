@@ -1,6 +1,7 @@
 ﻿#include "TextureLoader.h"
 #include "d3dx12.h"
 #include "GraphicsContext.h"
+#include "StringUtility.h"
 
 using namespace std;
 using namespace DirectX;
@@ -135,6 +136,8 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 	_resourceTable[texPath] = texBuffer;
 	return texBuffer;
 #else
+	auto* device = _graphicsContext->device->Get();
+
 	// CopyTextureRegion で転送する
 	// GPU用テクスチャを作成
 	auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
@@ -146,7 +149,7 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 		static_cast<UINT16>(metadata.mipLevels));
 
 	ID3D12Resource* texBuffer = nullptr;
-	result = _graphicsContext->device->CreateCommittedResource(
+	result = device->CreateCommittedResource(
 		&texHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&texDesc,
@@ -161,11 +164,11 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 	// 中間アップロード用のバッファを作成
 	auto uploadHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	UINT64 uploadBufferSize = 0;
-	_graphicsContext->device->GetCopyableFootprints(&texDesc, 0, 1, 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+	device->GetCopyableFootprints(&texDesc, 0, 1, 0, nullptr, nullptr, nullptr, &uploadBufferSize);
 	auto uploadDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
 
 	ComPtr<ID3D12Resource> uploadBuffer;
-	result = _graphicsContext->device->CreateCommittedResource(
+	result = device->CreateCommittedResource(
 		&uploadHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&uploadDesc,
@@ -182,7 +185,7 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 	UINT numRows;
 	UINT64 rowSizeInBytes;
 	UINT64 totalBytes;
-	_graphicsContext->device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &totalBytes);
+	device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &totalBytes);
 
 	void* mappedData = nullptr;
 	uploadBuffer->Map(0, nullptr, &mappedData);
@@ -209,18 +212,20 @@ ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
 	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 	src.PlacedFootprint = footprint;
 
-	_graphicsContext->commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+	_graphicsContext->commandContext->GetCommandList()->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
 
-	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	_graphicsContext->commandContext->ResourceBarrier(
 		texBuffer,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	_graphicsContext->commandList->ResourceBarrier(1, &barrier);
 
 	_graphicsContext->ExecuteCommand();
-	_graphicsContext->WaitDraw();
+	_graphicsContext->WaitGPU();
 	_graphicsContext->ResetCommand();
 
+	std::wstring name = L"texture";
+	name += StringUtility::ToWideString(texPath);
+	texBuffer->SetName(name.c_str());
 	_resourceTable[texPath] = texBuffer;
 	return texBuffer;
 #endif
@@ -232,7 +237,7 @@ ID3D12Resource* TextureLoader::CreateDefaultTexture(size_t width, size_t height)
 	auto resDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, static_cast<UINT>(height));
 
 	ID3D12Resource* buffer = nullptr;
-	auto result = _graphicsContext->device->CreateCommittedResource(
+	auto result = _graphicsContext->device->Get()->CreateCommittedResource(
 		&texHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&resDesc,
@@ -265,6 +270,7 @@ ID3D12Resource* TextureLoader::CreateWhiteTexture()
 
 	assert(SUCCEEDED(result));
 
+	whiteBuffer->SetName(L"white_texture");
 	return whiteBuffer;
 }
 
@@ -284,6 +290,7 @@ ID3D12Resource* TextureLoader::CreateBlackTexture()
 
 	assert(SUCCEEDED(result));
 
+	blackBuffer->SetName(L"black_texture");
 	return blackBuffer;
 }
 
@@ -311,10 +318,11 @@ ID3D12Resource* TextureLoader::CreateGrayGradationTexture()
 
 	assert(SUCCEEDED(result));
 
+	gradBuffer->SetName(L"gray_gradation_texture");
 	return gradBuffer;
 }
 
-void TextureLoader::Init(GraphicsContext* graphicsContext)
+void TextureLoader::Init(Graphics::GraphicsContext* graphicsContext)
 {
 	_graphicsContext = graphicsContext;
 

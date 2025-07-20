@@ -6,13 +6,13 @@
 #include <DirectXTex.h>
 #include <wrl.h>
 
-class GraphicsContext;
+#include "GraphicsContext.h"
 
 class TextureLoader
 {
 private:
 
-	GraphicsContext* _graphicsContext;
+	Graphics::GraphicsContext* _graphicsContext;
 
 	// ロード用テーブル
 	using LoadLamda_t = std::function<HRESULT(const std::wstring& path, DirectX::TexMetadata*, DirectX::ScratchImage&)>;
@@ -37,7 +37,7 @@ private:
 	ID3D12Resource* CreateGrayGradationTexture();
 
 public:
-	void Init(GraphicsContext* graphicsContext);
+	void Init(Graphics::GraphicsContext* graphicsContext);
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetTextureByPath(const char* texPath);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetWhiteTexture() const { return _whiteTexture.Get(); }

@@ -28,6 +28,7 @@ void ConstantBuffer::Init(ID3D12Device* device, DescriptorHeap* descHeap, UINT s
 		assert(0);
 		return;
 	}
+	_buffer->SetName(L"constant_buffer");
 
 	_mappedData = nullptr;
 	result = _buffer->Map(0, nullptr, &_mappedData);

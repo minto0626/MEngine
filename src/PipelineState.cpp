@@ -1,4 +1,4 @@
-#include "PipelineState.h"
+ï»¿#include "PipelineState.h"
 #include <cassert>
 
 void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DESC desc)
@@ -8,8 +8,9 @@ void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DES
 		IID_PPV_ARGS(_pipelineState.ReleaseAndGetAddressOf()));
 	if (FAILED(result))
 	{
-		assert(0 && "ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒgƒIƒuƒWƒFƒNƒg‚Ìì¬‚ÉŽ¸”s!");
+		assert(0 && "ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆã«å¤±æ•—!");
 		return;
 	}
-	_pipelineState->SetName(L"PipelineState");
+	_pipelineState->SetName(L"pipeline_state");
+	_rootSignature = desc.pRootSignature;
 }

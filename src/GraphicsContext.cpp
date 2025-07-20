@@ -1,26 +1,22 @@
 ﻿#include "GraphicsContext.h"
 
-void GraphicsContext::ExecuteCommand()
+namespace Graphics
 {
-    commandList->Close();
-
-    ID3D12CommandList* commandLists[] = { commandList };
-    commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-}
-
-void GraphicsContext::WaitDraw()
-{
-    commandQueue->Signal(fence, ++*fenceValue);
-
-    if (fence->GetCompletedValue() != *fenceValue)
+    void GraphicsContext::ExecuteCommand()
     {
-        fence->SetEventOnCompletion(*fenceValue, fenceEvent);
-        WaitForSingleObject(fenceEvent, INFINITE);
+        commandContext->Close();
+        ID3D12CommandList* commandLists[] = { commandContext->GetCommandList() };
+        commandQueue->Get()->ExecuteCommandLists(_countof(commandLists), commandLists);
     }
-}
 
-void GraphicsContext::ResetCommand()
-{
-    commandAllocator->Reset();
-    commandList->Reset(commandAllocator, nullptr);
+    void GraphicsContext::WaitGPU()
+    {
+        commandQueue->Signal(*fence);
+        fence->Wait();
+    }
+
+    void GraphicsContext::ResetCommand()
+    {
+        commandContext->Reset();
+    }
 }

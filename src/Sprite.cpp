@@ -21,7 +21,7 @@ void Sprite::InitVertexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* c
         {{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
         {{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
     };
-    _vertexBuffer.Init(device, commandList, &vertexData, _countof(vertexData), sizeof(MeshVertex));
+    //_vertexBuffer.Init(device, commandList, &vertexData, _countof(vertexData), sizeof(MeshVertex));
 }
 
 void Sprite::InitIndexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
@@ -30,7 +30,7 @@ void Sprite::InitIndexBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* co
         0, 1, 2,
         2, 1, 3,
     };
-    _indexBuffer.Init(device, commandList, &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
+    //_indexBuffer.Init(device, commandList, &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
 }
 
 void Sprite::InitTexture(ID3D12Device* device, DescriptorHeap* descHeap, ID3D12Resource* texture)
