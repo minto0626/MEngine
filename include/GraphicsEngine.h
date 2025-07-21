@@ -49,6 +49,8 @@ namespace Graphics
 		std::unique_ptr<ConstantBuffer> constantBuffer;
 		Transform transform;
 		std::unique_ptr<Renderer> renderer;
+		const std::string worldMatParamName = "worldMat";
+		const std::string mainTexParamName = "mainTex";
 
 		IDXGIFactory6* CreateDXGIFactory();
 

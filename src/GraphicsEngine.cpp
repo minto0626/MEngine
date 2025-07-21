@@ -90,8 +90,8 @@ namespace Graphics
 		ps.LoadPS(L"Assets/shader/BasicPixelShader.hlsl", "ps");
 
 		rootSignature = std::make_unique<RootSignature>();
-		rootSignature->AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
-		rootSignature->AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
+		rootSignature->AddDescriptorTable(worldMatParamName, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
+		rootSignature->AddDescriptorTable(mainTexParamName, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
 		rootSignature->AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
 		rootSignature->Build(device.Get());
 
@@ -126,13 +126,13 @@ namespace Graphics
 		const char* texfilePath = "Assets/texture/free_ei.png";
 		texture = std::make_unique<Texture>();
 		texture->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
-		material->SetTexture(texture.get());
+		material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture.get());
 
 		constantBuffer = std::make_unique<ConstantBuffer>();
 		transform.SetPos({640, 360, 0});
 		auto world = transform.GetWorldMatrix();
 		constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
-		material->SetConstantBuffer(constantBuffer.get());
+		material->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
 	}
 
 	void GraphicsEngine::Render()
@@ -162,7 +162,7 @@ namespace Graphics
 		commandList->SetDescriptorHeaps(1, heaps);
 		auto world = transform.GetWorldMatrix();
 		world *= camera2D.GetViewMatrix();
-		material->UploadConstantBuffer(&world, sizeof(world));
+		material->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world, sizeof(world));
 		renderer->Draw(&commandContext, mesh.get(), material.get());
 
 		commandContext.ResourceBarrier(

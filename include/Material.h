@@ -3,6 +3,7 @@
 #include "PipelineState.h"
 #include "ConstantBuffer.h"
 #include "Texture.h"
+#include <unordered_map>
 
 namespace Graphics
 {
@@ -10,17 +11,16 @@ namespace Graphics
 	{
 	private:
 		PipelineState* _pipelineState = nullptr;
-
-		ConstantBuffer* _constantBuffer;
-		Texture* _texture;
+		std::unordered_map<UINT, ConstantBuffer*> _constantBuffers;
+		std::unordered_map<UINT, Texture*> _textures;
 
 	public:
 		void SetPipelineState(PipelineState* pipelineState) { _pipelineState = pipelineState; }
 		PipelineState* GetPipelineState() const { return _pipelineState; }
-		void SetConstantBuffer(ConstantBuffer* constantBuffer) { _constantBuffer = constantBuffer; }
-		void SetTexture(Texture* texture) { _texture = texture; }
+		void SetConstantBuffer(UINT rootIndex, ConstantBuffer* constantBuffer);
+		void SetTexture(UINT rootIndex, Texture* texture);
 
-		void UploadConstantBuffer(const void* data, UINT size);
+		void UploadConstantBuffer(UINT rootIndex, const void* data, UINT size);
 		void Bind(GfxCommandContext& commandContext);
 	};
 }

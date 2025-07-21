@@ -4,10 +4,10 @@
 
 void SpriteRenderer::InitRootSignature(ID3D12Device* device)
 {
-    rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
-    rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
-    rootSignature.AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
-    rootSignature.Build(device);
+    //rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
+    //rootSignature.AddDescriptorTable(1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
+    //rootSignature.AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    //rootSignature.Build(device);
 }
 
 void SpriteRenderer::InitPipelineState(ID3D12Device* device)

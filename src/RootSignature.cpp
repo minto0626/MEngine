@@ -12,7 +12,7 @@ RootSignature::RootSignature()
 	_samplers.clear();
 }
 
-void RootSignature::AddDescriptorTable(UINT numDescriptors, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility, D3D12_DESCRIPTOR_RANGE_TYPE rangeType)
+void RootSignature::AddDescriptorTable(const std::string& name, UINT numDescriptors, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility, D3D12_DESCRIPTOR_RANGE_TYPE rangeType)
 {
 	CD3DX12_DESCRIPTOR_RANGE range = {};
 	range.Init(rangeType, numDescriptors, shaderRegister);
@@ -22,6 +22,9 @@ void RootSignature::AddDescriptorTable(UINT numDescriptors, UINT shaderRegister,
 	param.InitAsDescriptorTable(1, nullptr, visibility);	// Bulid時にレンジを設定する
 
 	_parameters.push_back(param);
+
+	UINT index = static_cast<UINT>(_parameters.size() - 1);
+	_rootIndexMap[name] = index;
 }
 
 void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility)
@@ -84,4 +87,14 @@ void RootSignature::Build(ID3D12Device* device)
 	}
 
 	_rootSignature->SetName(L"root_signature");
+}
+
+UINT RootSignature::GetRootIndex(const std::string& name) const
+{
+	auto it = _rootIndexMap.find(name);
+	if (it == _rootIndexMap.end())
+	{
+		return -1;
+	}
+	return it->second;
 }
