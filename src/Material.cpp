@@ -23,6 +23,9 @@ namespace Graphics
 
 	void Material::Bind(GfxCommandContext& commandContext)
 	{
+		commandContext.SetPipelineState(_pipelineState->Get());
+		commandContext.SetRootSignature(_pipelineState->GetRootSignature());
+
 		for (auto& [rootIndex, buffer] : _constantBuffers)
 		{
 			commandContext.SetGraphicsRootDescriptorTable(rootIndex, buffer->GetGPUHandle());

@@ -8,7 +8,8 @@ namespace Graphics
 	class Renderer
 	{
 	public:
-		void Draw(GfxCommandContext* commandContext, Mesh* mesh, Material* material);
+		virtual ~Renderer() = default;
+		virtual void Draw(GfxCommandContext* commandContext) = 0;
 
 	};
 }

@@ -173,6 +173,7 @@
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\MEngine.h" />
     <ClInclude Include="include\Mesh.h" />
+    <ClInclude Include="include\MeshRenderer.h" />
     <ClInclude Include="include\PipelineState.h" />
     <ClInclude Include="include\Random.h" />
     <ClInclude Include="include\Renderer.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MEngine.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\PipelineState.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Renderer.cpp" />

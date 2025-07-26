@@ -66,7 +66,7 @@ namespace Graphics
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
 		);
 		textureLoader.Init(&graphicsContext);
-		renderer = std::make_unique<Renderer>();
+		sceneRenderers.clear();
 
 		camera2D.Init(windowSize.cx, windowSize.cy);
 
@@ -81,6 +81,9 @@ namespace Graphics
 
 	void GraphicsEngine::LoadContent()
 	{
+		auto cameraWorld = camera2D.GetViewMatrix();
+
+		// メッシュ１
 		mesh = std::make_unique<Mesh>();
 		mesh->Initialize(device.Get(), commandContext);
 
@@ -133,6 +136,79 @@ namespace Graphics
 		auto world = transform.GetWorldMatrix();
 		constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
 		material->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
+		world *= cameraWorld;
+		material->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world, sizeof(world));
+
+		meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material.get());
+		sceneRenderers.push_back(meshRenderer.get());
+
+		// メッシュ２
+		mesh2 = std::make_unique<Mesh>();
+		mesh2->Initialize(device.Get(), commandContext);
+
+		material2 = std::make_unique<Material>();
+
+		rootSignature2 = std::make_unique<RootSignature>();
+		rootSignature2->AddDescriptorTable(worldMatParamName, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
+		rootSignature2->AddDescriptorTable(mainTexParamName, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
+		rootSignature2->AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootSignature2->Build(device.Get());
+		
+		pipelineState2 = std::make_unique<PipelineState>();
+		pipelineStateDesc.pRootSignature = rootSignature2->Get();
+		pipelineState2->Init(device.Get(), pipelineStateDesc);
+
+		material2->SetPipelineState(pipelineState2.get());
+
+		const char* texfilePath2 = "Assets/texture/free_brachiosaurus.png";
+		texture2 = std::make_unique<Texture>();
+		texture2->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath2).Get());
+		material2->SetTexture(rootSignature2->GetRootIndex(mainTexParamName), texture2.get());
+
+		constantBuffer2 = std::make_unique<ConstantBuffer>();
+		transform2.SetPos({ 1080, 360, 0 });
+		auto world2 = transform2.GetWorldMatrix();
+		constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
+		material2->SetConstantBuffer(rootSignature2->GetRootIndex(worldMatParamName), constantBuffer2.get());
+		world2 *= cameraWorld;
+		material2->UploadConstantBuffer(rootSignature2->GetRootIndex(worldMatParamName), &world2, sizeof(world2));
+
+		meshRenderer2 = std::make_unique<MeshRenderer>(mesh2.get(), material2.get());
+		sceneRenderers.push_back(meshRenderer2.get());
+
+		// メッシュ３
+		mesh3 = std::make_unique<Mesh>();
+		mesh3->Initialize(device.Get(), commandContext);
+
+		material3 = std::make_unique<Material>();
+
+		rootSignature3 = std::make_unique<RootSignature>();
+		rootSignature3->AddDescriptorTable(worldMatParamName, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
+		rootSignature3->AddDescriptorTable(mainTexParamName, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
+		rootSignature3->AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootSignature3->Build(device.Get());
+
+		pipelineState3 = std::make_unique<PipelineState>();
+		pipelineStateDesc.pRootSignature = rootSignature3->Get();
+		pipelineState3->Init(device.Get(), pipelineStateDesc);
+
+		material3->SetPipelineState(pipelineState3.get());
+
+		const char* texfilePath3 = "Assets/texture/free_woman_veterinarian.png";
+		texture3 = std::make_unique<Texture>();
+		texture3->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath3).Get());
+		material3->SetTexture(rootSignature3->GetRootIndex(mainTexParamName), texture3.get());
+
+		constantBuffer3 = std::make_unique<ConstantBuffer>();
+		transform3.SetPos({ 300, 360, 0 });
+		auto world3 = transform3.GetWorldMatrix();
+		constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
+		material3->SetConstantBuffer(rootSignature3->GetRootIndex(worldMatParamName), constantBuffer3.get());
+		world3 *= cameraWorld;
+		material3->UploadConstantBuffer(rootSignature3->GetRootIndex(worldMatParamName), &world3, sizeof(world3));
+
+		meshRenderer3 = std::make_unique<MeshRenderer>(mesh3.get(), material3.get());
+		sceneRenderers.push_back(meshRenderer3.get());
 	}
 
 	void GraphicsEngine::Render()
@@ -156,14 +232,16 @@ namespace Graphics
 
 		auto rtvHandle = rtvHandles[backBufferIndex].cpuHandle;
 		commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-		commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+		const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
+		commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
 
 		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
 		commandList->SetDescriptorHeaps(1, heaps);
-		auto world = transform.GetWorldMatrix();
-		world *= camera2D.GetViewMatrix();
-		material->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world, sizeof(world));
-		renderer->Draw(&commandContext, mesh.get(), material.get());
+
+		for (auto& renderer : sceneRenderers)
+		{
+			renderer->Draw(&commandContext);
+		}
 
 		commandContext.ResourceBarrier(
 			backBuffer,
