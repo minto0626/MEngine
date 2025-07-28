@@ -1,20 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="shader">
       <UniqueIdentifier>{2d1ee361-a7e0-4a5f-942b-2fee62a99808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{3d72a1e9-24b0-4839-8914-5cbaa4027899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine">
+      <UniqueIdentifier>{c6c3e410-a0e4-4302-bc4b-3db8578f497f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Core">
+      <UniqueIdentifier>{91fac123-6d43-46a0-8905-b2fe456fdefa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\DescriptorHeap">
+      <UniqueIdentifier>{91706ff2-efed-4128-9bb9-4e6629f3d3b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Material">
+      <UniqueIdentifier>{03d327c4-b386-4175-94b0-a0a57dd3ae4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Mesh">
+      <UniqueIdentifier>{01b566f1-2a4f-4741-95d8-94bb3b9e6f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Pipeline">
+      <UniqueIdentifier>{d23f67b4-f509-454e-944d-5ac00abe95f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Renderer">
+      <UniqueIdentifier>{b7e85118-e590-4776-8cdb-6080d83a4910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Resources">
+      <UniqueIdentifier>{a50673e5-a858-4f11-af12-52020e10c3ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GraphicsEngine\Shader">
+      <UniqueIdentifier>{722b7b62-10c6-42d3-a088-0924c3a2bfbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Input">
+      <UniqueIdentifier>{be5ea780-836a-4e47-b60b-2a0cc68e90c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Math">
+      <UniqueIdentifier>{8d81fc2b-55ff-49cc-87bf-9765516171ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Scene">
+      <UniqueIdentifier>{b04880be-f62f-4b01-b485-21aec5189af5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Utility">
+      <UniqueIdentifier>{c133c2fc-5727-4b9c-b954-7f1119f14175}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -23,238 +57,221 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\resource.h">
+    <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GfxCommandContext.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GfxCommandQueue.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GfxDevice.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GfxFence.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GfxSwapChain.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Core\GraphicsContext.h">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.h">
+      <Filter>src\GraphicsEngine\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Material\Material.h">
+      <Filter>src\GraphicsEngine\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Mesh\Mesh.h">
+      <Filter>src\GraphicsEngine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.h">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Pipeline\PipelineState.h">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignature.h">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\IndexBuffer.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\Texture.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\VertexBuffer.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Shader\Shader.h">
+      <Filter>src\GraphicsEngine\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\GraphicsEngine.h">
+      <Filter>src\GraphicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\TextureLoader.h">
+      <Filter>src\GraphicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MEngine.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource.h">
       <Filter>リソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\Application.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Scene\Camera.h">
+      <Filter>src\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\ConstantBuffer.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Scene\Transform.h">
+      <Filter>src\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\d3dx12.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Utility\Debug.h">
+      <Filter>src\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\Debug.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Utility\GameTime.h">
+      <Filter>src\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\GamePad.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Utility\Random.h">
+      <Filter>src\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\IInputDevice.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Utility\StringUtility.h">
+      <Filter>src\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexBuffer.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Input\GamePad.h">
+      <Filter>src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\InputLayoutHelper.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Input\IInputDevice.h">
+      <Filter>src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\InputSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Input\InputSystem.h">
+      <Filter>src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Keyboard.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Input\Keyboard.h">
+      <Filter>src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Matrix.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Math\Color.h">
+      <Filter>src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\MEngine.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Math\Matrix.h">
+      <Filter>src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\PipelineState.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RootSignature.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Shader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SpriteRenderer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\StringUtility.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Texture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TextureLoader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Transform.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Vector.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VertexBuffer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Color.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameTime.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Random.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DescriptorHeap.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GfxCommandQueue.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GfxCommandContext.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GfxDevice.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GfxFence.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GfxSwapChain.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GraphicsContext.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GraphicsEngine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Material.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Mesh.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MeshRenderer.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Math\Vector.h">
+      <Filter>src\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Core\GfxCommandQueue.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Core\GfxDevice.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Core\GfxFence.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Core\GfxSwapChain.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Core\GraphicsContext.cpp">
+      <Filter>src\GraphicsEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.cpp">
+      <Filter>src\GraphicsEngine\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Material\Material.cpp">
+      <Filter>src\GraphicsEngine\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Mesh\Mesh.cpp">
+      <Filter>src\GraphicsEngine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.cpp">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Pipeline\PipelineState.cpp">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignature.cpp">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Renderer\MeshRenderer.cpp">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Renderer\Renderer.cpp">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\ConstantBuffer.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\IndexBuffer.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\Texture.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\VertexBuffer.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Shader\Shader.cpp">
+      <Filter>src\GraphicsEngine\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\GraphicsEngine.cpp">
+      <Filter>src\GraphicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\TextureLoader.cpp">
+      <Filter>src\GraphicsEngine</Filter>
+    </ClCompile>
     <ClCompile Include="src\Application.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ConstantBuffer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Debug.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GamePad.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexBuffer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InputLayoutHelper.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InputSystem.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Keyboard.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\MEngine.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PipelineState.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Scene\Camera.cpp">
+      <Filter>src\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\RootSignature.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Scene\Transform.cpp">
+      <Filter>src\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Utility\Debug.cpp">
+      <Filter>src\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sprite.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Utility\GameTime.cpp">
+      <Filter>src\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\SpriteRenderer.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Utility\Random.cpp">
+      <Filter>src\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\StringUtility.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Utility\StringUtility.cpp">
+      <Filter>src\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Input\GamePad.cpp">
+      <Filter>src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextureLoader.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Input\InputSystem.cpp">
+      <Filter>src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Transform.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Input\Keyboard.cpp">
+      <Filter>src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexBuffer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameTime.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Random.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DescriptorHeap.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GfxCommandQueue.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GfxCommandContext.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GfxDevice.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GfxFence.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GfxSwapChain.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsContext.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsEngine.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Material.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshRenderer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="include\MEngine.rc">
-      <Filter>ヘッダー ファイル</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\shader\BasicPixelShader.hlsl">
@@ -268,5 +285,10 @@
     <None Include="Assets\shader\BasicShaderHeader.hlsli">
       <Filter>shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\MEngine.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

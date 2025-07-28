@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/include;$(SolutionDir)/src/GraphicsEngine;$(SolutionDir)/src;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/include;$(SolutionDir)/src/GraphicsEngine;$(SolutionDir)/src;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -148,86 +148,79 @@
     <Image Include="icon\ME_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\Camera.h" />
-    <ClInclude Include="include\Color.h" />
-    <ClInclude Include="include\ConstantBuffer.h" />
-    <ClInclude Include="include\d3dx12.h" />
-    <ClInclude Include="include\Debug.h" />
-    <ClInclude Include="include\DescriptorHeap.h" />
-    <ClInclude Include="include\GamePad.h" />
-    <ClInclude Include="include\GameTime.h" />
-    <ClInclude Include="include\GfxCommandQueue.h" />
-    <ClInclude Include="include\GfxCommandContext.h" />
-    <ClInclude Include="include\GfxDevice.h" />
-    <ClInclude Include="include\GfxFence.h" />
-    <ClInclude Include="include\GfxSwapChain.h" />
-    <ClInclude Include="include\GraphicsContext.h" />
-    <ClInclude Include="include\GraphicsEngine.h" />
-    <ClInclude Include="include\IInputDevice.h" />
-    <ClInclude Include="include\IndexBuffer.h" />
-    <ClInclude Include="include\InputLayoutHelper.h" />
-    <ClInclude Include="include\InputSystem.h" />
-    <ClInclude Include="include\Keyboard.h" />
-    <ClInclude Include="include\Material.h" />
-    <ClInclude Include="include\Matrix.h" />
-    <ClInclude Include="include\MEngine.h" />
-    <ClInclude Include="include\Mesh.h" />
-    <ClInclude Include="include\MeshRenderer.h" />
-    <ClInclude Include="include\PipelineState.h" />
-    <ClInclude Include="include\Random.h" />
-    <ClInclude Include="include\Renderer.h" />
-    <ClInclude Include="include\resource.h" />
-    <ClInclude Include="include\RootSignature.h" />
-    <ClInclude Include="include\Shader.h" />
-    <ClInclude Include="include\Sprite.h" />
-    <ClInclude Include="include\SpriteRenderer.h" />
-    <ClInclude Include="include\StringUtility.h" />
-    <ClInclude Include="include\Texture.h" />
-    <ClInclude Include="include\TextureLoader.h" />
-    <ClInclude Include="include\Transform.h" />
-    <ClInclude Include="include\Vector.h" />
-    <ClInclude Include="include\VertexBuffer.h" />
+    <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GfxCommandContext.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GfxCommandQueue.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GfxDevice.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GfxFence.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GfxSwapChain.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\GraphicsContext.h" />
+    <ClInclude Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.h" />
+    <ClInclude Include="src\GraphicsEngine\GraphicsEngine.h" />
+    <ClInclude Include="src\GraphicsEngine\Material\Material.h" />
+    <ClInclude Include="src\GraphicsEngine\Mesh\Mesh.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\PipelineState.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignature.h" />
+    <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h" />
+    <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h" />
+    <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h" />
+    <ClInclude Include="src\GraphicsEngine\Resources\IndexBuffer.h" />
+    <ClInclude Include="src\GraphicsEngine\Resources\Texture.h" />
+    <ClInclude Include="src\GraphicsEngine\Resources\VertexBuffer.h" />
+    <ClInclude Include="src\GraphicsEngine\Shader\Shader.h" />
+    <ClInclude Include="src\GraphicsEngine\TextureLoader.h" />
+    <ClInclude Include="src\Input\GamePad.h" />
+    <ClInclude Include="src\Input\IInputDevice.h" />
+    <ClInclude Include="src\Input\InputSystem.h" />
+    <ClInclude Include="src\Input\Keyboard.h" />
+    <ClInclude Include="src\Math\Color.h" />
+    <ClInclude Include="src\Math\Matrix.h" />
+    <ClInclude Include="src\Math\Vector.h" />
+    <ClInclude Include="src\MEngine.h" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\Scene\Camera.h" />
+    <ClInclude Include="src\Scene\Transform.h" />
+    <ClInclude Include="src\Utility\Debug.h" />
+    <ClInclude Include="src\Utility\GameTime.h" />
+    <ClInclude Include="src\Utility\Random.h" />
+    <ClInclude Include="src\Utility\StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\ConstantBuffer.cpp" />
-    <ClCompile Include="src\Debug.cpp" />
-    <ClCompile Include="src\DescriptorHeap.cpp" />
-    <ClCompile Include="src\GamePad.cpp" />
-    <ClCompile Include="src\GameTime.cpp" />
-    <ClCompile Include="src\GfxCommandQueue.cpp" />
-    <ClCompile Include="src\GfxCommandContext.cpp" />
-    <ClCompile Include="src\GfxDevice.cpp" />
-    <ClCompile Include="src\GfxFence.cpp" />
-    <ClCompile Include="src\GfxSwapChain.cpp" />
-    <ClCompile Include="src\GraphicsContext.cpp" />
-    <ClCompile Include="src\GraphicsEngine.cpp" />
-    <ClCompile Include="src\IndexBuffer.cpp" />
-    <ClCompile Include="src\InputLayoutHelper.cpp" />
-    <ClCompile Include="src\InputSystem.cpp" />
-    <ClCompile Include="src\Keyboard.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GfxCommandQueue.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GfxDevice.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GfxFence.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GfxSwapChain.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\GraphicsContext.cpp" />
+    <ClCompile Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.cpp" />
+    <ClCompile Include="src\GraphicsEngine\GraphicsEngine.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Material\Material.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Mesh\Mesh.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pipeline\PipelineState.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignature.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Renderer\MeshRenderer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Resources\ConstantBuffer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Resources\IndexBuffer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Resources\Texture.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Resources\VertexBuffer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Shader\Shader.cpp" />
+    <ClCompile Include="src\GraphicsEngine\TextureLoader.cpp" />
+    <ClCompile Include="src\Input\GamePad.cpp" />
+    <ClCompile Include="src\Input\InputSystem.cpp" />
+    <ClCompile Include="src\Input\Keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MEngine.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\MeshRenderer.cpp" />
-    <ClCompile Include="src\PipelineState.cpp" />
-    <ClCompile Include="src\Random.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\RootSignature.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\Sprite.cpp" />
-    <ClCompile Include="src\SpriteRenderer.cpp" />
-    <ClCompile Include="src\StringUtility.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\TextureLoader.cpp" />
-    <ClCompile Include="src\Transform.cpp" />
-    <ClCompile Include="src\VertexBuffer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="include\MEngine.rc" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
+    <ClCompile Include="src\Scene\Transform.cpp" />
+    <ClCompile Include="src\Utility\Debug.cpp" />
+    <ClCompile Include="src\Utility\GameTime.cpp" />
+    <ClCompile Include="src\Utility\Random.cpp" />
+    <ClCompile Include="src\Utility\StringUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\shader\BasicPixelShader.hlsl">
@@ -249,6 +242,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\shader\BasicShaderHeader.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\MEngine.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
