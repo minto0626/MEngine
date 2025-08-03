@@ -1,7 +1,8 @@
 ﻿#include "PipelineState.h"
 #include "Shader/Shader.h"
-#include "Pipeline/RootSignature.h"
-#include "Pipeline/InputLayoutHelper.h"
+#include "RootSignature.h"
+#include "InputLayoutHelper.h"
+#include "StateFactory.h"
 
 #include <cassert>
 
@@ -43,16 +44,19 @@ void PipelineState::CreateFromDesc(
 	psoDesc.PS = ps.GetBytecode();
 	psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
 	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // カリングしない
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	psoDesc.BlendState.AlphaToCoverageEnable = true;  // アルファテストする
+	//psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	//psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // カリングしない
+	psoDesc.RasterizerState = Graphics::StateFactory::GetRasterizerState(desc.rasterizerPreset);
+	//psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	//psoDesc.BlendState.AlphaToCoverageEnable = true;  // アルファテストする
+	psoDesc.BlendState = Graphics::StateFactory::GetBlendState(desc.blendPreset);
 	psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画
 	psoDesc.NumRenderTargets = 1; // レンダーターゲットは一つ
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.SampleDesc.Quality = 0;
+	psoDesc.DepthStencilState = Graphics::StateFactory::GetDepthStencilState(desc.depthStencilPreset);
 
 	auto result = device.Get()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(_pipelineState.ReleaseAndGetAddressOf()));
 	if (FAILED(result))

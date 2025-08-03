@@ -180,6 +180,9 @@
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.h">
       <Filter>src\GraphicsEngine\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Pipeline\StateFactory.h">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">

@@ -166,6 +166,7 @@
     <ClInclude Include="src\GraphicsEngine\Pipeline\PipelineState.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignature.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\StateFactory.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h" />

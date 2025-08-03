@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Pipeline/StateFactory.h"
+
 #include <string>
 
 namespace Graphics
@@ -8,9 +10,9 @@ namespace Graphics
 		std::wstring vertexShaderPath;
 		std::wstring pixelShaderPath;
 		std::string rootSignatureName;
-		std::string blendStateName;
-		std::string rasterizerStateName;
-		std::string depthStencilStateName;
+		BlendPreset blendPreset;
+		RasterizerPreset rasterizerPreset;
+		DepthStencilPreset depthStencilPreset;
 
 		bool operator ==(const MaterialDesc & other) const;
 	};

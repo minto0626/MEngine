@@ -1,6 +1,7 @@
 ﻿#include "GraphicsEngine.h"
 #include "Shader/Shader.h"
 #include "Pipeline/InputLayoutHelper.h"
+#include "Pipeline/StateFactory.h"
 
 #include <wrl.h>
 #include <Core/d3dx12.h>
@@ -103,9 +104,9 @@ namespace Graphics
 				L"Assets/shader/BasicVertexShader.hlsl",
 				L"Assets/shader/BasicPixelShader.hlsl",
 				"BasicRootSignature",
-				"AlphaBlend",
-				"CullNone",
-				"DepthDisable",
+				BlendPreset::AlphaBlend,
+				RasterizerPreset::CullNode,
+				DepthStencilPreset::DepthDisable,
 			};
 
 			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
@@ -140,9 +141,9 @@ namespace Graphics
 				L"Assets/shader/BasicVertexShader.hlsl",
 				L"Assets/shader/BasicPixelShader.hlsl",
 				"BasicRootSignature",
-				"AlphaBlend",
-				"CullNone",
-				"DepthDisable",
+				BlendPreset::AlphaBlend,
+				RasterizerPreset::CullNode,
+				DepthStencilPreset::DepthDisable,
 			};
 
 			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
@@ -156,7 +157,7 @@ namespace Graphics
 			material2->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture2.get());
 
 			constantBuffer2 = std::make_unique<ConstantBuffer>();
-			transform2.SetPos({ 1080, 360, 0 });
+			transform2.SetPos({ 850, 360, 0 });
 			auto world2 = transform2.GetWorldMatrix();
 			constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
 			material2->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
@@ -177,9 +178,9 @@ namespace Graphics
 				L"Assets/shader/BasicVertexShader.hlsl",
 				L"Assets/shader/BasicPixelShader.hlsl",
 				"BasicRootSignature",
-				"AlphaBlend",
-				"CullNone",
-				"DepthDisable",
+				BlendPreset::AlphaBlend,
+				RasterizerPreset::CullNode,
+				DepthStencilPreset::DepthDisable,
 			};
 
 			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
@@ -193,7 +194,7 @@ namespace Graphics
 			material3->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture3.get());
 
 			constantBuffer3 = std::make_unique<ConstantBuffer>();
-			transform3.SetPos({ 300, 360, 0 });
+			transform3.SetPos({ 450, 360, 0 });
 			auto world3 = transform3.GetWorldMatrix();
 			constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
 			material3->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
