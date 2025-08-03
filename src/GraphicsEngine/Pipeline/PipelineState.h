@@ -2,6 +2,10 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+#include "Core/GfxDevice.h"
+#include "Material/MaterialDesc.h"
+#include "Pipeline/RootSignatureRegistry.h"
+
 class PipelineState
 {
 private:
@@ -12,6 +16,8 @@ public:
 	void Init(
 		ID3D12Device* device,
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc);
+	void CreateFromDesc(const Graphics::GfxDevice& device, const Graphics::MaterialDesc& desc, Graphics::RootSignatureRegistry& rootSignatureRegistry);
+
 	ID3D12PipelineState* Get() const { return _pipelineState.Get(); }
 	ID3D12RootSignature* GetRootSignature() const { return _rootSignature; }
 };

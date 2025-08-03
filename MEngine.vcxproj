@@ -159,10 +159,13 @@
     <ClInclude Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.h" />
     <ClInclude Include="src\GraphicsEngine\GraphicsEngine.h" />
     <ClInclude Include="src\GraphicsEngine\Material\Material.h" />
+    <ClInclude Include="src\GraphicsEngine\Material\MaterialCache.h" />
+    <ClInclude Include="src\GraphicsEngine\Material\MaterialDesc.h" />
     <ClInclude Include="src\GraphicsEngine\Mesh\Mesh.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\PipelineState.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignature.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h" />
@@ -198,10 +201,13 @@
     <ClCompile Include="src\GraphicsEngine\DescriptorHeap\DescriptorHeap.cpp" />
     <ClCompile Include="src\GraphicsEngine\GraphicsEngine.cpp" />
     <ClCompile Include="src\GraphicsEngine\Material\Material.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Material\MaterialCache.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Material\MaterialDesc.cpp" />
     <ClCompile Include="src\GraphicsEngine\Mesh\Mesh.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pipeline\PipelineState.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignature.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer\MeshRenderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\ConstantBuffer.cpp" />

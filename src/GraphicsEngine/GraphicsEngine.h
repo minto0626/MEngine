@@ -7,9 +7,11 @@
 #include "Core/GraphicsContext.h"
 #include "DescriptorHeap/DescriptorHeap.h"
 #include "TextureLoader.h"
+#include "Material/MaterialCache.h"
 #include "Mesh/Mesh.h"
 #include "Pipeline/RootSignature.h"
 #include "Pipeline/PipelineState.h"
+#include "Pipeline/RootSignatureRegistry.h"
 #include "Resources/Texture.h"
 #include "Resources/ConstantBuffer.h"
 #include "Renderer/Renderer.h"
@@ -44,22 +46,22 @@ namespace Graphics
 
 		TextureLoader textureLoader;
 		std::vector<Renderer*> sceneRenderers;
+		std::unique_ptr<MaterialCache> materialCache;
+		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;
+
+		const std::string worldMatParamName = "worldMat";
+		const std::string mainTexParamName = "mainTex";
+		std::shared_ptr<RootSignature> basicRootSignature;
 
 		std::unique_ptr<Mesh> mesh;
 		std::unique_ptr<Material> material;
-		std::unique_ptr<RootSignature> rootSignature;
-		std::unique_ptr<PipelineState> pipelineState;
 		std::unique_ptr<Texture> texture;
 		std::unique_ptr<ConstantBuffer> constantBuffer;
 		Transform transform;
 		std::unique_ptr<MeshRenderer> meshRenderer;
-		const std::string worldMatParamName = "worldMat";
-		const std::string mainTexParamName = "mainTex";
 
 		std::unique_ptr<Mesh> mesh2;
 		std::unique_ptr<Material> material2;
-		std::unique_ptr<RootSignature> rootSignature2;
-		std::unique_ptr<PipelineState> pipelineState2;
 		std::unique_ptr<Texture> texture2;
 		std::unique_ptr<ConstantBuffer> constantBuffer2;
 		Transform transform2;
@@ -67,8 +69,6 @@ namespace Graphics
 
 		std::unique_ptr<Mesh> mesh3;
 		std::unique_ptr<Material> material3;
-		std::unique_ptr<RootSignature> rootSignature3;
-		std::unique_ptr<PipelineState> pipelineState3;
 		std::unique_ptr<Texture> texture3;
 		std::unique_ptr<ConstantBuffer> constantBuffer3;
 		Transform transform3;

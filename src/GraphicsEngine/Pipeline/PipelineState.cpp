@@ -1,4 +1,7 @@
 ﻿#include "PipelineState.h"
+#include "Shader/Shader.h"
+#include "Pipeline/RootSignature.h"
+#include "Pipeline/InputLayoutHelper.h"
 
 #include <cassert>
 
@@ -14,4 +17,50 @@ void PipelineState::Init(ID3D12Device* device, D3D12_GRAPHICS_PIPELINE_STATE_DES
 	}
 	_pipelineState->SetName(L"pipeline_state");
 	_rootSignature = desc.pRootSignature;
+}
+
+void PipelineState::CreateFromDesc(
+	const Graphics::GfxDevice& device,
+	const Graphics::MaterialDesc& desc,
+	Graphics::RootSignatureRegistry& rootSignatureRegistry)
+{
+	auto rootSignature = rootSignatureRegistry.Get(desc.rootSignatureName);
+
+	Shader vs, ps;
+	vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
+	ps.LoadPS(desc.pixelShaderPath.c_str(), "ps");
+
+	auto inputLayout = InputLayoutHelper::CreateInputLayout(
+		{
+			{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+			{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+		}
+		);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.pRootSignature = rootSignature->Get();
+	psoDesc.VS = vs.GetBytecode();
+	psoDesc.PS = ps.GetBytecode();
+	psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
+	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // カリングしない
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.BlendState.AlphaToCoverageEnable = true;  // アルファテストする
+	psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画
+	psoDesc.NumRenderTargets = 1; // レンダーターゲットは一つ
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.SampleDesc.Count = 1;
+	psoDesc.SampleDesc.Quality = 0;
+
+	auto result = device.Get()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(_pipelineState.ReleaseAndGetAddressOf()));
+	if (FAILED(result))
+	{
+		assert(0 && "パイプラインステートオブジェクトの作成に失敗!");
+		return;
+	}
+
+	_pipelineState->SetName(L"pipeline_state");
+	_rootSignature = psoDesc.pRootSignature;
 }

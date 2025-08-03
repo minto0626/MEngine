@@ -1,0 +1,26 @@
+﻿#pragma once
+#include <string>
+
+namespace Graphics
+{
+	struct MaterialDesc
+	{
+		std::wstring vertexShaderPath;
+		std::wstring pixelShaderPath;
+		std::string rootSignatureName;
+		std::string blendStateName;
+		std::string rasterizerStateName;
+		std::string depthStencilStateName;
+
+		bool operator ==(const MaterialDesc & other) const;
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<Graphics::MaterialDesc>
+	{
+		size_t operator ()(const Graphics::MaterialDesc& desc) const;
+	};
+}
