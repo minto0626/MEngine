@@ -183,6 +183,12 @@
     <ClInclude Include="src\GraphicsEngine\Pipeline\StateFactory.h">
       <Filter>src\GraphicsEngine\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureDesc.h">
+      <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Material\MaterialRegistry.h">
+      <Filter>src\GraphicsEngine\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -292,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.cpp">
       <Filter>src\GraphicsEngine\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Material\MaterialRegistry.cpp">
+      <Filter>src\GraphicsEngine\Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

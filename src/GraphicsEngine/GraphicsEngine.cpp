@@ -71,6 +71,7 @@ namespace Graphics
 
 		rootSignatureRegistry = std::make_unique<RootSignatureRegistry>();
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
+		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
 		camera2D.Init(windowSize.cx, windowSize.cy);
 
@@ -87,32 +88,44 @@ namespace Graphics
 	{
 		auto cameraWorld = camera2D.GetViewMatrix();
 
-		basicRootSignature.reset(new RootSignature());
-		basicRootSignature->AddDescriptorTable(worldMatParamName, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
-		basicRootSignature->AddDescriptorTable(mainTexParamName, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_DESCRIPTOR_RANGE_TYPE_SRV);
-		basicRootSignature->AddStaticSampler(0, D3D12_SHADER_VISIBILITY_PIXEL);
-		basicRootSignature->Build(device.Get());
-		rootSignatureRegistry->Register("BasicRootSignature", basicRootSignature);
+		RootSignatureDesc rootDesc1;
+		rootDesc1.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+		rootDesc1.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		rootDesc1.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		MaterialDesc materialDesc1 =
+		{
+			L"Assets/shader/BasicVertexShader.hlsl",
+			L"Assets/shader/BasicPixelShader.hlsl",
+			rootDesc1,
+			BlendPreset::AlphaBlend,
+			RasterizerPreset::CullNode,
+			DepthStencilPreset::DepthDisable,
+		};
+		materialRegistry->Register("DefaultMaterial", materialDesc1);
+
+		RootSignatureDesc rootDesc2;
+		rootDesc2.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+		rootDesc2.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		rootDesc2.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		MaterialDesc materialDesc2 =
+		{
+			L"Assets/shader/BasicVertexShader.hlsl",
+			L"Assets/shader/BasicPixelShader.hlsl",
+			rootDesc2,
+			BlendPreset::Opaque,
+			RasterizerPreset::CullNode,
+			DepthStencilPreset::DepthDisable,
+		};
+		materialRegistry->Register("NonAlphablendMaterial", materialDesc2);
 
 		// メッシュ１
 		{
 			mesh = std::make_unique<Mesh>();
 			mesh->Initialize(device.Get(), commandContext);
 
-			MaterialDesc materialDesc =
-			{
-				L"Assets/shader/BasicVertexShader.hlsl",
-				L"Assets/shader/BasicPixelShader.hlsl",
-				"BasicRootSignature",
-				BlendPreset::AlphaBlend,
-				RasterizerPreset::CullNode,
-				DepthStencilPreset::DepthDisable,
-			};
+			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
 
-			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
-
-			material = std::make_unique<Material>();
-			material->SetPipelineState(materialDesc, materialCache->GetOrCreate(device, materialDesc));
+			auto material = materialRegistry->Get("DefaultMaterial");
 
 			const char* texfilePath = "Assets/texture/free_ei.png";
 			texture = std::make_unique<Texture>();
@@ -123,11 +136,10 @@ namespace Graphics
 			transform.SetPos({640, 360, 0});
 			auto world = transform.GetWorldMatrix();
 			constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
-			material->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
 			world *= cameraWorld;
-			material->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world, sizeof(world));
+			constantBuffer->Update(&world, sizeof(world));
 
-			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material.get());
+			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
 			sceneRenderers.push_back(meshRenderer.get());
 		}
 
@@ -136,20 +148,9 @@ namespace Graphics
 			mesh2 = std::make_unique<Mesh>();
 			mesh2->Initialize(device.Get(), commandContext);
 
-			MaterialDesc materialDesc =
-			{
-				L"Assets/shader/BasicVertexShader.hlsl",
-				L"Assets/shader/BasicPixelShader.hlsl",
-				"BasicRootSignature",
-				BlendPreset::AlphaBlend,
-				RasterizerPreset::CullNode,
-				DepthStencilPreset::DepthDisable,
-			};
+			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
 
-			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
-
-			material2 = std::make_unique<Material>();
-			material2->SetPipelineState(materialDesc, materialCache->GetOrCreate(device, materialDesc));
+			auto material2 = materialRegistry->Get("DefaultMaterial");
 
 			const char* texfilePath2 = "Assets/texture/free_brachiosaurus.png";
 			texture2 = std::make_unique<Texture>();
@@ -160,11 +161,10 @@ namespace Graphics
 			transform2.SetPos({ 850, 360, 0 });
 			auto world2 = transform2.GetWorldMatrix();
 			constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
-			material2->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
 			world2 *= cameraWorld;
-			material2->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world2, sizeof(world2));
+			constantBuffer2->Update(&world2, sizeof(world2));
 
-			meshRenderer2 = std::make_unique<MeshRenderer>(mesh2.get(), material2.get());
+			meshRenderer2 = std::make_unique<MeshRenderer>(mesh2.get(), material2, rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
 			sceneRenderers.push_back(meshRenderer2.get());
 		}
 
@@ -173,20 +173,9 @@ namespace Graphics
 			mesh3 = std::make_unique<Mesh>();
 			mesh3->Initialize(device.Get(), commandContext);
 
-			MaterialDesc materialDesc =
-			{
-				L"Assets/shader/BasicVertexShader.hlsl",
-				L"Assets/shader/BasicPixelShader.hlsl",
-				"BasicRootSignature",
-				BlendPreset::AlphaBlend,
-				RasterizerPreset::CullNode,
-				DepthStencilPreset::DepthDisable,
-			};
+			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc2);
 
-			auto* rootSignature = rootSignatureRegistry->Get(materialDesc.rootSignatureName).get();
-
-			material3 = std::make_unique<Material>();
-			material3->SetPipelineState(materialDesc, materialCache->GetOrCreate(device, materialDesc));
+			auto material3 = materialRegistry->Get("NonAlphablendMaterial");
 
 			const char* texfilePath3 = "Assets/texture/free_woman_veterinarian.png";
 			texture3 = std::make_unique<Texture>();
@@ -197,11 +186,10 @@ namespace Graphics
 			transform3.SetPos({ 450, 360, 0 });
 			auto world3 = transform3.GetWorldMatrix();
 			constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
-			material3->SetConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
 			world3 *= cameraWorld;
-			material3->UploadConstantBuffer(rootSignature->GetRootIndex(worldMatParamName), &world3, sizeof(world3));
+			constantBuffer3->Update(&world3, sizeof(world3));
 
-			meshRenderer3 = std::make_unique<MeshRenderer>(mesh3.get(), material3.get());
+			meshRenderer3 = std::make_unique<MeshRenderer>(mesh3.get(), material3, rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
 			sceneRenderers.push_back(meshRenderer3.get());
 		}
 	}

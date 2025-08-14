@@ -16,7 +16,7 @@ namespace Graphics
 		}
 
 		auto pso = std::make_unique<PipelineState>();
-		pso->CreateFromDesc(device, desc, *_rootSignatureRegistry); // MaterialDesc から PSO を生成
+		pso->CreateFromDesc(device, desc, *_rootSignatureRegistry);
 		PipelineState* ptr = pso.get();
 		_cache[desc] = std::move(pso);
 		return ptr;

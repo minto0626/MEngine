@@ -2,19 +2,33 @@
 
 namespace Graphics
 {
-	void RootSignatureRegistry::Register(const std::string& name, std::shared_ptr<RootSignature> signature)
+	std::shared_ptr<RootSignature> RootSignatureRegistry::GetOrCreate(const GfxDevice& device, const RootSignatureDesc& desc)
 	{
-		_signatures[name] = signature;
-	}
-
-	std::shared_ptr<RootSignature> RootSignatureRegistry::Get(const std::string& name)
-	{
-		auto it = _signatures.find(name);
-		if (it == _signatures.end())
+		auto it = _cache.find(desc);
+		if (it != _cache.end())
 		{
-			return nullptr;
+			return it->second;
 		}
 
-		return it->second;
+		auto rootSignature = std::make_shared<RootSignature>();
+		for (auto& param : desc.params)
+		{
+			rootSignature->AddDescriptorTable(
+				param.name,
+				param.numDescriptors,
+				param.shaderRegister,
+				param.visibility,
+				param.type);
+		}
+		for (auto& sampler : desc.staticSamplers)
+		{
+			rootSignature->AddStaticSampler(
+				sampler.shaderRegister,
+				sampler.visibility);
+		}
+		rootSignature->Build(device.Get());
+
+		_cache[desc] = rootSignature;
+		return rootSignature;
 	}
 }

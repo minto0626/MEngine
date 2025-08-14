@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Mesh/Mesh.h"
 #include "Material/Material.h"
+#include "Resources/ConstantBuffer.h"
 
 namespace Graphics
 {
@@ -10,9 +11,11 @@ namespace Graphics
 	private:
 		Mesh* _mesh;
 		Material* _material;
+		UINT _transformCBRootParamIndex;
+		ConstantBuffer* _transformCB;
 
 	public:
-		MeshRenderer(Mesh* mesh, Material* material);
+		MeshRenderer(Mesh* mesh, Material* material, UINT transformCBRootParamIndex, ConstantBuffer* transformCB);
 		void Draw(GfxCommandContext* commandContext) override;
 
 	};

@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include "RootSignature.h"
+#include "RootSignatureDesc.h"
+#include "Core/GfxDevice.h"
 
 #include <unordered_map>
-#include <string>
 #include <memory>
 
 namespace Graphics
@@ -10,11 +11,10 @@ namespace Graphics
 	class RootSignatureRegistry
 	{
 	private:
-		std::unordered_map<std::string, std::shared_ptr<RootSignature>> _signatures;
+		std::unordered_map<RootSignatureDesc, std::shared_ptr<RootSignature>> _cache;
 
 	public:
-		void Register(const std::string& name, std::shared_ptr<RootSignature> signature);
-		std::shared_ptr<RootSignature> Get(const std::string& name);
+		std::shared_ptr<RootSignature> GetOrCreate(const GfxDevice& device, const RootSignatureDesc& desc);
 
 	};
 }

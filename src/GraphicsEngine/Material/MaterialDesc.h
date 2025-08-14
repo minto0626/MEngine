@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Pipeline/StateFactory.h"
+#include "Pipeline/RootSignatureDesc.h"
 
 #include <string>
 
@@ -9,7 +10,7 @@ namespace Graphics
 	{
 		std::wstring vertexShaderPath;
 		std::wstring pixelShaderPath;
-		std::string rootSignatureName;
+		RootSignatureDesc rootSignatureDesc;
 		BlendPreset blendPreset;
 		RasterizerPreset rasterizerPreset;
 		DepthStencilPreset depthStencilPreset;
@@ -20,7 +21,7 @@ namespace Graphics
 
 namespace std
 {
-	template <>
+	template<>
 	struct hash<Graphics::MaterialDesc>
 	{
 		size_t operator ()(const Graphics::MaterialDesc& desc) const;

@@ -8,6 +8,7 @@
 #include "DescriptorHeap/DescriptorHeap.h"
 #include "TextureLoader.h"
 #include "Material/MaterialCache.h"
+#include "Material/MaterialRegistry.h"
 #include "Mesh/Mesh.h"
 #include "Pipeline/RootSignature.h"
 #include "Pipeline/PipelineState.h"
@@ -48,6 +49,7 @@ namespace Graphics
 		std::vector<Renderer*> sceneRenderers;
 		std::unique_ptr<MaterialCache> materialCache;
 		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;
+		std::unique_ptr<MaterialRegistry> materialRegistry;
 
 		const std::string worldMatParamName = "worldMat";
 		const std::string mainTexParamName = "mainTex";

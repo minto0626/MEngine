@@ -25,7 +25,7 @@ void PipelineState::CreateFromDesc(
 	const Graphics::MaterialDesc& desc,
 	Graphics::RootSignatureRegistry& rootSignatureRegistry)
 {
-	auto rootSignature = rootSignatureRegistry.Get(desc.rootSignatureName);
+	auto rootSignature = rootSignatureRegistry.GetOrCreate(device, desc.rootSignatureDesc);
 
 	Shader vs, ps;
 	vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
@@ -44,11 +44,7 @@ void PipelineState::CreateFromDesc(
 	psoDesc.PS = ps.GetBytecode();
 	psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
 	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	//psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	//psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;  // カリングしない
 	psoDesc.RasterizerState = Graphics::StateFactory::GetRasterizerState(desc.rasterizerPreset);
-	//psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	//psoDesc.BlendState.AlphaToCoverageEnable = true;  // アルファテストする
 	psoDesc.BlendState = Graphics::StateFactory::GetBlendState(desc.blendPreset);
 	psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画

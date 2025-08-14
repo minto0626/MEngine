@@ -7,7 +7,7 @@ namespace Graphics
 		return
 			vertexShaderPath == other.vertexShaderPath &&
 			pixelShaderPath == other.pixelShaderPath &&
-			rootSignatureName == other.rootSignatureName &&
+			rootSignatureDesc == other.rootSignatureDesc &&
 			blendPreset == other.blendPreset &&
 			rasterizerPreset == other.rasterizerPreset &&
 			depthStencilPreset == other.depthStencilPreset;
@@ -18,7 +18,7 @@ size_t std::hash<Graphics::MaterialDesc>::operator ()(const Graphics::MaterialDe
 {
 	size_t h = std::hash<std::wstring>{}(desc.vertexShaderPath);
 	h ^= std::hash<std::wstring>{}(desc.pixelShaderPath) << 1;
-	h ^= std::hash<std::string>{}(desc.rootSignatureName) << 2;
+	h ^= std::hash<Graphics::RootSignatureDesc>{}(desc.rootSignatureDesc) << 2;
 	h ^= std::hash<int>{}(static_cast<int>(desc.blendPreset)) << 3;
 	h ^= std::hash<int>{}(static_cast<int>(desc.rasterizerPreset)) << 4;
 	h ^= std::hash<int>{}(static_cast<int>(desc.depthStencilPreset)) << 5;

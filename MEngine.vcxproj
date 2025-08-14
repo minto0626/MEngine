@@ -161,10 +161,12 @@
     <ClInclude Include="src\GraphicsEngine\Material\Material.h" />
     <ClInclude Include="src\GraphicsEngine\Material\MaterialCache.h" />
     <ClInclude Include="src\GraphicsEngine\Material\MaterialDesc.h" />
+    <ClInclude Include="src\GraphicsEngine\Material\MaterialRegistry.h" />
     <ClInclude Include="src\GraphicsEngine\Mesh\Mesh.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\PipelineState.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignature.h" />
+    <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureDesc.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.h" />
     <ClInclude Include="src\GraphicsEngine\Pipeline\StateFactory.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h" />
@@ -204,6 +206,7 @@
     <ClCompile Include="src\GraphicsEngine\Material\Material.cpp" />
     <ClCompile Include="src\GraphicsEngine\Material\MaterialCache.cpp" />
     <ClCompile Include="src\GraphicsEngine\Material\MaterialDesc.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Material\MaterialRegistry.cpp" />
     <ClCompile Include="src\GraphicsEngine\Mesh\Mesh.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pipeline\InputLayoutHelper.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pipeline\PipelineState.cpp" />
