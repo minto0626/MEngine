@@ -2,9 +2,9 @@
 
 namespace Graphics
 {
-	MeshRenderer::MeshRenderer(Mesh* mesh, Material* material, UINT transformCBRootParamIndex, ConstantBuffer* transformCB)
-		:_mesh(mesh),
-		_material(material),
+	MeshRenderer::MeshRenderer(Mesh* mesh, Material* material, UINT transformCBRootParamIndex, ConstantBuffer* transformCB) :
+		Renderer::Renderer(material),
+		_mesh(mesh),
 		_transformCBRootParamIndex(transformCBRootParamIndex),
 		_transformCB(transformCB)
 	{
@@ -12,7 +12,6 @@ namespace Graphics
 
 	void MeshRenderer::Draw(GfxCommandContext* commandContext)
 	{
-		_material->Bind(*commandContext);
 		commandContext->SetGraphicsRootDescriptorTable(_transformCBRootParamIndex, _transformCB->GetGPUHandle());
 		_mesh->Draw(*commandContext);
 	}

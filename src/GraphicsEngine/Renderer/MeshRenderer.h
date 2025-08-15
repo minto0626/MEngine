@@ -10,7 +10,6 @@ namespace Graphics
 	{
 	private:
 		Mesh* _mesh;
-		Material* _material;
 		UINT _transformCBRootParamIndex;
 		ConstantBuffer* _transformCB;
 

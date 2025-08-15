@@ -10,7 +10,11 @@ namespace Graphics
 
 	void MaterialRegistry::Register(const std::string& key, const MaterialDesc& desc)
 	{
-		auto material = std::make_unique<Material>();
+		size_t h = 0;
+		h ^= std::hash<Graphics::MaterialDesc>{}(desc)+0x9e3779b9 + (h << 6) + (h >> 2);
+		UINT64 instanceID = static_cast<UINT64>(h);
+
+		auto material = std::make_unique<Material>(instanceID);
 		material->SetPipelineState(desc, _materialCache->GetOrCreate(*_device, desc));
 		_materials[key] = std::move(material);
 	}

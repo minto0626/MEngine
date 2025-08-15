@@ -2,6 +2,11 @@
 
 namespace Graphics
 {
+	Material::Material(UINT64 instanceID) :
+		_instanceID(instanceID)
+	{
+	}
+
 	void Material::SetConstantBuffer(UINT rootIndex, ConstantBuffer* constantBuffer)
 	{
 		_constantBuffers[rootIndex] = constantBuffer;

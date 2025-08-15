@@ -221,8 +221,26 @@ namespace Graphics
 		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
 		commandList->SetDescriptorHeaps(1, heaps);
 
+		// 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
+		std::sort(sceneRenderers.begin(), sceneRenderers.end(),
+			[](const Renderer* a, const Renderer* b)
+			{
+				Material* materialA = a->GetMaterial();
+				Material* materialB = b->GetMaterial();
+				if (!materialA || !materialB) { return materialA < materialB; }
+				return materialA->GetInstanceID() < materialB->GetInstanceID();
+			});
+
+		Material* lastMaterial = nullptr;
+
 		for (auto& renderer : sceneRenderers)
 		{
+			Material* currentMaterial = renderer->GetMaterial();
+			if (currentMaterial && currentMaterial != lastMaterial)
+			{
+				currentMaterial->Bind(commandContext);
+				lastMaterial = currentMaterial;
+			}
 			renderer->Draw(&commandContext);
 		}
 
