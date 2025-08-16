@@ -1,35 +1,12 @@
 ﻿#include "Mesh.h"
-#include "Math/Vector.h"
-
-namespace
-{
-	struct MeshVertex
-	{
-		Vector3 pos;
-		Vector2 uv;
-	};
-}
 
 namespace Graphics
 {
-	bool Mesh::Initialize(ID3D12Device* device, GfxCommandContext& commandContext)
+	bool Mesh::Initialize(ID3D12Device* device, GfxCommandContext& commandContext, MeshData& meshData)
 	{
-		auto halfW = 300.0f * 0.5f;
-		auto halfH = 300.0f * 0.5f;
+		_vertexBuffer.Init(device, commandContext, meshData.vertices.data(), meshData.vertices.size(), sizeof(MeshVertex));
 
-		const MeshVertex vertexData[] = {
-			{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
-			{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
-			{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
-			{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
-		};
-		_vertexBuffer.Init(device, commandContext, &vertexData, _countof(vertexData), sizeof(MeshVertex));
-
-		const unsigned short indices[] = {
-			0, 1, 2,
-			2, 1, 3,
-		};
-		_indexBuffer.Init(device, commandContext, &indices, _countof(indices), DXGI_FORMAT_R16_UINT);
+		_indexBuffer.Init(device, commandContext, meshData.indices.data(), meshData.indices.size(), DXGI_FORMAT_R16_UINT);
 
 		return true;
 	}

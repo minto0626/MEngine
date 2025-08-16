@@ -120,8 +120,22 @@ namespace Graphics
 
 		// メッシュ１
 		{
+			MeshData meshData;
+			auto halfW = 500.0f * 0.5f;
+			auto halfH = 500.0f * 0.5f;
+			meshData.vertices = {
+				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
+			};
+			meshData.indices = {
+				0, 1, 2,
+				2, 1, 3,
+			};
+
 			mesh = std::make_unique<Mesh>();
-			mesh->Initialize(device.Get(), commandContext);
+			mesh->Initialize(device.Get(), commandContext, meshData);
 
 			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
 
@@ -145,8 +159,22 @@ namespace Graphics
 
 		// メッシュ２
 		{
+			MeshData meshData;
+			auto halfW = 200.0f * 0.5f;
+			auto halfH = 200.0f * 0.5f;
+			meshData.vertices = {
+				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
+			};
+			meshData.indices = {
+				0, 1, 2,
+				2, 1, 3,
+			};
+
 			mesh2 = std::make_unique<Mesh>();
-			mesh2->Initialize(device.Get(), commandContext);
+			mesh2->Initialize(device.Get(), commandContext, meshData);
 
 			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
 
@@ -170,8 +198,22 @@ namespace Graphics
 
 		// メッシュ３
 		{
+			MeshData meshData;
+			auto halfW = 300.0f * 0.5f;
+			auto halfH = 600.0f * 0.5f;
+			meshData.vertices = {
+				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
+			};
+			meshData.indices = {
+				0, 1, 2,
+				2, 1, 3,
+			};
+
 			mesh3 = std::make_unique<Mesh>();
-			mesh3->Initialize(device.Get(), commandContext);
+			mesh3->Initialize(device.Get(), commandContext, meshData);
 
 			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc2);
 
