@@ -67,7 +67,8 @@ namespace Graphics
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
 		);
 		textureLoader.Init(&graphicsContext);
-		sceneRenderers.clear();
+		scene2DRenderers.clear();
+		scene3DRenderers.clear();
 
 		rootSignatureRegistry = std::make_unique<RootSignatureRegistry>();
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
@@ -91,8 +92,6 @@ namespace Graphics
 
 	void GraphicsEngine::LoadContent()
 	{
-		auto cameraWorld = camera2D.GetViewMatrix();
-
 		RootSignatureDesc rootDesc1;
 		rootDesc1.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
 		rootDesc1.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
@@ -122,6 +121,21 @@ namespace Graphics
 			DepthStencilPreset::DepthDisable,
 		};
 		materialRegistry->Register("NonAlphablendMaterial", materialDesc2);
+
+		RootSignatureDesc rootDesc3;
+		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+		rootDesc3.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		rootDesc3.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		MaterialDesc materialDesc3 =
+		{
+			L"Assets/shader/BasicVertexShader.hlsl",
+			L"Assets/shader/BasicPixelShader.hlsl",
+			rootDesc3,
+			BlendPreset::AlphaBlend,
+			RasterizerPreset::CullBack,
+			DepthStencilPreset::DepthDisable,
+		};
+		materialRegistry->Register("3DMaterial", materialDesc3);
 
 		// メッシュ１
 		{
@@ -159,7 +173,7 @@ namespace Graphics
 			constantBuffer->Update(&world, sizeof(world));
 
 			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
-			sceneRenderers.push_back(meshRenderer.get());
+			scene2DRenderers.push_back(meshRenderer.get());
 		}
 
 		// メッシュ２
@@ -198,7 +212,7 @@ namespace Graphics
 			constantBuffer2->Update(&world2, sizeof(world2));
 
 			meshRenderer2 = std::make_unique<MeshRenderer>(mesh2.get(), material2, rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
-			sceneRenderers.push_back(meshRenderer2.get());
+			scene2DRenderers.push_back(meshRenderer2.get());
 		}
 
 		// メッシュ３
@@ -237,12 +251,84 @@ namespace Graphics
 			constantBuffer3->Update(&world3, sizeof(world3));
 
 			meshRenderer3 = std::make_unique<MeshRenderer>(mesh3.get(), material3, rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
-			sceneRenderers.push_back(meshRenderer3.get());
+			scene2DRenderers.push_back(meshRenderer3.get());
+		}
+
+		// メッシュ４
+		{
+			MeshData meshData;
+			auto halfW = 10.0f * 0.5f;
+			auto halfH = 10.0f * 0.5f;
+			auto halfZ = 10.0f * 0.5f;
+			meshData.vertices = {
+				{{ -halfW, -halfH, -halfZ }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW,  halfH, -halfZ }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW, -halfH, -halfZ }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW,  halfH, -halfZ }, { 1.0f, 0.0f }},   // 右上
+
+				{{  halfW, -halfH, -halfZ }, { 0.0f, 1.0f }},   // 左下
+				{{  halfW,  halfH, -halfZ }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW, -halfH,  halfZ }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW,  halfH,  halfZ }, { 1.0f, 0.0f }},   // 右上
+
+				{{  halfW, -halfH,  halfZ }, { 0.0f, 1.0f }},   // 左下
+				{{  halfW,  halfH,  halfZ }, { 0.0f, 0.0f }},   // 左上
+				{{ -halfW, -halfH,  halfZ }, { 1.0f, 1.0f }},   // 右下
+				{{ -halfW,  halfH,  halfZ }, { 1.0f, 0.0f }},   // 右上
+
+				{{ -halfW, -halfH,  halfZ }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW,  halfH,  halfZ }, { 0.0f, 0.0f }},   // 左上
+				{{ -halfW, -halfH, -halfZ }, { 1.0f, 1.0f }},   // 右下
+				{{ -halfW,  halfH, -halfZ }, { 1.0f, 0.0f }},   // 右上
+			};
+			meshData.indices = {
+				0, 1, 2,
+				2, 1, 3,
+
+				4, 5, 6,
+				6, 5, 7,
+
+				8, 9, 10,
+				10, 9, 11,
+
+				12, 13, 14,
+				14, 13, 15,
+			};
+
+			mesh4 = std::make_unique<Mesh>();
+			mesh4->Initialize(device.Get(), commandContext, meshData);
+
+			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc3);
+
+			auto material = materialRegistry->Get("3DMaterial");
+
+			const char* texfilePath = "Assets/texture/free_horse.png";
+			texture4 = std::make_unique<Texture>();
+			texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
+			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture4.get());
+
+			constantBuffer4 = std::make_unique<ConstantBuffer>();
+			transform4.SetPos({ 0, 0, 30 });
+			auto world = transform4.GetWorldMatrix();
+			constantBuffer4->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
+			world *= camera3D.GetViewProjectionMatrix();
+			constantBuffer4->Update(&world, sizeof(world));
+
+			meshRenderer4 = std::make_unique<MeshRenderer>(mesh4.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer4.get());
+			scene3DRenderers.push_back(meshRenderer4.get());
 		}
 	}
 
 	void GraphicsEngine::Render()
 	{
+		// 回転テスト
+		{
+			auto a = transform4.GetRot() * Quaternion::FromEulerAngles(0.0f, 1.0f * 0.5f, 0.0f);
+			transform4.SetRot(a);
+			auto world = transform4.GetWorldMatrix() * camera3D.GetViewProjectionMatrix();
+			constantBuffer4->Update(&world, sizeof(world));
+		}
+
 		camera2D.Update();
 		camera3D.Update();
 
@@ -272,7 +358,15 @@ namespace Graphics
 		commandList->SetDescriptorHeaps(1, heaps);
 
 		// 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
-		std::sort(sceneRenderers.begin(), sceneRenderers.end(),
+		std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
+			[](const Renderer* a, const Renderer* b)
+			{
+				Material* materialA = a->GetMaterial();
+				Material* materialB = b->GetMaterial();
+				if (!materialA || !materialB) { return materialA < materialB; }
+				return materialA->GetInstanceID() < materialB->GetInstanceID();
+			});
+		std::sort(scene3DRenderers.begin(), scene3DRenderers.end(),
 			[](const Renderer* a, const Renderer* b)
 			{
 				Material* materialA = a->GetMaterial();
@@ -283,7 +377,17 @@ namespace Graphics
 
 		Material* lastMaterial = nullptr;
 
-		for (auto& renderer : sceneRenderers)
+		for (auto& renderer : scene3DRenderers)
+		{
+			Material* currentMaterial = renderer->GetMaterial();
+			if (currentMaterial && currentMaterial != lastMaterial)
+			{
+				currentMaterial->Bind(commandContext);
+				lastMaterial = currentMaterial;
+			}
+			renderer->Draw(&commandContext);
+		}
+		for (auto& renderer : scene2DRenderers)
 		{
 			Material* currentMaterial = renderer->GetMaterial();
 			if (currentMaterial && currentMaterial != lastMaterial)

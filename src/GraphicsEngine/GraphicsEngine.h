@@ -47,10 +47,11 @@ namespace Graphics
 		Camera camera3D;
 
 		TextureLoader textureLoader;
-		std::vector<Renderer*> sceneRenderers;
 		std::unique_ptr<MaterialCache> materialCache;
 		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;
 		std::unique_ptr<MaterialRegistry> materialRegistry;
+		std::vector<Renderer*> scene2DRenderers;
+		std::vector<Renderer*> scene3DRenderers;
 
 		const std::string worldMatParamName = "worldMat";
 		const std::string mainTexParamName = "mainTex";
@@ -76,6 +77,12 @@ namespace Graphics
 		std::unique_ptr<ConstantBuffer> constantBuffer3;
 		Transform transform3;
 		std::unique_ptr<MeshRenderer> meshRenderer3;
+
+		std::unique_ptr<Mesh> mesh4;
+		std::unique_ptr<Texture> texture4;
+		std::unique_ptr<ConstantBuffer> constantBuffer4;
+		Transform transform4;
+		std::unique_ptr<MeshRenderer> meshRenderer4;
 
 		IDXGIFactory6* CreateDXGIFactory();
 
