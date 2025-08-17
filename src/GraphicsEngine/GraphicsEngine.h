@@ -44,6 +44,7 @@ namespace Graphics
 		std::vector<DescriptorHandle> rtvHandles;
 		Color clearColor = Color::FromHex(0x6c9bd2);
 		Camera camera2D;
+		Camera camera3D;
 
 		TextureLoader textureLoader;
 		std::vector<Renderer*> sceneRenderers;

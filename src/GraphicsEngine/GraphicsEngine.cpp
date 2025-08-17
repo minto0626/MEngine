@@ -73,7 +73,12 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
-		camera2D.Init(windowSize.cx, windowSize.cy);
+		camera2D.Init(Camera::ProjectionType::Ortho, windowSize.cx, windowSize.cy);
+		camera2D.SetPos({ 0.0f, 0.0f, 0.0f });
+
+		camera3D.Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
+		camera3D.SetPos({ 0.0f, 0.0f, -5.0f });
+		camera3D.SetTarget({ 0.0f, 0.0f, 0.0f });
 
 		return true;
 	}
@@ -150,7 +155,7 @@ namespace Graphics
 			transform.SetPos({640, 360, 0});
 			auto world = transform.GetWorldMatrix();
 			constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
-			world *= cameraWorld;
+			world *= camera2D.GetViewProjectionMatrix();
 			constantBuffer->Update(&world, sizeof(world));
 
 			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
@@ -189,7 +194,7 @@ namespace Graphics
 			transform2.SetPos({ 850, 360, 0 });
 			auto world2 = transform2.GetWorldMatrix();
 			constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
-			world2 *= cameraWorld;
+			world2 *= camera2D.GetViewProjectionMatrix();
 			constantBuffer2->Update(&world2, sizeof(world2));
 
 			meshRenderer2 = std::make_unique<MeshRenderer>(mesh2.get(), material2, rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
@@ -228,7 +233,7 @@ namespace Graphics
 			transform3.SetPos({ 450, 360, 0 });
 			auto world3 = transform3.GetWorldMatrix();
 			constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
-			world3 *= cameraWorld;
+			world3 *= camera2D.GetViewProjectionMatrix();
 			constantBuffer3->Update(&world3, sizeof(world3));
 
 			meshRenderer3 = std::make_unique<MeshRenderer>(mesh3.get(), material3, rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
@@ -238,6 +243,9 @@ namespace Graphics
 
 	void GraphicsEngine::Render()
 	{
+		camera2D.Update();
+		camera3D.Update();
+
 		auto* commandList = commandContext.GetCommandList();
 
 		UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();

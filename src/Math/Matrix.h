@@ -58,6 +58,22 @@ public:
         return Vector3(result.x, result.y, result.z);
     }
 
+    void MakeLookAt(const Vector3& pos, const Vector3& target, const Vector3& up)
+    {
+        DirectX::XMStoreFloat4x4(
+            &mat,
+            DirectX::XMMatrixLookAtLH(pos.ToXMVECTOR(), target.ToXMVECTOR(), up.ToXMVECTOR())
+        );
+    }
+
+    void MakeProjectionMatrix(float fov, float aspectRaito, float nearZ, float farZ)
+    {
+        DirectX::XMStoreFloat4x4(
+            &mat,
+            DirectX::XMMatrixPerspectiveFovLH(fov, aspectRaito, nearZ, farZ)
+        );
+    }
+
     float GetElement(int row, int col) const { return mat.m[row][col]; }
     void SetElement(int row, int col, float value) { mat.m[row][col] = value; }
 
