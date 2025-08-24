@@ -80,11 +80,11 @@ namespace Graphics
 		Transform transform3;
 		std::unique_ptr<SpriteRenderer> spriteRenderer3;
 
-		std::unique_ptr<Mesh> mesh4;
+		std::unique_ptr<Mesh> mesh;
 		std::unique_ptr<Texture> texture4;
 		std::unique_ptr<ConstantBuffer> constantBuffer4;
 		Transform transform4;
-		std::unique_ptr<MeshRenderer> meshRenderer4;
+		std::unique_ptr<MeshRenderer> meshRenderer;
 
 		IDXGIFactory6* CreateDXGIFactory();
 

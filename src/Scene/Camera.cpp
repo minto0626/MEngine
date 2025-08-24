@@ -33,6 +33,20 @@ void Camera::SetRot(Quaternion rot)
 	_isDirty = true;
 }
 
+Matrix Camera::GetViewMatrix()
+{
+	// 何かしらのパラメータが変更されていたら再計算される
+	Update();
+	return _viewMatrix;
+}
+
+Matrix Camera::GetProjectionMatrix()
+{
+	// 何かしらのパラメータが変更されていたら再計算される
+	Update();
+	return _projectionMatrix;
+}
+
 Matrix Camera::GetViewProjectionMatrix()
 {
 	// 何かしらのパラメータが変更されていたら再計算される

@@ -136,8 +136,13 @@ namespace Graphics
 		rootDesc3.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		MaterialDesc materialDesc3 =
 		{
-			L"Assets/shader/BasicVertexShader.hlsl",
-			L"Assets/shader/BasicPixelShader.hlsl",
+			L"Assets/shader/Basic3DShader.hlsl",
+			L"Assets/shader/Basic3DShader.hlsl",
+			{
+				{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+				{ "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+				{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+			},
 			rootDesc3,
 			BlendPreset::AlphaBlend,
 			RasterizerPreset::CullBack,
@@ -264,66 +269,68 @@ namespace Graphics
 
 		// メッシュ４
 		{
-			//MeshData meshData;
-			//auto halfW = 10.0f * 0.5f;
-			//auto halfH = 10.0f * 0.5f;
-			//auto halfZ = 10.0f * 0.5f;
-			//meshData.vertices = {
-			//	{{ -halfW, -halfH, -halfZ }, { 0.0f, 1.0f }},   // 左下
-			//	{{ -halfW,  halfH, -halfZ }, { 0.0f, 0.0f }},   // 左上
-			//	{{  halfW, -halfH, -halfZ }, { 1.0f, 1.0f }},   // 右下
-			//	{{  halfW,  halfH, -halfZ }, { 1.0f, 0.0f }},   // 右上
+			MeshData meshData;
+			auto halfW = 10.0f * 0.5f;
+			auto halfH = 10.0f * 0.5f;
+			auto halfZ = 10.0f * 0.5f;
+			meshData.vertices = {
+				{{ -halfW, -halfH, -halfZ }, {  0,  0, -1 }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW,  halfH, -halfZ }, {  0,  0, -1 }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW, -halfH, -halfZ }, {  0,  0, -1 }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW,  halfH, -halfZ }, {  0,  0, -1 }, { 1.0f, 0.0f }},   // 右上
 
-			//	{{  halfW, -halfH, -halfZ }, { 0.0f, 1.0f }},   // 左下
-			//	{{  halfW,  halfH, -halfZ }, { 0.0f, 0.0f }},   // 左上
-			//	{{  halfW, -halfH,  halfZ }, { 1.0f, 1.0f }},   // 右下
-			//	{{  halfW,  halfH,  halfZ }, { 1.0f, 0.0f }},   // 右上
+				{{  halfW, -halfH, -halfZ }, {  1,  0,  0 }, { 0.0f, 1.0f }},   // 左下
+				{{  halfW,  halfH, -halfZ }, {  1,  0,  0 }, { 0.0f, 0.0f }},   // 左上
+				{{  halfW, -halfH,  halfZ }, {  1,  0,  0 }, { 1.0f, 1.0f }},   // 右下
+				{{  halfW,  halfH,  halfZ }, {  1,  0,  0 }, { 1.0f, 0.0f }},   // 右上
 
-			//	{{  halfW, -halfH,  halfZ }, { 0.0f, 1.0f }},   // 左下
-			//	{{  halfW,  halfH,  halfZ }, { 0.0f, 0.0f }},   // 左上
-			//	{{ -halfW, -halfH,  halfZ }, { 1.0f, 1.0f }},   // 右下
-			//	{{ -halfW,  halfH,  halfZ }, { 1.0f, 0.0f }},   // 右上
+				{{  halfW, -halfH,  halfZ }, {  0,  0,  1 }, { 0.0f, 1.0f }},   // 左下
+				{{  halfW,  halfH,  halfZ }, {  0,  0,  1 }, { 0.0f, 0.0f }},   // 左上
+				{{ -halfW, -halfH,  halfZ }, {  0,  0,  1 }, { 1.0f, 1.0f }},   // 右下
+				{{ -halfW,  halfH,  halfZ }, {  0,  0,  1 }, { 1.0f, 0.0f }},   // 右上
+ 
+				{{ -halfW, -halfH,  halfZ }, { -1,  0,  0 }, { 0.0f, 1.0f }},   // 左下
+				{{ -halfW,  halfH,  halfZ }, { -1,  0,  0 }, { 0.0f, 0.0f }},   // 左上
+				{{ -halfW, -halfH, -halfZ }, { -1,  0,  0 }, { 1.0f, 1.0f }},   // 右下
+				{{ -halfW,  halfH, -halfZ }, { -1,  0,  0 }, { 1.0f, 0.0f }},   // 右上
+			};
+			meshData.indices = {
+				0, 1, 2,
+				2, 1, 3,
 
-			//	{{ -halfW, -halfH,  halfZ }, { 0.0f, 1.0f }},   // 左下
-			//	{{ -halfW,  halfH,  halfZ }, { 0.0f, 0.0f }},   // 左上
-			//	{{ -halfW, -halfH, -halfZ }, { 1.0f, 1.0f }},   // 右下
-			//	{{ -halfW,  halfH, -halfZ }, { 1.0f, 0.0f }},   // 右上
-			//};
-			//meshData.indices = {
-			//	0, 1, 2,
-			//	2, 1, 3,
+				4, 5, 6,
+				6, 5, 7,
 
-			//	4, 5, 6,
-			//	6, 5, 7,
+				8, 9, 10,
+				10, 9, 11,
 
-			//	8, 9, 10,
-			//	10, 9, 11,
+				12, 13, 14,
+				14, 13, 15,
+			};
 
-			//	12, 13, 14,
-			//	14, 13, 15,
-			//};
+			mesh = std::make_unique<Mesh>();
+			mesh->Initialize(device.Get(), commandContext, meshData);
 
-			//mesh4 = std::make_unique<Mesh>();
-			//mesh4->Initialize(device.Get(), commandContext, meshData);
+			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc3);
 
-			//auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc3);
+			auto material = materialRegistry->Get("3DMaterial");
 
-			//auto material = materialRegistry->Get("3DMaterial");
+			const char* texfilePath = "Assets/texture/free_horse.png";
+			texture4 = std::make_unique<Texture>();
+			texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
+			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture4.get());
 
-			//const char* texfilePath = "Assets/texture/free_horse.png";
-			//texture4 = std::make_unique<Texture>();
-			//texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
-			//material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture4.get());
+			constantBuffer4 = std::make_unique<ConstantBuffer>();
+			transform4.SetPos({ 0, 0, 30 });
+			SceneConstantBuffer sceneCB;
+			constantBuffer4->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(sceneCB));
+			sceneCB.worldMatrix = transform4.GetWorldMatrix();
+			sceneCB.viewMatrix = camera3D.GetViewMatrix();
+			sceneCB.projectionMatrix = camera3D.GetProjectionMatrix();
+			constantBuffer4->Update(&sceneCB, sizeof(sceneCB));
 
-			//constantBuffer4 = std::make_unique<ConstantBuffer>();
-			//transform4.SetPos({ 0, 0, 30 });
-			//auto world = transform4.GetWorldMatrix();
-			//constantBuffer4->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
-			//world *= camera3D.GetViewProjectionMatrix();
-			//constantBuffer4->Update(&world, sizeof(world));
-
-			//meshRenderer4 = std::make_unique<MeshRenderer>(mesh4.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer4.get());
-			//scene3DRenderers.push_back(meshRenderer4.get());
+			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer4.get());
+			scene3DRenderers.push_back(meshRenderer.get());
 		}
 	}
 
@@ -331,10 +338,13 @@ namespace Graphics
 	{
 		// 回転テスト
 		{
-			//auto a = transform4.GetRot() * Quaternion::FromEulerAngles(0.0f, 1.0f * 0.5f, 0.0f);
-			//transform4.SetRot(a);
-			//auto world = transform4.GetWorldMatrix() * camera3D.GetViewProjectionMatrix();
-			//constantBuffer4->Update(&world, sizeof(world));
+			auto angle = transform4.GetRot() * Quaternion::FromEulerAngles(0.0f, 1.0f * 0.5f, 0.0f);
+			transform4.SetRot(angle);
+			SceneConstantBuffer sceneCB;
+			sceneCB.worldMatrix = transform4.GetWorldMatrix();
+			sceneCB.viewMatrix = camera3D.GetViewMatrix();
+			sceneCB.projectionMatrix = camera3D.GetProjectionMatrix();
+			constantBuffer4->Update(&sceneCB, sizeof(sceneCB));
 		}
 
 		camera2D.Update();

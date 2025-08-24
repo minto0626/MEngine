@@ -30,6 +30,8 @@ public:
 	void SetPos(Vector3 pos);
 	void SetTarget(Vector3 target);
 	void SetRot(Quaternion rot);
+	Matrix GetViewMatrix();
+	Matrix GetProjectionMatrix();
 	Matrix GetViewProjectionMatrix();
 
 	void Update();
