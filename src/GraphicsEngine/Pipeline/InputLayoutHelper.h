@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 #include <d3d12.h>
 
@@ -6,11 +6,11 @@ namespace InputLayoutHelper
 {
 	struct InputElement
 	{
-		const char* semanticName;	// ƒZƒ}ƒ“ƒeƒBƒNƒX–¼
-		UINT semanticIndex;			// “¯‚¶ƒZƒ}ƒ“ƒeƒBƒNƒX–¼‚Ì‚Ég‚¤ƒCƒ“ƒfƒbƒNƒX
-		DXGI_FORMAT format;			// ƒf[ƒ^ƒtƒH[ƒ}ƒbƒg
-		UINT inputSlot;				// “ü—ÍƒXƒƒbƒg‚ÌƒCƒ“ƒfƒbƒNƒX
-		UINT byteOffset;			// ƒf[ƒ^‚ÌêŠ
+		const char* semanticName;	// ã‚»ãƒãƒ³ãƒ†ã‚£ã‚¯ã‚¹å
+		UINT semanticIndex;			// åŒã˜ã‚»ãƒãƒ³ãƒ†ã‚£ã‚¯ã‚¹åã®æ™‚ã«ä½¿ã†ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+		DXGI_FORMAT format;			// ãƒ‡ãƒ¼ã‚¿ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+		UINT inputSlot;				// å…¥åŠ›ã‚¹ãƒ­ãƒƒãƒˆã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+		UINT byteOffset;			// ãƒ‡ãƒ¼ã‚¿ã®å ´æ‰€
 
 		InputElement(const char* semanticName, DXGI_FORMAT format) :
 			semanticName(semanticName),
@@ -29,11 +29,39 @@ namespace InputLayoutHelper
 				format,
 				inputSlot,
 				byteOffset,
-				D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,	// 1’¸“_‚²‚Æ‚ÉƒŒƒCƒAƒEƒg‚ª“ü‚Á‚Ä‚¢‚é
-				0	// ƒCƒ“ƒXƒ^ƒ“ƒVƒ“ƒO‚ğ—˜—p‚µ‚È‚¢
+				D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,	// 1é ‚ç‚¹ã”ã¨ã«ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆãŒå…¥ã£ã¦ã„ã‚‹
+				0	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚·ãƒ³ã‚°ã‚’åˆ©ç”¨ã—ãªã„
 			};
+		}
+
+		bool operator ==(const InputElement& other) const 
+		{
+			return
+				semanticName == other.semanticName &&
+				semanticIndex == other.semanticIndex &&
+				format == other.format &&
+				inputSlot == other.inputSlot &&
+				byteOffset == other.byteOffset;
 		}
 	};
 
-	std::vector<D3D12_INPUT_ELEMENT_DESC> CreateInputLayout(const std::initializer_list<InputElement>& elements);
+	std::vector<D3D12_INPUT_ELEMENT_DESC> CreateInputLayout(const std::vector<InputElement>& elements);
+}
+
+namespace std
+{
+	template<>
+	struct hash<InputLayoutHelper::InputElement>
+	{
+		size_t operator ()(const InputLayoutHelper::InputElement& e) const
+		{
+			size_t h = 0;
+			h ^= std::hash<const char*>{}(e.semanticName) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= std::hash<UINT>{}(e.semanticIndex) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= std::hash<DXGI_FORMAT>{}(e.format) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= std::hash<UINT>{}(e.inputSlot) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= std::hash<UINT>{}(e.byteOffset) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			return h;
+		}
+	};
 }

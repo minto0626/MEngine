@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include "Pipeline/StateFactory.h"
 #include "Pipeline/RootSignatureDesc.h"
+#include "Pipeline/InputLayoutHelper.h"
 
 #include <string>
+#include <vector>
 
 namespace Graphics
 {
@@ -10,6 +12,7 @@ namespace Graphics
 	{
 		std::wstring vertexShaderPath;
 		std::wstring pixelShaderPath;
+		std::vector<InputLayoutHelper::InputElement> inputElements;
 		RootSignatureDesc rootSignatureDesc;
 		BlendPreset blendPreset;
 		RasterizerPreset rasterizerPreset;

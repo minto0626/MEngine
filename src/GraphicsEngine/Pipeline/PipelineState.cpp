@@ -31,12 +31,7 @@ void PipelineState::CreateFromDesc(
 	vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
 	ps.LoadPS(desc.pixelShaderPath.c_str(), "ps");
 
-	auto inputLayout = InputLayoutHelper::CreateInputLayout(
-		{
-			{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-			{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-		}
-		);
+	auto inputLayout = InputLayoutHelper::CreateInputLayout(desc.inputElements);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = rootSignature->Get();

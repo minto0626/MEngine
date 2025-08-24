@@ -171,11 +171,13 @@
     <ClInclude Include="src\GraphicsEngine\Pipeline\StateFactory.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\MeshRenderer.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h" />
+    <ClInclude Include="src\GraphicsEngine\Renderer\SpriteRenderer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\IndexBuffer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\Texture.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\VertexBuffer.h" />
     <ClInclude Include="src\GraphicsEngine\Shader\Shader.h" />
+    <ClInclude Include="src\GraphicsEngine\Sprite\Sprite.h" />
     <ClInclude Include="src\GraphicsEngine\TextureLoader.h" />
     <ClInclude Include="src\Input\GamePad.h" />
     <ClInclude Include="src\Input\IInputDevice.h" />
@@ -214,11 +216,13 @@
     <ClCompile Include="src\GraphicsEngine\Pipeline\RootSignatureRegistry.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer\MeshRenderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Renderer\SpriteRenderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\IndexBuffer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\Texture.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\VertexBuffer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Shader\Shader.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Sprite\Sprite.cpp" />
     <ClCompile Include="src\GraphicsEngine\TextureLoader.cpp" />
     <ClCompile Include="src\Input\GamePad.cpp" />
     <ClCompile Include="src\Input\InputSystem.cpp" />

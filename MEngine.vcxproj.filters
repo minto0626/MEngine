@@ -50,6 +50,9 @@
     <Filter Include="src\Utility">
       <UniqueIdentifier>{c133c2fc-5727-4b9c-b954-7f1119f14175}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\GraphicsEngine\Sprite">
+      <UniqueIdentifier>{ca003c40-eb87-4ba1-9db8-bd8c8b4c3105}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon\ME_icon.ico">
@@ -189,6 +192,12 @@
     <ClInclude Include="src\GraphicsEngine\Material\MaterialRegistry.h">
       <Filter>src\GraphicsEngine\Material</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Sprite\Sprite.h">
+      <Filter>src\GraphicsEngine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Renderer\SpriteRenderer.h">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -301,6 +310,12 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\Material\MaterialRegistry.cpp">
       <Filter>src\GraphicsEngine\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Sprite\Sprite.cpp">
+      <Filter>src\GraphicsEngine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Renderer\SpriteRenderer.cpp">
+      <Filter>src\GraphicsEngine\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

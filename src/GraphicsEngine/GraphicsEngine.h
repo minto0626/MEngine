@@ -10,6 +10,7 @@
 #include "Material/MaterialCache.h"
 #include "Material/MaterialRegistry.h"
 #include "Mesh/Mesh.h"
+#include "Sprite/Sprite.h"
 #include "Pipeline/RootSignature.h"
 #include "Pipeline/PipelineState.h"
 #include "Pipeline/RootSignatureRegistry.h"
@@ -17,6 +18,7 @@
 #include "Resources/ConstantBuffer.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/MeshRenderer.h"
+#include "Renderer/SpriteRenderer.h"
 #include "Scene/Camera.h"
 #include "Scene/Transform.h"
 #include "Math/Color.h"
@@ -57,26 +59,26 @@ namespace Graphics
 		const std::string mainTexParamName = "mainTex";
 		std::shared_ptr<RootSignature> basicRootSignature;
 
-		std::unique_ptr<Mesh> mesh;
+		std::unique_ptr<Sprite> sprite;
 		std::unique_ptr<Material> material;
 		std::unique_ptr<Texture> texture;
 		std::unique_ptr<ConstantBuffer> constantBuffer;
 		Transform transform;
-		std::unique_ptr<MeshRenderer> meshRenderer;
+		std::unique_ptr<SpriteRenderer> spriteRenderer;
 
-		std::unique_ptr<Mesh> mesh2;
+		std::unique_ptr<Sprite> sprite2;
 		std::unique_ptr<Material> material2;
 		std::unique_ptr<Texture> texture2;
 		std::unique_ptr<ConstantBuffer> constantBuffer2;
 		Transform transform2;
-		std::unique_ptr<MeshRenderer> meshRenderer2;
+		std::unique_ptr<SpriteRenderer> spriteRenderer2;
 
-		std::unique_ptr<Mesh> mesh3;
+		std::unique_ptr<Sprite> sprite3;
 		std::unique_ptr<Material> material3;
 		std::unique_ptr<Texture> texture3;
 		std::unique_ptr<ConstantBuffer> constantBuffer3;
 		Transform transform3;
-		std::unique_ptr<MeshRenderer> meshRenderer3;
+		std::unique_ptr<SpriteRenderer> spriteRenderer3;
 
 		std::unique_ptr<Mesh> mesh4;
 		std::unique_ptr<Texture> texture4;
