@@ -48,6 +48,7 @@ void PipelineState::CreateFromDesc(
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.SampleDesc.Quality = 0;
 	psoDesc.DepthStencilState = Graphics::StateFactory::GetDepthStencilState(desc.depthStencilPreset);
+	psoDesc.DSVFormat = desc.depthStencilPreset == Graphics::DepthStencilPreset::DepthEnable ? DXGI_FORMAT_D32_FLOAT : DXGI_FORMAT_UNKNOWN;
 
 	auto result = device.Get()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(_pipelineState.ReleaseAndGetAddressOf()));
 	if (FAILED(result))

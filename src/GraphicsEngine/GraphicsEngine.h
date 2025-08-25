@@ -41,10 +41,13 @@ namespace Graphics
 		GraphicsContext graphicsContext;
 		std::unique_ptr<DescriptorHeap> cbv_srv_uav_heap;
 		std::unique_ptr<DescriptorHeap> rtv_heap;
+		std::unique_ptr<DescriptorHeap> dsv_heap;
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> renderTargets;
 		std::vector<DescriptorHandle> rtvHandles;
 		Color clearColor = Color::FromHex(0x6c9bd2);
+		Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
+		DescriptorHandle dsvHandle;
 		Camera camera2D;
 		Camera camera3D;
 

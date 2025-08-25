@@ -63,6 +63,41 @@ namespace Graphics
 			device.Get()->CreateRenderTargetView(renderTargets[i].Get(), nullptr, handle.cpuHandle);
 		}
 
+		dsv_heap = std::make_unique<DescriptorHeap>(
+			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 32, false
+		);
+		auto depthHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+		auto depthResDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+			DXGI_FORMAT_R32_TYPELESS,					// 深度書き込み用フォーマット
+			swapchainDesc.Width, swapchainDesc.Height,	// 幅高さはレンダーターゲットと同じ
+			1,	// テクスチャ配列でも、3Dテクスチャでもない
+			1,	// ミップマップしないので1
+			1,	// サンプルは1ピクセルあたり1つ
+			0,	// クオリティは最低
+			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
+		);
+		CD3DX12_CLEAR_VALUE depthClearValue(
+			DXGI_FORMAT_D32_FLOAT,	// 32bit floatでクリア
+			1.0f,	// 1.0fでクリア
+			0);		// ステンシルは使わない
+		auto result = device.Get()->CreateCommittedResource(
+			&depthHeapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&depthResDesc,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&depthClearValue,
+			IID_PPV_ARGS(depthBuffer.ReleaseAndGetAddressOf()));
+		if (FAILED(result))
+		{
+			return false;
+		}
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;	// 深度に32bit使用
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;	// 2Dテクスチャ
+		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+		dsvHandle = dsv_heap->Allocate();
+		device.Get()->CreateDepthStencilView(depthBuffer.Get(), &dsvDesc, dsvHandle.cpuHandle);
+
 		cbv_srv_uav_heap = std::make_unique<DescriptorHeap>(
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
 		);
@@ -145,8 +180,8 @@ namespace Graphics
 			},
 			rootDesc3,
 			BlendPreset::AlphaBlend,
-			RasterizerPreset::CullBack,
-			DepthStencilPreset::DepthDisable,
+			RasterizerPreset::CullNode,
+			DepthStencilPreset::DepthEnable,
 		};
 		materialRegistry->Register("3DMaterial", materialDesc3);
 
@@ -368,9 +403,10 @@ namespace Graphics
 			D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		auto rtvHandle = rtvHandles[backBufferIndex].cpuHandle;
-		commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle.cpuHandle);
 		const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
 		commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle.cpuHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
 		commandList->SetDescriptorHeaps(1, heaps);
