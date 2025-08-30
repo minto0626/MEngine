@@ -198,6 +198,12 @@
     <ClInclude Include="src\GraphicsEngine\Renderer\SpriteRenderer.h">
       <Filter>src\GraphicsEngine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\RenderTarget.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\DepthBuffer.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -316,6 +322,12 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\Renderer\SpriteRenderer.cpp">
       <Filter>src\GraphicsEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\RenderTarget.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\DepthBuffer.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

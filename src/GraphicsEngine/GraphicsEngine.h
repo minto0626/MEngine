@@ -14,6 +14,8 @@
 #include "Pipeline/RootSignature.h"
 #include "Pipeline/PipelineState.h"
 #include "Pipeline/RootSignatureRegistry.h"
+#include "Resources/RenderTarget.h"
+#include "Resources/DepthBuffer.h"
 #include "Resources/Texture.h"
 #include "Resources/ConstantBuffer.h"
 #include "Renderer/Renderer.h"
@@ -43,11 +45,9 @@ namespace Graphics
 		std::unique_ptr<DescriptorHeap> rtv_heap;
 		std::unique_ptr<DescriptorHeap> dsv_heap;
 
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> renderTargets;
-		std::vector<DescriptorHandle> rtvHandles;
+		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 		Color clearColor = Color::FromHex(0x6c9bd2);
-		Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
-		DescriptorHandle dsvHandle;
+		std::unique_ptr<DepthBuffer> depthBuffer;
 		Camera camera2D;
 		Camera camera3D;
 

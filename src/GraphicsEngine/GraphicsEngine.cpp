@@ -54,49 +54,18 @@ namespace Graphics
 		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
 		swapChain.Get()->GetDesc1(&swapchainDesc);
 		renderTargets.resize(swapchainDesc.BufferCount);
-		rtvHandles.resize(swapchainDesc.BufferCount);
 		for (UINT i = 0; i < renderTargets.size(); ++i)
 		{
-			swapChain.Get()->GetBuffer(i, IID_PPV_ARGS(renderTargets[i].ReleaseAndGetAddressOf()));
-			auto handle = rtv_heap->Allocate();
-			rtvHandles[i] = handle;
-			device.Get()->CreateRenderTargetView(renderTargets[i].Get(), nullptr, handle.cpuHandle);
+			renderTargets[i] = std::make_unique<RenderTarget>();
+			renderTargets[i]->InitFromSwapChain(&device, &swapChain, *rtv_heap, i);
 		}
 
 		dsv_heap = std::make_unique<DescriptorHeap>(
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 32, false
 		);
-		auto depthHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		auto depthResDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-			DXGI_FORMAT_R32_TYPELESS,					// 深度書き込み用フォーマット
-			swapchainDesc.Width, swapchainDesc.Height,	// 幅高さはレンダーターゲットと同じ
-			1,	// テクスチャ配列でも、3Dテクスチャでもない
-			1,	// ミップマップしないので1
-			1,	// サンプルは1ピクセルあたり1つ
-			0,	// クオリティは最低
-			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
-		);
-		CD3DX12_CLEAR_VALUE depthClearValue(
-			DXGI_FORMAT_D32_FLOAT,	// 32bit floatでクリア
-			1.0f,	// 1.0fでクリア
-			0);		// ステンシルは使わない
-		auto result = device.Get()->CreateCommittedResource(
-			&depthHeapProp,
-			D3D12_HEAP_FLAG_NONE,
-			&depthResDesc,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&depthClearValue,
-			IID_PPV_ARGS(depthBuffer.ReleaseAndGetAddressOf()));
-		if (FAILED(result))
-		{
-			return false;
-		}
-		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;	// 深度に32bit使用
-		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;	// 2Dテクスチャ
-		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-		dsvHandle = dsv_heap->Allocate();
-		device.Get()->CreateDepthStencilView(depthBuffer.Get(), &dsvDesc, dsvHandle.cpuHandle);
+		depthBuffer = std::make_unique<DepthBuffer>();
+		// 深度に32bit使用
+		depthBuffer->Init(&device, swapchainDesc.Width, swapchainDesc.Height, DXGI_FORMAT_D32_FLOAT, *dsv_heap);
 
 		cbv_srv_uav_heap = std::make_unique<DescriptorHeap>(
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
@@ -179,7 +148,7 @@ namespace Graphics
 				{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
 			},
 			rootDesc3,
-			BlendPreset::AlphaBlend,
+			BlendPreset::Opaque,
 			RasterizerPreset::CullNode,
 			DepthStencilPreset::DepthEnable,
 		};
@@ -388,7 +357,7 @@ namespace Graphics
 		auto* commandList = commandContext.GetCommandList();
 
 		UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
-		auto* backBuffer = renderTargets[backBufferIndex].Get();
+		auto* backBuffer = renderTargets[backBufferIndex]->GetResource();
 
 		D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(backBuffer);
 		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
@@ -402,11 +371,12 @@ namespace Graphics
 			D3D12_RESOURCE_STATE_PRESENT,
 			D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		auto rtvHandle = rtvHandles[backBufferIndex].cpuHandle;
-		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle.cpuHandle);
+		auto rtvHandle = renderTargets[backBufferIndex]->GetCPUHandle();
+		auto dsvHandle = depthBuffer->GetCPUHandle();
+		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
 		commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
-		commandList->ClearDepthStencilView(dsvHandle.cpuHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
 		commandList->SetDescriptorHeaps(1, heaps);
