@@ -6,7 +6,20 @@ namespace Graphics
 	{
 		_vertexBuffer.Init(device, commandContext, meshData.vertices.data(), meshData.vertices.size(), sizeof(MeshVertex));
 
-		_indexBuffer.Init(device, commandContext, meshData.indices.data(), meshData.indices.size(), DXGI_FORMAT_R16_UINT);
+		// インデックスバッファーのフォーマットを頂点数で決定
+		if (meshData.indices.size() < (std::numeric_limits<uint16_t>::max)())
+		{
+			auto dstIndices = reinterpret_cast<uint16_t*>(meshData.indices.data());
+			for (auto i = 0; i < meshData.indices.size(); ++i)
+			{
+				dstIndices[i] = static_cast<uint16_t>(meshData.indices[i]);
+			}
+			_indexBuffer.Init(device, commandContext, dstIndices, meshData.indices.size(), DXGI_FORMAT_R16_UINT);
+		}
+		else
+		{
+			_indexBuffer.Init(device, commandContext, meshData.indices.data(), meshData.indices.size(), DXGI_FORMAT_R32_UINT);
+		}
 
 		return true;
 	}

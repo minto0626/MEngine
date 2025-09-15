@@ -43,6 +43,9 @@ namespace Graphics
 		if (!fence.Initialize(&device)) { return false; }
 		factory->Release();
 
+		// モデルインポーター初期化
+		modelImporter.Init();
+
 		graphicsContext.device = &device;
 		graphicsContext.commandQueue = &commandQueue;
 		graphicsContext.commandContext = &commandContext;
@@ -157,8 +160,8 @@ namespace Graphics
 		// スプライト１
 		{
 			SpriteData spriteData;
-			auto halfW = 500.0f * 0.5f;
-			auto halfH = 500.0f * 0.5f;
+			auto halfW = 250.0f * 0.5f;
+			auto halfH = 250.0f * 0.5f;
 			spriteData.vertices = {
 				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
 				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
@@ -183,7 +186,7 @@ namespace Graphics
 			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture.get());
 
 			constantBuffer = std::make_unique<ConstantBuffer>();
-			transform.SetPos({640, 360, 0});
+			transform.SetPos({1080, 520, 0});
 			auto world = transform.GetWorldMatrix();
 			constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
 			world *= camera2D.GetViewProjectionMatrix();
@@ -193,7 +196,7 @@ namespace Graphics
 			scene2DRenderers.push_back(spriteRenderer.get());
 		}
 
-		// メッシュ２
+		// スプライト２
 		{
 			SpriteData spriteData;
 			auto halfW = 200.0f * 0.5f;
@@ -222,7 +225,7 @@ namespace Graphics
 			material2->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture2.get());
 
 			constantBuffer2 = std::make_unique<ConstantBuffer>();
-			transform2.SetPos({ 850, 360, 0 });
+			transform2.SetPos({ 850, 560, 0 });
 			auto world2 = transform2.GetWorldMatrix();
 			constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
 			world2 *= camera2D.GetViewProjectionMatrix();
@@ -232,11 +235,11 @@ namespace Graphics
 			scene2DRenderers.push_back(spriteRenderer2.get());
 		}
 
-		// メッシュ３
+		// スプライト３
 		{
 			SpriteData spriteData;
 			auto halfW = 300.0f * 0.5f;
-			auto halfH = 600.0f * 0.5f;
+			auto halfH = 300.0f * 0.5f;
 			spriteData.vertices = {
 				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
 				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
@@ -261,7 +264,7 @@ namespace Graphics
 			material3->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture3.get());
 
 			constantBuffer3 = std::make_unique<ConstantBuffer>();
-			transform3.SetPos({ 250, 360, 0 });
+			transform3.SetPos({ 250, 500, 0 });
 			auto world3 = transform3.GetWorldMatrix();
 			constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
 			world3 *= camera2D.GetViewProjectionMatrix();
@@ -273,44 +276,25 @@ namespace Graphics
 
 		// メッシュ４
 		{
+			const wchar_t* sampleModelPath[] =
+			{
+				L"Assets/3D/samples/teapot/teapot.fbx",
+				L"Assets/3D/samples/cube/cube.fbx",
+			};
+			const auto modelPath = sampleModelPath[0];
+			std::vector<ImportMeshData> meshDataList;
+			std::vector<ImportMaterialData> materialDataList;
+			if (!modelImporter.Load(modelPath, meshDataList, materialDataList))
+			{
+				assert(0 && "モデル読み込み失敗");
+				return;
+			}
+
+			// 今回はメッシュが一つだけの想定
+			ImportMeshData& meshDataSrc = meshDataList[0];
 			MeshData meshData;
-			auto halfW = 10.0f * 0.5f;
-			auto halfH = 10.0f * 0.5f;
-			auto halfZ = 10.0f * 0.5f;
-			meshData.vertices = {
-				{{ -halfW, -halfH, -halfZ }, {  0,  0, -1 }, { 0.0f, 1.0f }},   // 左下
-				{{ -halfW,  halfH, -halfZ }, {  0,  0, -1 }, { 0.0f, 0.0f }},   // 左上
-				{{  halfW, -halfH, -halfZ }, {  0,  0, -1 }, { 1.0f, 1.0f }},   // 右下
-				{{  halfW,  halfH, -halfZ }, {  0,  0, -1 }, { 1.0f, 0.0f }},   // 右上
-
-				{{  halfW, -halfH, -halfZ }, {  1,  0,  0 }, { 0.0f, 1.0f }},   // 左下
-				{{  halfW,  halfH, -halfZ }, {  1,  0,  0 }, { 0.0f, 0.0f }},   // 左上
-				{{  halfW, -halfH,  halfZ }, {  1,  0,  0 }, { 1.0f, 1.0f }},   // 右下
-				{{  halfW,  halfH,  halfZ }, {  1,  0,  0 }, { 1.0f, 0.0f }},   // 右上
-
-				{{  halfW, -halfH,  halfZ }, {  0,  0,  1 }, { 0.0f, 1.0f }},   // 左下
-				{{  halfW,  halfH,  halfZ }, {  0,  0,  1 }, { 0.0f, 0.0f }},   // 左上
-				{{ -halfW, -halfH,  halfZ }, {  0,  0,  1 }, { 1.0f, 1.0f }},   // 右下
-				{{ -halfW,  halfH,  halfZ }, {  0,  0,  1 }, { 1.0f, 0.0f }},   // 右上
- 
-				{{ -halfW, -halfH,  halfZ }, { -1,  0,  0 }, { 0.0f, 1.0f }},   // 左下
-				{{ -halfW,  halfH,  halfZ }, { -1,  0,  0 }, { 0.0f, 0.0f }},   // 左上
-				{{ -halfW, -halfH, -halfZ }, { -1,  0,  0 }, { 1.0f, 1.0f }},   // 右下
-				{{ -halfW,  halfH, -halfZ }, { -1,  0,  0 }, { 1.0f, 0.0f }},   // 右上
-			};
-			meshData.indices = {
-				0, 1, 2,
-				2, 1, 3,
-
-				4, 5, 6,
-				6, 5, 7,
-
-				8, 9, 10,
-				10, 9, 11,
-
-				12, 13, 14,
-				14, 13, 15,
-			};
+			meshData.vertices = meshDataSrc.vertices;
+			meshData.indices = meshDataSrc.indices;
 
 			mesh = std::make_unique<Mesh>();
 			mesh->Initialize(device.Get(), commandContext, meshData);
@@ -319,13 +303,22 @@ namespace Graphics
 
 			auto material = materialRegistry->Get("3DMaterial");
 
-			const char* texfilePath = "Assets/texture/free_horse.png";
 			texture4 = std::make_unique<Texture>();
-			texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
+			ComPtr<ID3D12Resource> textureRes = nullptr;
+			if (materialDataList.size() > 0 &&
+				materialDataList[meshDataSrc.materialIndex].useDiffuseTexture)
+			{
+				textureRes = textureLoader.GetTextureByPath(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
+			}
+			if (textureRes == nullptr)
+			{
+				textureRes = textureLoader.GetWhiteTexture();
+			}
+			texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureRes);
 			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture4.get());
 
 			constantBuffer4 = std::make_unique<ConstantBuffer>();
-			transform4.SetPos({ 0, 0, 30 });
+			transform4.SetPos({ 0, -1, 0 });
 			SceneConstantBuffer sceneCB;
 			constantBuffer4->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(sceneCB));
 			sceneCB.worldMatrix = transform4.GetWorldMatrix();

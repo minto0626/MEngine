@@ -9,6 +9,7 @@
 #include "TextureLoader.h"
 #include "Material/MaterialCache.h"
 #include "Material/MaterialRegistry.h"
+#include "ModelImporter.h"
 #include "Mesh/Mesh.h"
 #include "Sprite/Sprite.h"
 #include "Pipeline/RootSignature.h"
@@ -50,6 +51,8 @@ namespace Graphics
 		std::unique_ptr<DepthBuffer> depthBuffer;
 		Camera camera2D;
 		Camera camera3D;
+
+		ModelImporter modelImporter;
 
 		TextureLoader textureLoader;
 		std::unique_ptr<MaterialCache> materialCache;

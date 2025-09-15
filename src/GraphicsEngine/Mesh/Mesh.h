@@ -19,7 +19,7 @@ namespace Graphics
 	struct MeshData
 	{
 		std::vector<MeshVertex> vertices;
-		std::vector<unsigned short> indices;
+		std::vector<uint32_t> indices;
 	};
 
 	struct SceneConstantBuffer
