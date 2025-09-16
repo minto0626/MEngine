@@ -22,7 +22,7 @@
 1. [CMake](https://cmake.org/)が無い方はインストールする\
 ・筆者のバージョンは4.1.1
 
-2. [assimp](https://github.com/assimp/assimp) から `git clone`
+2. [assimp](https://github.com/assimp/assimp) から `git clone`\
 ・任意の場所でよい
 
 3. クローンしたディレクトリに移動してコマンドプロンプトを開き、assimpをビルドする\
