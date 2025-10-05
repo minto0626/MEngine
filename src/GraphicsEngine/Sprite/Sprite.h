@@ -3,6 +3,7 @@
 #include "Resources/VertexBuffer.h"
 #include "Resources/IndexBuffer.h"
 #include "Math/Vector.h"
+#include "Math/Matrix.h"
 
 #include <vector>
 
@@ -18,6 +19,11 @@ namespace Graphics
 	{
 		std::vector<SpriteVertex> vertices;
 		std::vector<unsigned short> indices;
+	};
+
+	struct ScreenConstantBuffer
+	{
+		Matrix worldMatrix;
 	};
 
 	class Sprite

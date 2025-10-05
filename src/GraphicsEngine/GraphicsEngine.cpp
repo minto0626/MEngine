@@ -81,13 +81,6 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
-		camera2D.Init(Camera::ProjectionType::Ortho, windowSize.cx, windowSize.cy);
-		camera2D.SetPos({ 0.0f, 0.0f, 0.0f });
-
-		camera3D.Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
-		camera3D.SetPos({ 0.0f, 0.0f, -5.0f });
-		camera3D.SetTarget({ 0.0f, 0.0f, 0.0f });
-
 		return true;
 	}
 
@@ -157,196 +150,110 @@ namespace Graphics
 		};
 		materialRegistry->Register("3DMaterial", materialDesc3);
 
-		// スプライト１
+		// テクスチャ取得のメモ
 		{
-			SpriteData spriteData;
-			auto halfW = 250.0f * 0.5f;
-			auto halfH = 250.0f * 0.5f;
-			spriteData.vertices = {
-				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
-				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
-				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
-				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
-			};
-			spriteData.indices = {
-				0, 1, 2,
-				2, 1, 3,
-			};
-
-			sprite = std::make_unique<Sprite>();
-			sprite->Initialize(device.Get(), commandContext, spriteData);
-
-			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
-
-			auto material = materialRegistry->Get("DefaultMaterial");
-
-			const char* texfilePath = "Assets/texture/free_ei.png";
-			texture = std::make_unique<Texture>();
-			texture->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath).Get());
-			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture.get());
-
-			constantBuffer = std::make_unique<ConstantBuffer>();
-			transform.SetPos({1080, 520, 0});
-			auto world = transform.GetWorldMatrix();
-			constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world));
-			world *= camera2D.GetViewProjectionMatrix();
-			constantBuffer->Update(&world, sizeof(world));
-
-			spriteRenderer = std::make_unique<SpriteRenderer>(sprite.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer.get());
-			scene2DRenderers.push_back(spriteRenderer.get());
-		}
-
-		// スプライト２
-		{
-			SpriteData spriteData;
-			auto halfW = 200.0f * 0.5f;
-			auto halfH = 200.0f * 0.5f;
-			spriteData.vertices = {
-				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
-				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
-				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
-				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
-			};
-			spriteData.indices = {
-				0, 1, 2,
-				2, 1, 3,
-			};
-
-			sprite2 = std::make_unique<Sprite>();
-			sprite2->Initialize(device.Get(), commandContext, spriteData);
-
-			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc1);
-
-			auto material2 = materialRegistry->Get("DefaultMaterial");
-
-			const char* texfilePath2 = "Assets/texture/free_brachiosaurus.png";
-			texture2 = std::make_unique<Texture>();
-			texture2->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath2).Get());
-			material2->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture2.get());
-
-			constantBuffer2 = std::make_unique<ConstantBuffer>();
-			transform2.SetPos({ 850, 560, 0 });
-			auto world2 = transform2.GetWorldMatrix();
-			constantBuffer2->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world2));
-			world2 *= camera2D.GetViewProjectionMatrix();
-			constantBuffer2->Update(&world2, sizeof(world2));
-
-			spriteRenderer2 = std::make_unique<SpriteRenderer>(sprite2.get(), material2, rootSignature->GetRootIndex(worldMatParamName), constantBuffer2.get());
-			scene2DRenderers.push_back(spriteRenderer2.get());
-		}
-
-		// スプライト３
-		{
-			SpriteData spriteData;
-			auto halfW = 300.0f * 0.5f;
-			auto halfH = 300.0f * 0.5f;
-			spriteData.vertices = {
-				{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
-				{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
-				{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
-				{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
-			};
-			spriteData.indices = {
-				0, 1, 2,
-				2, 1, 3,
-			};
-
-			sprite3 = std::make_unique<Sprite>();
-			sprite3->Initialize(device.Get(), commandContext, spriteData);
-
-			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc2);
-
-			auto material3 = materialRegistry->Get("NonAlphablendMaterial");
-
-			const char* texfilePath3 = "Assets/texture/free_woman_veterinarian.png";
-			texture3 = std::make_unique<Texture>();
-			texture3->Init(device.Get(), cbv_srv_uav_heap.get(), textureLoader.GetTextureByPath(texfilePath3).Get());
-			material3->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture3.get());
-
-			constantBuffer3 = std::make_unique<ConstantBuffer>();
-			transform3.SetPos({ 250, 500, 0 });
-			auto world3 = transform3.GetWorldMatrix();
-			constantBuffer3->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(world3));
-			world3 *= camera2D.GetViewProjectionMatrix();
-			constantBuffer3->Update(&world3, sizeof(world3));
-
-			spriteRenderer3 = std::make_unique<SpriteRenderer>(sprite3.get(), material3, rootSignature->GetRootIndex(worldMatParamName), constantBuffer3.get());
-			scene2DRenderers.push_back(spriteRenderer3.get());
-		}
-
-		// メッシュ４
-		{
-			const wchar_t* sampleModelPath[] =
-			{
-				L"Assets/3D/samples/teapot/teapot.fbx",
-				L"Assets/3D/samples/cube/cube.fbx",
-			};
-			const auto modelPath = sampleModelPath[0];
 			std::vector<ImportMeshData> meshDataList;
 			std::vector<ImportMaterialData> materialDataList;
-			if (!modelImporter.Load(modelPath, meshDataList, materialDataList))
+			if (!modelImporter.Load(L"Assets/3D/samples/teapot/teapot.fbx", meshDataList, materialDataList))
 			{
 				assert(0 && "モデル読み込み失敗");
 				return;
 			}
-
-			// 今回はメッシュが一つだけの想定
 			ImportMeshData& meshDataSrc = meshDataList[0];
-			MeshData meshData;
-			meshData.vertices = meshDataSrc.vertices;
-			meshData.indices = meshDataSrc.indices;
-
-			mesh = std::make_unique<Mesh>();
-			mesh->Initialize(device.Get(), commandContext, meshData);
-
-			auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootDesc3);
-
-			auto material = materialRegistry->Get("3DMaterial");
-
-			texture4 = std::make_unique<Texture>();
 			ComPtr<ID3D12Resource> textureRes = nullptr;
 			if (materialDataList.size() > 0 &&
 				materialDataList[meshDataSrc.materialIndex].useDiffuseTexture)
 			{
 				textureRes = textureLoader.GetTextureByPath(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
 			}
-			if (textureRes == nullptr)
-			{
-				textureRes = textureLoader.GetWhiteTexture();
-			}
-			texture4->Init(device.Get(), cbv_srv_uav_heap.get(), textureRes);
-			material->SetTexture(rootSignature->GetRootIndex(mainTexParamName), texture4.get());
-
-			constantBuffer4 = std::make_unique<ConstantBuffer>();
-			transform4.SetPos({ 0, -1, 0 });
-			SceneConstantBuffer sceneCB;
-			constantBuffer4->Init(device.Get(), cbv_srv_uav_heap.get(), sizeof(sceneCB));
-			sceneCB.worldMatrix = transform4.GetWorldMatrix();
-			sceneCB.viewMatrix = camera3D.GetViewMatrix();
-			sceneCB.projectionMatrix = camera3D.GetProjectionMatrix();
-			constantBuffer4->Update(&sceneCB, sizeof(sceneCB));
-
-			meshRenderer = std::make_unique<MeshRenderer>(mesh.get(), material, rootSignature->GetRootIndex(worldMatParamName), constantBuffer4.get());
-			scene3DRenderers.push_back(meshRenderer.get());
 		}
 	}
 
-	void GraphicsEngine::Render()
+	Sprite* GraphicsEngine::GetSprite(const std::string& path)
 	{
-		// 回転テスト
+		// todo: pathで指定されたSpriteを読み込む
+		SpriteData spriteData;
+		auto width = 100.0f;
+		auto height = 100.0f;
+		auto halfW = width * 0.5f;
+		auto halfH = height * 0.5f;
+		spriteData.vertices = {
+			{{ -halfW,  halfH, 0.0f }, { 0.0f, 1.0f }},   // 左下
+			{{ -halfW, -halfH, 0.0f }, { 0.0f, 0.0f }},   // 左上
+			{{  halfW,  halfH, 0.0f }, { 1.0f, 1.0f }},   // 右下
+			{{  halfW, -halfH, 0.0f }, { 1.0f, 0.0f }},   // 右上
+		};
+		spriteData.indices = {
+			0, 1, 2,
+			2, 1, 3,
+		};
+		auto sprite = std::make_unique<Sprite>();
+		sprite->Initialize(device.Get(), commandContext, spriteData);
+		return sprite.release();
+	}
+
+	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
+	{
+		std::vector<ImportMeshData> meshDataList;
+		std::vector<ImportMaterialData> materialDataList;
+		if (!modelImporter.Load(path.c_str(), meshDataList, materialDataList))
 		{
-			auto angle = transform4.GetRot() * Quaternion::FromEulerAngles(0.0f, 1.0f * 0.5f, 0.0f);
-			transform4.SetRot(angle);
-			SceneConstantBuffer sceneCB;
-			sceneCB.worldMatrix = transform4.GetWorldMatrix();
-			sceneCB.viewMatrix = camera3D.GetViewMatrix();
-			sceneCB.projectionMatrix = camera3D.GetProjectionMatrix();
-			constantBuffer4->Update(&sceneCB, sizeof(sceneCB));
+			assert(0 && "モデル読み込み失敗");
+			return nullptr;
 		}
+		// 今はメッシュが一つだけの想定
+		ImportMeshData& meshDataSrc = meshDataList[0];
+		MeshData meshData;
+		meshData.vertices = meshDataSrc.vertices;
+		meshData.indices = meshDataSrc.indices;
+		auto mesh = std::make_unique<Mesh>();
+		mesh->Initialize(device.Get(), commandContext, meshData);
+		return mesh.release();
+	}
 
-		camera2D.Update();
-		camera3D.Update();
+	Material* GraphicsEngine::GetMaterial(const std::string& name)
+	{
+		return materialRegistry->Get(name);
+	}
 
+	UINT GraphicsEngine::GetRootParameterIndex(const std::string& name, const Material& mat)
+	{
+		auto& rootSignatureDesc = mat.GetDesc().rootSignatureDesc;
+		auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootSignatureDesc);
+		return rootSignature->GetRootIndex(name);
+	}
+
+	ConstantBuffer* GraphicsEngine::CreateConstantBuffer(size_t size)
+	{
+		auto constantBuffer = std::make_unique<ConstantBuffer>();
+		constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), size);
+		return constantBuffer.release();
+	}
+
+	Texture* GraphicsEngine::GetTexture(const std::string& path)
+	{
+		auto texture = std::make_unique<Texture>();
+		auto res = textureLoader.GetTextureByPath(path.c_str());
+		if (res == nullptr)
+		{
+			res = textureLoader.GetWhiteTexture();
+		}
+		texture->Init(device.Get(), cbv_srv_uav_heap.get(), res.Get());
+		return texture.release();
+	}
+
+	void GraphicsEngine::RegisterSpriteRenderer(SpriteRenderer* spriteRenderer)
+	{
+		scene2DRenderers.push_back(spriteRenderer);
+	}
+
+	void GraphicsEngine::RegisterMeshRenderer(MeshRenderer* meshRenderer)
+	{
+		scene3DRenderers.push_back(meshRenderer);
+	}
+
+	void GraphicsEngine::Render(Camera* camera2D, Camera* camera3D)
+	{
 		auto* commandList = commandContext.GetCommandList();
 
 		UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
@@ -402,7 +309,7 @@ namespace Graphics
 				currentMaterial->Bind(commandContext);
 				lastMaterial = currentMaterial;
 			}
-			renderer->Draw(&commandContext);
+			renderer->Draw(&commandContext, camera3D);
 		}
 		for (auto& renderer : scene2DRenderers)
 		{
@@ -412,7 +319,7 @@ namespace Graphics
 				currentMaterial->Bind(commandContext);
 				lastMaterial = currentMaterial;
 			}
-			renderer->Draw(&commandContext);
+			renderer->Draw(&commandContext, camera2D);
 		}
 
 		commandContext.ResourceBarrier(

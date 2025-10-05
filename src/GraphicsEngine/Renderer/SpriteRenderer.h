@@ -14,8 +14,12 @@ namespace Graphics
 		ConstantBuffer* _transformCB;
 
 	public:
-		SpriteRenderer(Sprite* sprite, Material* material, UINT transformCBRootParamIndex, ConstantBuffer* transformCB);
-		void Draw(GfxCommandContext* commandContext) override;
+		SpriteRenderer(class GameObject* owner, int updateOrder = 100);
+
+		void SetSprite(Sprite* sprite) { _sprite = sprite; };
+		void SetMaterial(Material* material) override;
+
+		void Draw(GfxCommandContext* commandContext, Camera* camera) override;
 
 	};
 }

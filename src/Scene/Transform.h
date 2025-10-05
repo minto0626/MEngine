@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
+#include "Component.h"
 
 #include <string>
 
-class Transform
+class Transform : public Component
 {
 private:
 	Vector3 _pos;
@@ -16,7 +17,7 @@ private:
 	void UpdateMatrix();
 
 public:
-	Transform();
+	Transform(class GameObject* owner, int updateOrder = 100);
 
 	void SetPos(const Vector3& pos) { _pos = pos; _isDirty = true; }
 	void SetRot(const Quaternion& rot) { _rot = rot; _isDirty = true; }

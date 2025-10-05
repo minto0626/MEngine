@@ -23,6 +23,7 @@ namespace Graphics
 
 		UINT64 GetInstanceID() const { return _instanceID; };
 		void SetPipelineState(const MaterialDesc& desc, PipelineState* pipelineState) { _desc = desc; _pipelineState = pipelineState; }
+		const MaterialDesc& GetDesc() const { return _desc; }
 		PipelineState* GetPipelineState() const { return _pipelineState; }
 		void SetConstantBuffer(UINT rootIndex, ConstantBuffer* constantBuffer);
 		void SetTexture(UINT rootIndex, Texture* texture);

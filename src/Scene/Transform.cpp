@@ -1,10 +1,12 @@
 ﻿#include "Transform.h"
+#include "GameObject.h"
 
 #include <sstream>
 
 using namespace DirectX;
 
-Transform::Transform() :
+Transform::Transform(GameObject* owner, int updateOrder) :
+	Component(owner, updateOrder),
 	_pos(0.0f, 0.0f, 0.0f),
 	_rot(0.0f, 0.0f, 0.0f, 1.0),
 	_scale(1.0f, 1.0f, 1.0f),

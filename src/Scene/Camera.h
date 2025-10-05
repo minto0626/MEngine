@@ -1,7 +1,10 @@
 ﻿#pragma once
 #include "Transform.h"
+#include "Component.h"
 
-class Camera
+#include <memory>
+
+class Camera : public Component
 {
 public:
 	enum ProjectionType
@@ -11,7 +14,7 @@ public:
 	};
 
 private:
-	Transform _transform;
+	class Transform* _transform;
 	Vector3 _target;
 	float _fov;
 	float _aspectRaito;
@@ -26,6 +29,8 @@ private:
 	bool _isDirty;
 
 public:
+	Camera(class GameObject* owner, int updateOrder = 100);
+
 	void Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_t viewportHeight);
 	void SetPos(Vector3 pos);
 	void SetTarget(Vector3 target);
@@ -34,5 +39,5 @@ public:
 	Matrix GetProjectionMatrix();
 	Matrix GetViewProjectionMatrix();
 
-	void Update();
+	void Update(float deltaTime) override;
 };

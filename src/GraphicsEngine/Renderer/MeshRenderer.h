@@ -14,8 +14,12 @@ namespace Graphics
 		ConstantBuffer* _transformCB;
 
 	public:
-		MeshRenderer(Mesh* mesh, Material* material, UINT transformCBRootParamIndex, ConstantBuffer* transformCB);
-		void Draw(GfxCommandContext* commandContext) override;
+		MeshRenderer(class GameObject* owner, int updateOrder = 100);
+
+		void SetMesh(Mesh* mesh) { _mesh = mesh; };
+		void SetMaterial(Material* material) override;
+
+		void Draw(GfxCommandContext* commandContext, Camera* camera) override;
 
 	};
 }

@@ -22,7 +22,6 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/MeshRenderer.h"
 #include "Renderer/SpriteRenderer.h"
-#include "Scene/Camera.h"
 #include "Scene/Transform.h"
 #include "Math/Color.h"
 
@@ -49,8 +48,6 @@ namespace Graphics
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 		Color clearColor = Color::FromHex(0x6c9bd2);
 		std::unique_ptr<DepthBuffer> depthBuffer;
-		Camera camera2D;
-		Camera camera3D;
 
 		ModelImporter modelImporter;
 
@@ -63,34 +60,6 @@ namespace Graphics
 
 		const std::string worldMatParamName = "worldMat";
 		const std::string mainTexParamName = "mainTex";
-		std::shared_ptr<RootSignature> basicRootSignature;
-
-		std::unique_ptr<Sprite> sprite;
-		std::unique_ptr<Material> material;
-		std::unique_ptr<Texture> texture;
-		std::unique_ptr<ConstantBuffer> constantBuffer;
-		Transform transform;
-		std::unique_ptr<SpriteRenderer> spriteRenderer;
-
-		std::unique_ptr<Sprite> sprite2;
-		std::unique_ptr<Material> material2;
-		std::unique_ptr<Texture> texture2;
-		std::unique_ptr<ConstantBuffer> constantBuffer2;
-		Transform transform2;
-		std::unique_ptr<SpriteRenderer> spriteRenderer2;
-
-		std::unique_ptr<Sprite> sprite3;
-		std::unique_ptr<Material> material3;
-		std::unique_ptr<Texture> texture3;
-		std::unique_ptr<ConstantBuffer> constantBuffer3;
-		Transform transform3;
-		std::unique_ptr<SpriteRenderer> spriteRenderer3;
-
-		std::unique_ptr<Mesh> mesh;
-		std::unique_ptr<Texture> texture4;
-		std::unique_ptr<ConstantBuffer> constantBuffer4;
-		Transform transform4;
-		std::unique_ptr<MeshRenderer> meshRenderer;
 
 		IDXGIFactory6* CreateDXGIFactory();
 
@@ -98,7 +67,15 @@ namespace Graphics
 		bool Initialize(HWND hwnd, SIZE& windowSize);
 		void UnInitialize();
 		void LoadContent();
-		void Render();
+		Sprite* GetSprite(const std::string& path);
+		Mesh* GetMesh(const std::wstring& path);
+		Material* GetMaterial(const std::string& name);
+		UINT GetRootParameterIndex(const std::string& name, const Material& mat);
+		ConstantBuffer* CreateConstantBuffer(size_t size);
+		Texture* GetTexture(const std::string& path);
+		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
+		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
+		void Render(class Camera* camera2D, class Camera* camera3D);
 
 	};
 }
