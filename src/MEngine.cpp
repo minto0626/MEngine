@@ -9,6 +9,7 @@
 #include "Renderer/SpriteRenderer.h"
 #include "Scene/GameObject.h"
 #include "Scene/Camera.h"
+#include "Scene/Light.h"
 
 MEngine::~MEngine()
 {
@@ -58,10 +59,15 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         camera3D->SetPos({ 0.0f, 0.0f, -5.0f });
         camera3D->SetTarget({ 0.0f, 0.0f, 0.0f });
     }
+    // ライト
+    {
+        directionalLight = _scene->CreateGameObject("DirectionalLight")->AddComponent<Light>();
+        directionalLight->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(45.0f, 45.0f, 0.0f));
+    }
 
     // スプライト
     {
-	    sample_spriteObject = _scene->CreateGameObject("SampleGameObject_1");
+	    sample_spriteObject = _scene->CreateGameObject("サンプルゲームオブジェクト１");
         sample_spriteObject->GetTransform()->SetPos({ 640.0f, 240.0f, 0.0f });
 		sample_spriteObject->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
 		sample_spriteObject->GetTransform()->SetScale({ 2.0f, 2.0f, 1.0f });
@@ -77,7 +83,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
 	// メッシュ
     {
-	    sample_meshObject = _scene->CreateGameObject("SampleGameObject_2");
+	    sample_meshObject = _scene->CreateGameObject("サンプルゲームオブジェクト２");
 	    sample_meshObject->GetTransform()->SetPos({ 0.0f, -1.0f, 0.0f });
 	    auto meshRenderer = sample_meshObject->AddComponent<Graphics::MeshRenderer>();
 	    auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/teapot/teapot.fbx");
@@ -88,6 +94,9 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 		material->SetTexture(texIdx, texture);
 		meshRenderer->SetMaterial(material);
     }
+
+	Debug::Log("スプライトの名前 : " + (sample_spriteObject->GetName()));
+    Debug::Log("メッシュの名前 : " + (sample_meshObject->GetName()));
 
     return true;
 }
@@ -173,9 +182,15 @@ void MEngine::Update()
         pos += move;
         camera3D->SetPos(pos);
     }
+
+    if (input.IsButtonDown(0, DIK_R))
+    {
+        directionalLight->GetGameObject()->GetTransform()->SetRot(
+            directionalLight->GetGameObject()->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.0f, 0.25f, 0.0f));
+    }
 }
 
 void MEngine::Draw()
 {
-    graphicsEngine.Render(camera2D, camera3D);
+    graphicsEngine.Render(camera2D, camera3D, directionalLight);
 }

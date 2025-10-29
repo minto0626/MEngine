@@ -24,6 +24,7 @@
 #include "Renderer/SpriteRenderer.h"
 #include "Scene/Transform.h"
 #include "Math/Color.h"
+#include "Scene/Light.h"
 
 #include <memory>
 #include <vector>
@@ -75,7 +76,7 @@ namespace Graphics
 		Texture* GetTexture(const std::string& path);
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
 		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
-		void Render(class Camera* camera2D, class Camera* camera3D);
+		void Render(class Camera* camera2D, class Camera* camera3D, Light* light);
 
 	};
 }

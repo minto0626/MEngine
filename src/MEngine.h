@@ -19,6 +19,7 @@ private:
 
 	class Camera* camera2D;
 	class Camera* camera3D;
+    class Light* directionalLight;
 
 	GameObject* sample_spriteObject;
 	GameObject* sample_meshObject;

@@ -27,6 +27,10 @@ namespace Graphics
 		Matrix worldMatrix;
 		Matrix viewMatrix;
 		Matrix projectionMatrix;
+        Vector3 lightDirection;
+        float pad0;
+        Vector3 cameraPosition;
+        float pad1;
 	};
 
 	class Mesh

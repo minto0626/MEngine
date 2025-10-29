@@ -131,7 +131,7 @@ namespace Graphics
 		materialRegistry->Register("NonAlphablendMaterial", materialDesc2);
 
 		RootSignatureDesc rootDesc3;
-		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
 		rootDesc3.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		rootDesc3.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		MaterialDesc materialDesc3 =
@@ -252,7 +252,7 @@ namespace Graphics
 		scene3DRenderers.push_back(meshRenderer);
 	}
 
-	void GraphicsEngine::Render(Camera* camera2D, Camera* camera3D)
+	void GraphicsEngine::Render(Camera* camera2D, Camera* camera3D, Light* light)
 	{
 		auto* commandList = commandContext.GetCommandList();
 
@@ -309,7 +309,7 @@ namespace Graphics
 				currentMaterial->Bind(commandContext);
 				lastMaterial = currentMaterial;
 			}
-			renderer->Draw(&commandContext, camera3D);
+			renderer->Draw(&commandContext, camera3D, light);
 		}
 		for (auto& renderer : scene2DRenderers)
 		{
@@ -319,7 +319,7 @@ namespace Graphics
 				currentMaterial->Bind(commandContext);
 				lastMaterial = currentMaterial;
 			}
-			renderer->Draw(&commandContext, camera2D);
+			renderer->Draw(&commandContext, camera2D, light);
 		}
 
 		commandContext.ResourceBarrier(

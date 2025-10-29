@@ -26,7 +26,7 @@ namespace Graphics
 		}
 	}
 
-	void MeshRenderer::Draw(GfxCommandContext* commandContext, Camera* camera)
+	void MeshRenderer::Draw(GfxCommandContext* commandContext, Camera* camera, Light* light)
 	{
 		if (_owner != nullptr)
 		{
@@ -34,6 +34,8 @@ namespace Graphics
 			sceneCB.worldMatrix = _owner->GetTransform()->GetWorldMatrix();
 			sceneCB.viewMatrix = camera->GetViewMatrix();
 			sceneCB.projectionMatrix = camera->GetProjectionMatrix();
+            sceneCB.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
+            sceneCB.cameraPosition = camera->GetGameObject()->GetTransform()->GetPos();
 			_transformCB->Update(&sceneCB, sizeof(sceneCB));
 		}
 		commandContext->SetGraphicsRootDescriptorTable(_transformCBRootParamIndex, _transformCB->GetGPUHandle());
