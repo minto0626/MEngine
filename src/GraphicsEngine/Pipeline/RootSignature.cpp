@@ -21,11 +21,30 @@ void RootSignature::AddDescriptorTable(const std::string& name, UINT numDescript
 
 	CD3DX12_ROOT_PARAMETER param = {};
 	param.InitAsDescriptorTable(1, nullptr, visibility);	// Bulid時にレンジを設定する
-
 	_parameters.push_back(param);
 
 	UINT index = static_cast<UINT>(_parameters.size() - 1);
 	_rootIndexMap[name] = index;
+}
+
+void RootSignature::AddConstantBuffer(const std::string& name, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility)
+{
+    CD3DX12_ROOT_PARAMETER param = {};
+    param.InitAsConstantBufferView(shaderRegister, 0, visibility);
+    _parameters.push_back(param);
+
+    UINT index = static_cast<UINT>(_parameters.size() - 1);
+    _rootIndexMap[name] = index;
+}
+
+void RootSignature::Add32BitConstant(const std::string& name, UINT numValues, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility)
+{
+    CD3DX12_ROOT_PARAMETER param = {};
+    param.InitAsConstants(numValues, shaderRegister, 0, visibility);
+    _parameters.push_back(param);
+
+    UINT index = static_cast<UINT>(_parameters.size() - 1);
+    _rootIndexMap[name] = index;
 }
 
 void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility)

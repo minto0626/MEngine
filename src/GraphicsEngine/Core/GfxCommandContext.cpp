@@ -79,6 +79,16 @@ namespace Graphics
 		_commandList->SetGraphicsRootDescriptorTable(index, handle);
 	}
 
+    void GfxCommandContext::SetGraphicsRootConstantBufferView(UINT index, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+    {
+        _commandList->SetGraphicsRootConstantBufferView(index, handle.ptr);
+    }
+
+    void GfxCommandContext::SetGraphicsRoot32BitConstant(UINT index, UINT value, UINT offset)
+    {
+        _commandList->SetGraphicsRoot32BitConstant(index, value, offset);
+    }
+
 	void GfxCommandContext::CopyResource(ID3D12Resource* dest, ID3D12Resource* src)
 	{
 		_commandList->CopyResource(dest, src);

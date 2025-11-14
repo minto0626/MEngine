@@ -27,6 +27,8 @@ namespace Graphics
 		void SetPipelineState(ID3D12PipelineState* pso);
 		void SetRootSignature(ID3D12RootSignature* rootSignature);
 		void SetGraphicsRootDescriptorTable(UINT index, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+        void SetGraphicsRootConstantBufferView(UINT index, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+        void SetGraphicsRoot32BitConstant(UINT index, UINT value, UINT offset);
 		void CopyResource(ID3D12Resource* dest, ID3D12Resource* src);
 		void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 
