@@ -92,9 +92,11 @@ namespace Graphics
 
 	void GraphicsEngine::LoadContent()
 	{
+        sceneCB = CreateConstantBuffer(sizeof(SceneConstantBuffer));
+
 		RootSignatureDesc rootDesc1;
 		rootDesc1.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-		rootDesc1.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		rootDesc1.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		rootDesc1.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		MaterialDesc materialDesc1 =
 		{
@@ -113,7 +115,7 @@ namespace Graphics
 
 		RootSignatureDesc rootDesc2;
 		rootDesc2.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-		rootDesc2.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		rootDesc2.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		rootDesc2.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		MaterialDesc materialDesc2 =
 		{
@@ -131,8 +133,9 @@ namespace Graphics
 		materialRegistry->Register("NonAlphablendMaterial", materialDesc2);
 
 		RootSignatureDesc rootDesc3;
-		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-		rootDesc3.params.push_back({ mainTexParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+        rootDesc3.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+		rootDesc3.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		rootDesc3.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		MaterialDesc materialDesc3 =
 		{
@@ -281,6 +284,15 @@ namespace Graphics
 		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
 		commandList->SetDescriptorHeaps(1, heaps);
 
+        // ここでやれるなら、シーンの更新側でやるほうがいいかも
+        // シーン共通の定数バッファを更新
+        SceneConstantBuffer _sceneCB;
+        _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
+        _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
+        _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
+        _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
+        sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
+
 		// 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
 		std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
 			[](const Renderer* a, const Renderer* b)
@@ -308,6 +320,10 @@ namespace Graphics
 			{
 				currentMaterial->Bind(commandContext);
 				lastMaterial = currentMaterial;
+                // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
+                // 3Dシーン用の定数バッファをセット
+                auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
+                commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
 			}
 			renderer->Draw(&commandContext, camera3D, light);
 		}

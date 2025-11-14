@@ -15,13 +15,18 @@ struct BasicOutput
 
 cbuffer SceneCB : register(b0)
 {
-    matrix world;
     matrix view;
     matrix projection;
-    float3 lightVec;
-    float pad0;
     float3 eyePos;
+    float pad0;
+
+    float3 lightVec;
     float pad1;
+};
+
+cbuffer Transform : register(b1)
+{
+    matrix world;
 };
 
 Texture2D<float4> main_tex : register(t0);

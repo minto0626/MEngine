@@ -22,7 +22,7 @@ namespace Graphics
 		if (_material != nullptr && _owner != nullptr && _owner->GetScene() != nullptr)
 		{
 			_transformCBRootParamIndex = _owner->GetScene()->GetGraphicsEngine()->GetRootParameterIndex("worldMat", *_material);
-			_transformCB = _owner->GetScene()->GetGraphicsEngine()->CreateConstantBuffer(sizeof(SceneConstantBuffer));
+			_transformCB = _owner->GetScene()->GetGraphicsEngine()->CreateConstantBuffer(sizeof(ObjectConstantBuffer));
 		}
 	}
 
@@ -30,13 +30,9 @@ namespace Graphics
 	{
 		if (_owner != nullptr)
 		{
-			SceneConstantBuffer sceneCB;
-			sceneCB.worldMatrix = _owner->GetTransform()->GetWorldMatrix();
-			sceneCB.viewMatrix = camera->GetViewMatrix();
-			sceneCB.projectionMatrix = camera->GetProjectionMatrix();
-            sceneCB.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
-            sceneCB.cameraPosition = camera->GetGameObject()->GetTransform()->GetPos();
-			_transformCB->Update(&sceneCB, sizeof(sceneCB));
+            ObjectConstantBuffer objectCB;
+            objectCB.worldMatrix = _owner->GetTransform()->GetWorldMatrix();
+            _transformCB->Update(&objectCB, sizeof(objectCB));
 		}
 		commandContext->SetGraphicsRootDescriptorTable(_transformCBRootParamIndex, _transformCB->GetGPUHandle());
 		_mesh->Draw(*commandContext);

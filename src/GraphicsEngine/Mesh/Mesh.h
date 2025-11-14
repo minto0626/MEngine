@@ -22,16 +22,10 @@ namespace Graphics
 		std::vector<uint32_t> indices;
 	};
 
-	struct SceneConstantBuffer
-	{
-		Matrix worldMatrix;
-		Matrix viewMatrix;
-		Matrix projectionMatrix;
-        Vector3 lightDirection;
-        float pad0;
-        Vector3 cameraPosition;
-        float pad1;
-	};
+    struct ObjectConstantBuffer
+    {
+        Matrix worldMatrix;
+    };
 
 	class Mesh
 	{

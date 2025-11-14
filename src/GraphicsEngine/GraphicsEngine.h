@@ -23,6 +23,7 @@
 #include "Renderer/MeshRenderer.h"
 #include "Renderer/SpriteRenderer.h"
 #include "Scene/Transform.h"
+#include "Scene/GameObject.h"
 #include "Math/Color.h"
 #include "Scene/Light.h"
 
@@ -59,8 +60,30 @@ namespace Graphics
 		std::vector<Renderer*> scene2DRenderers;
 		std::vector<Renderer*> scene3DRenderers;
 
+        const std::string sceneDataParamName = "sceneCB";
 		const std::string worldMatParamName = "worldMat";
-		const std::string mainTexParamName = "mainTex";
+
+        ConstantBuffer* sceneCB = nullptr;
+
+        struct SceneCameraData
+        {
+            Matrix viewMatrix;
+            Matrix projectionMatrix;
+            Vector3 cameraPosition;
+            float pad0;
+        };
+
+        struct SceneLightData
+        {
+            Vector3 lightDirection;
+            float pad0;
+        };
+
+        struct SceneConstantBuffer
+        {
+            SceneCameraData camera;
+            SceneLightData light;
+        };
 
 		IDXGIFactory6* CreateDXGIFactory();
 
