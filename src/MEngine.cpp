@@ -56,7 +56,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         camera3D = _scene->CreateGameObject("Camera3D")->AddComponent<Camera>();
         camera3D->Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
-        camera3D->SetPos({ 0.0f, 0.0f, -5.0f });
+        camera3D->SetPos({ 0.0f, 5.0f, -10.0f });
         camera3D->SetTarget({ 0.0f, 0.0f, 0.0f });
     }
     // ライト
@@ -67,15 +67,16 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
     // スプライト
     {
-	    sample_spriteObject = _scene->CreateGameObject("サンプルゲームオブジェクト１");
-        sample_spriteObject->GetTransform()->SetPos({ 640.0f, 240.0f, 0.0f });
-		sample_spriteObject->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
-		sample_spriteObject->GetTransform()->SetScale({ 2.0f, 2.0f, 1.0f });
-        auto spriteRenderer = sample_spriteObject->AddComponent<Graphics::SpriteRenderer>();
+        auto obj = _scene->CreateGameObject("猫");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 1200.0f, 640.0f, 0.0f });
+        obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
+        obj->GetTransform()->SetScale({ 1.0f, 1.25f, 1.0f });
+        auto spriteRenderer = obj->AddComponent<Graphics::SpriteRenderer>();
         Graphics::Sprite* sprite = graphicsEngine.GetSprite("testSprite");
         spriteRenderer->SetSprite(sprite);
-        Graphics::Material* material = graphicsEngine.GetMaterial("DefaultMaterial");
-	    Texture* texture = graphicsEngine.GetTexture("Assets/texture/free_brachiosaurus.png");
+        Graphics::Material* material = graphicsEngine.GetMaterial("cat_sprite_mat");
+	    Texture* texture = graphicsEngine.GetTexture("Assets/texture/free_cat.png");
         UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
 	    material->SetTexture(texIdx, texture);
 	    spriteRenderer->SetMaterial(material);
@@ -83,20 +84,91 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
 	// メッシュ
     {
-	    sample_meshObject = _scene->CreateGameObject("サンプルゲームオブジェクト２");
-	    sample_meshObject->GetTransform()->SetPos({ 0.0f, -1.0f, 0.0f });
-	    auto meshRenderer = sample_meshObject->AddComponent<Graphics::MeshRenderer>();
+        auto obj = _scene->CreateGameObject("ティーポット");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
+	    auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
 	    auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/teapot/teapot.fbx");
 	    meshRenderer->SetMesh(mesh);
-		Graphics::Material* material = graphicsEngine.GetMaterial("3DMaterial");
+		Graphics::Material* material = graphicsEngine.GetMaterial("teapot_mat");
 		Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/teapot/default.png");
 		UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
 		material->SetTexture(texIdx, texture);
 		meshRenderer->SetMaterial(material);
     }
+    {
+        auto obj = _scene->CreateGameObject("キューブ");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 2.0f, 1.0f, 2.0f });
+        obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 45.0f, 0.0f));
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/cube/cube.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("cube_mat");
+        Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/cube/default.png");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("馬の像");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ -2.0f, 0.0f, -2.0f });
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/horse/horse_statue_01.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("horse_mat");
+        Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/horse/horse_statue_01_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("おもちゃのアヒル");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 3.0f, 0.0f, -3.0f });
+        obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 30.0f, 0.0f));
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/duck_toy/rubber_duck_toy.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("duck_mat");
+        Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/duck_toy/rubber_duck_toy_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("ラウンジチェア");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ -4.0f, 0.0f, 1.0f });
+        obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, -20.0f, 0.0f));
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/chair/mid_century_lounge_chair.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("chair_mat");
+        Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/chair/mid_century_lounge_chair_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("床");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/plane/plane.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("floor_mat");
+        Texture* texture = graphicsEngine.GetTexture("Assets/3D/samples/plane/checkered_pavement_tiles_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
 
-	Debug::Log("スプライトの名前 : " + (sample_spriteObject->GetName()));
-    Debug::Log("メッシュの名前 : " + (sample_meshObject->GetName()));
+    for (auto& obj : sample_objects)
+    {
+        Debug::Log("オブジェクトの名前 : " + (obj->GetName()));
+    }
 
     return true;
 }
@@ -116,63 +188,40 @@ void MEngine::Update()
     //if (!(std::abs(input.GetAxis(1, 0)) > 0.1f)) { return; }  // [ps4] 0:LX, 1:LY, 2:RX, 3:RY
     //if (!(input.GetAxis(1, 5) > 0.1f)) { return; }    // [ps4] 4:L2, 5:R2 うまくいかない
 
+    sample_objects[1]->GetTransform()->SetRot(
+        sample_objects[1]->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.0f, 0.25f, 0.0f));
+    sample_objects[2]->GetTransform()->SetRot(
+        sample_objects[2]->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.3f, 0.3f, 0.3f));
+    sample_objects[3]->GetTransform()->SetRot(
+        sample_objects[3]->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.0f, 0.1f, 0.0f));
+
     Vector3 move;
-    if (input.IsButtonDown(0, DIK_D))
+
+	move = Vector3::Zero();
+    if (input.IsButtonDown(0, DIK_W))
     {
-        move.SetX(1);
+		move.SetZ(1);
     }
+    if (input.IsButtonDown(0, DIK_S))
+    {
+		move.SetZ(-1);
+	}
     if (input.IsButtonDown(0, DIK_A))
     {
         move.SetX(-1);
     }
-    if (input.IsButtonDown(0, DIK_S))
+    if (input.IsButtonDown(0, DIK_D))
+    {
+        move.SetX(1);
+    }
+    if (input.IsButtonDown(0, DIK_UPARROW))
     {
         move.SetY(1);
     }
-    if (input.IsButtonDown(0, DIK_W))
+    if (input.IsButtonDown(0, DIK_DOWNARROW))
     {
         move.SetY(-1);
     }
-    if (move.Length() > 0.0f)
-    {
-        move.Normalize();
-        float moveSpeed = 300.0f; // 1秒で300px移動
-        move *= moveSpeed * deltaTime;
-        auto pos = sample_spriteObject->GetTransform()->GetPos();
-        pos += move;
-        sample_spriteObject->GetTransform()->SetPos(pos);
-	}
-
-    move = Vector3::Zero();
-    sample_meshObject->GetTransform()->SetRot(
-		sample_meshObject->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.0f, 0.25f, 0.0f));
-    if (input.IsButtonDown(0, DIK_LEFTARROW))
-    {
-		move.SetX(-1);
-    }
-    if (input.IsButtonDown(0, DIK_RIGHTARROW))
-    {
-		move.SetX(1);
-    }
-    if (move.Length() > 0.0f)
-    {
-        move.Normalize();
-        float moveSpeed = 3.0f; // 1秒で3m移動
-        move *= moveSpeed * deltaTime;
-        auto pos = sample_meshObject->GetTransform()->GetPos();
-        pos += move;
-        sample_meshObject->GetTransform()->SetPos(pos);
-	}
-
-	move = Vector3::Zero();
-    if (input.IsButtonDown(0, DIK_UPARROW))
-    {
-		move.SetY(1);
-    }
-    if (input.IsButtonDown(0, DIK_DOWNARROW))
-    {
-		move.SetY(-1);
-	}
     if (move.Length() > 0.0f)
     {
         move.Normalize();
@@ -183,7 +232,7 @@ void MEngine::Update()
         camera3D->SetPos(pos);
     }
 
-    if (input.IsButtonDown(0, DIK_R))
+    if (input.IsButtonDown(0, DIK_L))
     {
         directionalLight->GetGameObject()->GetTransform()->SetRot(
             directionalLight->GetGameObject()->GetTransform()->GetRot() * Quaternion::FromEulerAngles(0.0f, 0.25f, 0.0f));

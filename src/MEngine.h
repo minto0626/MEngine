@@ -4,6 +4,7 @@
 #include "Input/InputSystem.h"
 #include "Scene/Scene.h"
 
+#include <vector>
 #include <memory>
 
 class MEngine
@@ -21,8 +22,7 @@ private:
 	class Camera* camera3D;
     class Light* directionalLight;
 
-	GameObject* sample_spriteObject;
-	GameObject* sample_meshObject;
+    std::vector<GameObject*> sample_objects;
 
 public:
 	~MEngine();

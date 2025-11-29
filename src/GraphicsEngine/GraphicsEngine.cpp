@@ -94,64 +94,158 @@ namespace Graphics
 	{
         sceneCB = CreateConstantBuffer(sizeof(SceneConstantBuffer));
 
-		RootSignatureDesc rootDesc1;
-		rootDesc1.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-		rootDesc1.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		rootDesc1.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		MaterialDesc materialDesc1 =
-		{
-			L"Assets/shader/BasicVertexShader.hlsl",
-			L"Assets/shader/BasicPixelShader.hlsl",
-			{
-				{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-				{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-			},
-			rootDesc1,
-			BlendPreset::AlphaBlend,
-			RasterizerPreset::CullNode,
-			DepthStencilPreset::DepthDisable,
-		};
-		materialRegistry->Register("DefaultMaterial", materialDesc1);
-
-		RootSignatureDesc rootDesc2;
-		rootDesc2.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-		rootDesc2.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		rootDesc2.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		MaterialDesc materialDesc2 =
-		{
-			L"Assets/shader/BasicVertexShader.hlsl",
-			L"Assets/shader/BasicPixelShader.hlsl",
-			{
-				{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-				{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-			},
-			rootDesc2,
-			BlendPreset::Opaque,
-			RasterizerPreset::CullNode,
-			DepthStencilPreset::DepthDisable,
-		};
-		materialRegistry->Register("NonAlphablendMaterial", materialDesc2);
-
-		RootSignatureDesc rootDesc3;
-        rootDesc3.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-		rootDesc3.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-		rootDesc3.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		rootDesc3.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		MaterialDesc materialDesc3 =
-		{
-			L"Assets/shader/Basic3DShader.hlsl",
-			L"Assets/shader/Basic3DShader.hlsl",
-			{
-				{ "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-				{ "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-				{ "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-			},
-			rootDesc3,
-			BlendPreset::Opaque,
-			RasterizerPreset::CullNode,
-			DepthStencilPreset::DepthEnable,
-		};
-		materialRegistry->Register("3DMaterial", materialDesc3);
+        {
+		    RootSignatureDesc rootDesc;
+		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    MaterialDesc materialDesc =
+		    {
+			    L"Assets/shader/BasicVertexShader.hlsl",
+			    L"Assets/shader/BasicPixelShader.hlsl",
+			    {
+				    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+				    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+			    },
+			    rootDesc,
+			    BlendPreset::AlphaBlend,
+			    RasterizerPreset::CullNode,
+			    DepthStencilPreset::DepthDisable,
+		    };
+		    materialRegistry->Register("cat_sprite_mat", materialDesc);
+        }
+        {
+		    RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    MaterialDesc materialDesc =
+		    {
+			    L"Assets/shader/Basic3DShader.hlsl",
+			    L"Assets/shader/Basic3DShader.hlsl",
+			    {
+				    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+				    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+				    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+			    },
+			    rootDesc,
+			    BlendPreset::Opaque,
+			    RasterizerPreset::CullBack,
+			    DepthStencilPreset::DepthEnable,
+		    };
+		    materialRegistry->Register("teapot_mat", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShader.hlsl",
+                L"Assets/shader/Basic3DShader.hlsl",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("cube_mat", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShader.hlsl",
+                L"Assets/shader/Basic3DShader.hlsl",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("horse_mat", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShader.hlsl",
+                L"Assets/shader/Basic3DShader.hlsl",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("duck_mat", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShader.hlsl",
+                L"Assets/shader/Basic3DShader.hlsl",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("chair_mat", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShader.hlsl",
+                L"Assets/shader/Basic3DShader.hlsl",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("floor_mat", materialDesc);
+        }
 
 		// テクスチャ取得のメモ
 		{
