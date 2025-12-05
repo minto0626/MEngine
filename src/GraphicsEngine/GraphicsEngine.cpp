@@ -81,6 +81,16 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
+        offscreenRenderTexture = std::make_unique<RenderTexture>();
+        offscreenRenderTexture->Init(
+            &device,
+            rtv_heap.get(),
+            cbv_srv_uav_heap.get(),
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            swapchainDesc.Format
+        );
+
 		return true;
 	}
 
@@ -246,6 +256,22 @@ namespace Graphics
             };
             materialRegistry->Register("floor_mat", materialDesc);
         }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ "srcTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/PostProcess.hlsl",
+                L"Assets/shader/PostProcess.hlsl",
+                { /* SV_VertexIDを使う場合、入力レイアウトは空で良い */ },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullNode,
+                DepthStencilPreset::DepthDisable,
+            };
+            materialRegistry->Register("PostProcess", materialDesc);
+        }
 
 		// テクスチャ取得のメモ
 		{
@@ -353,89 +379,129 @@ namespace Graphics
 	{
 		auto* commandList = commandContext.GetCommandList();
 
-		UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
-		auto* backBuffer = renderTargets[backBufferIndex]->GetResource();
+        // オフスクリーンにシーンを描画
+        {
+            auto* renderTextureBuffer = offscreenRenderTexture->GetResource();
 
-		D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(backBuffer);
-		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
-		swapChain.Get()->GetDesc1(&swapchainDesc);
-		D3D12_RECT scissor = CD3DX12_RECT(0, 0, swapchainDesc.Width, swapchainDesc.Height);
-		commandList->RSSetViewports(1, &viewport);
-		commandList->RSSetScissorRects(1, &scissor);
+            D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
+            D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTexture->GetWidth(), offscreenRenderTexture->GetHeight());
+            commandList->RSSetViewports(1, &viewport);
+            commandList->RSSetScissorRects(1, &scissor);
 
-		commandContext.ResourceBarrier(
-			backBuffer,
-			D3D12_RESOURCE_STATE_PRESENT,
-			D3D12_RESOURCE_STATE_RENDER_TARGET);
+            commandContext.ResourceBarrier(
+                renderTextureBuffer,
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+                D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		auto rtvHandle = renderTargets[backBufferIndex]->GetCPUHandle();
-		auto dsvHandle = depthBuffer->GetCPUHandle();
-		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-		const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
-		commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
-		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+            auto rtvHandle = offscreenRenderTexture->GetRTV().cpuHandle;
+            auto dsvHandle = depthBuffer->GetCPUHandle();
+            commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+            const float cc[4] = { 0, 0, 0, 0 };
+            commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+            commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-		commandList->SetDescriptorHeaps(1, heaps);
+            ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+            commandList->SetDescriptorHeaps(1, heaps);
 
-        // ここでやれるなら、シーンの更新側でやるほうがいいかも
-        // シーン共通の定数バッファを更新
-        SceneConstantBuffer _sceneCB;
-        _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
-        _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
-        _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
-        _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
-        sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
+            // ここでやれるなら、シーンの更新側でやるほうがいいかも
+            // シーン共通の定数バッファを更新
+            SceneConstantBuffer _sceneCB;
+            _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
+            _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
+            _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
+            _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
+            sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
 
-		// 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
-		std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
-			[](const Renderer* a, const Renderer* b)
-			{
-				Material* materialA = a->GetMaterial();
-				Material* materialB = b->GetMaterial();
-				if (!materialA || !materialB) { return materialA < materialB; }
-				return materialA->GetInstanceID() < materialB->GetInstanceID();
-			});
-		std::sort(scene3DRenderers.begin(), scene3DRenderers.end(),
-			[](const Renderer* a, const Renderer* b)
-			{
-				Material* materialA = a->GetMaterial();
-				Material* materialB = b->GetMaterial();
-				if (!materialA || !materialB) { return materialA < materialB; }
-				return materialA->GetInstanceID() < materialB->GetInstanceID();
-			});
+            // 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
+            std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
+                [](const Renderer* a, const Renderer* b)
+                {
+                    Material* materialA = a->GetMaterial();
+                    Material* materialB = b->GetMaterial();
+                    if (!materialA || !materialB) { return materialA < materialB; }
+                    return materialA->GetInstanceID() < materialB->GetInstanceID();
+                });
+            std::sort(scene3DRenderers.begin(), scene3DRenderers.end(),
+                [](const Renderer* a, const Renderer* b)
+                {
+                    Material* materialA = a->GetMaterial();
+                    Material* materialB = b->GetMaterial();
+                    if (!materialA || !materialB) { return materialA < materialB; }
+                    return materialA->GetInstanceID() < materialB->GetInstanceID();
+                });
 
-		Material* lastMaterial = nullptr;
+            Material* lastMaterial = nullptr;
 
-		for (auto& renderer : scene3DRenderers)
-		{
-			Material* currentMaterial = renderer->GetMaterial();
-			if (currentMaterial && currentMaterial != lastMaterial)
-			{
-				currentMaterial->Bind(commandContext);
-				lastMaterial = currentMaterial;
-                // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
-                // 3Dシーン用の定数バッファをセット
-                auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
-                commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
-			}
-			renderer->Draw(&commandContext, camera3D, light);
-		}
-		for (auto& renderer : scene2DRenderers)
-		{
-			Material* currentMaterial = renderer->GetMaterial();
-			if (currentMaterial && currentMaterial != lastMaterial)
-			{
-				currentMaterial->Bind(commandContext);
-				lastMaterial = currentMaterial;
-			}
-			renderer->Draw(&commandContext, camera2D, light);
-		}
+            for (auto& renderer : scene3DRenderers)
+            {
+                Material* currentMaterial = renderer->GetMaterial();
+                if (currentMaterial && currentMaterial != lastMaterial)
+                {
+                    currentMaterial->Bind(commandContext);
+                    lastMaterial = currentMaterial;
+                    // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
+                    // 3Dシーン用の定数バッファをセット
+                    auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
+                    commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
+                }
+                renderer->Draw(&commandContext, camera3D, light);
+            }
+            for (auto& renderer : scene2DRenderers)
+            {
+                Material* currentMaterial = renderer->GetMaterial();
+                if (currentMaterial && currentMaterial != lastMaterial)
+                {
+                    currentMaterial->Bind(commandContext);
+                    lastMaterial = currentMaterial;
+                }
+                renderer->Draw(&commandContext, camera2D, light);
+            }
 
-		commandContext.ResourceBarrier(
-			backBuffer,
-			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			D3D12_RESOURCE_STATE_PRESENT);
+            commandContext.ResourceBarrier(
+                renderTextureBuffer,
+                D3D12_RESOURCE_STATE_RENDER_TARGET,
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        }
+
+        // バックバッファへ描画
+        {
+		    UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
+		    auto* backBuffer = renderTargets[backBufferIndex]->GetResource();
+
+		    D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(backBuffer);
+		    DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
+		    swapChain.Get()->GetDesc1(&swapchainDesc);
+		    D3D12_RECT scissor = CD3DX12_RECT(0, 0, swapchainDesc.Width, swapchainDesc.Height);
+		    commandList->RSSetViewports(1, &viewport);
+		    commandList->RSSetScissorRects(1, &scissor);
+
+		    commandContext.ResourceBarrier(
+			    backBuffer,
+			    D3D12_RESOURCE_STATE_PRESENT,
+			    D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		    auto rtvHandle = renderTargets[backBufferIndex]->GetCPUHandle();
+		    commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+		    const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
+		    commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+
+            ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+            commandList->SetDescriptorHeaps(1, heaps);
+
+            // ポストプロセス描画
+            auto* postProcessMat = materialRegistry->Get("PostProcess");
+            postProcessMat->Bind(commandContext);
+            commandContext.SetGraphicsRootDescriptorTable(
+                GetRootParameterIndex("srcTex", *postProcessMat),
+                offscreenRenderTexture->GetSRV().gpuHandle);
+            commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            commandContext.DrawInstanced(3);
+
+		    commandContext.ResourceBarrier(
+			    backBuffer,
+			    D3D12_RESOURCE_STATE_RENDER_TARGET,
+			    D3D12_RESOURCE_STATE_PRESENT);
+        }
 
 		commandContext.Close();
 		ID3D12CommandList* commandLists[] = { commandList };

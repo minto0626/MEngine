@@ -23,6 +23,7 @@ namespace Graphics
 		void SetVertexBuffer(UINT slot, const D3D12_VERTEX_BUFFER_VIEW& vbv);
 		void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& ibv);
 		void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY toplogy);
+        void DrawInstanced(UINT vertexCount, UINT instanceCount = 1, UINT startVertex = 0, UINT startInstance = 0);
 		void DrawIndexedInstanced(UINT indexCount, UINT instanceCount = 1, UINT startIndex = 0, UINT baseVertex = 0, UINT startInstance = 0);
 		void SetPipelineState(ID3D12PipelineState* pso);
 		void SetRootSignature(ID3D12RootSignature* rootSignature);

@@ -59,6 +59,11 @@ namespace Graphics
 		_commandList->IASetPrimitiveTopology(toplogy);
 	}
 
+	void GfxCommandContext::DrawInstanced(UINT vertexCount, UINT instanceCount, UINT startVertex, UINT startInstance)
+	{
+        _commandList->DrawInstanced(vertexCount, instanceCount, startVertex, startInstance);
+	}
+
 	void GfxCommandContext::DrawIndexedInstanced(UINT indexCount, UINT instanceCount, UINT startIndex, UINT baseVertex, UINT startInstance)
 	{
 		_commandList->DrawIndexedInstanced(indexCount, instanceCount, startIndex, baseVertex, startInstance);

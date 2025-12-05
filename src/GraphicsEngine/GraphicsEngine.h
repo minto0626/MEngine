@@ -16,6 +16,7 @@
 #include "Pipeline/PipelineState.h"
 #include "Pipeline/RootSignatureRegistry.h"
 #include "Resources/RenderTarget.h"
+#include "Resources/RenderTexture.h"
 #include "Resources/DepthBuffer.h"
 #include "Resources/Texture.h"
 #include "Resources/ConstantBuffer.h"
@@ -50,6 +51,8 @@ namespace Graphics
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 		Color clearColor = Color::FromHex(0x6c9bd2);
 		std::unique_ptr<DepthBuffer> depthBuffer;
+
+        std::unique_ptr<RenderTexture> offscreenRenderTexture;
 
 		ModelImporter modelImporter;
 

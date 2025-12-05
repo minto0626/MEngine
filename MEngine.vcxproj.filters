@@ -222,6 +222,9 @@
     <ClInclude Include="src\Scene\Light.h">
       <Filter>src\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Resources\RenderTexture.h">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -365,6 +368,9 @@
     <ClCompile Include="src\Scene\Light.cpp">
       <Filter>src\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Resources\RenderTexture.cpp">
+      <Filter>src\GraphicsEngine\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\shader\BasicPixelShader.hlsl">
@@ -374,6 +380,9 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="Assets\shader\Basic3DShader.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\shader\PostProcess.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

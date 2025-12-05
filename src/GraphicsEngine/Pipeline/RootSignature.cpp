@@ -51,6 +51,7 @@ void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILIT
 {
 	CD3DX12_STATIC_SAMPLER_DESC desc = {};
 	desc.Init(shaderRegister);
+    desc.AddressU = desc.AddressV = desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 	desc.ShaderVisibility = visibility;
 
 	_samplers.push_back(desc);
