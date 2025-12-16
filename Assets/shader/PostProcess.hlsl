@@ -50,10 +50,10 @@ float noise(float2 uv, float scale)
 float4 ps(VSOut input) : SV_TARGET
 {
     float4 color = srcTex.Sample(smp, input.uv);
-    //return color;
+    return color;
 
     //return monochrome(color);
     //return sepia(color);
     //return negative(color);
-    return srcTex.Sample(smp, input.uv + 0.01f * noise(input.uv, 10.0));
+    //return srcTex.Sample(smp, input.uv + 0.01f * noise(input.uv, 10.0));
 }

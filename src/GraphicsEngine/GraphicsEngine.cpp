@@ -54,6 +54,13 @@ namespace Graphics
 		rtv_heap = std::make_unique<DescriptorHeap>(
 			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 32, false
 		);
+		dsv_heap = std::make_unique<DescriptorHeap>(
+			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 32, false
+		);
+		cbv_srv_uav_heap = std::make_unique<DescriptorHeap>(
+			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
+		);
+
 		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
 		swapChain.Get()->GetDesc1(&swapchainDesc);
 		renderTargets.resize(swapchainDesc.BufferCount);
@@ -63,16 +70,6 @@ namespace Graphics
 			renderTargets[i]->InitFromSwapChain(&device, &swapChain, *rtv_heap, i);
 		}
 
-		dsv_heap = std::make_unique<DescriptorHeap>(
-			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 32, false
-		);
-		depthBuffer = std::make_unique<DepthBuffer>();
-		// 深度に32bit使用
-		depthBuffer->Init(&device, swapchainDesc.Width, swapchainDesc.Height, DXGI_FORMAT_D32_FLOAT, *dsv_heap);
-
-		cbv_srv_uav_heap = std::make_unique<DescriptorHeap>(
-			device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 64
-		);
 		textureLoader.Init(&graphicsContext);
 		scene2DRenderers.clear();
 		scene3DRenderers.clear();
@@ -81,14 +78,21 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
-        offscreenRenderTexture = std::make_unique<RenderTexture>();
-        offscreenRenderTexture->Init(
-            &device,
-            rtv_heap.get(),
-            cbv_srv_uav_heap.get(),
+        offscreenRenderTarget = std::make_unique<RenderTarget>();
+        offscreenRenderTarget->InitColor(
+            device,
             swapchainDesc.Width,
             swapchainDesc.Height,
-            swapchainDesc.Format
+            swapchainDesc.Format,
+            *rtv_heap,
+            cbv_srv_uav_heap.get()
+        );
+        offscreenRenderTarget->InitDepth(
+            device,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            DXGI_FORMAT_D32_FLOAT,  // 深度に32bit使用
+            *dsv_heap
         );
 
 		return true;
@@ -381,10 +385,10 @@ namespace Graphics
 
         // オフスクリーンにシーンを描画
         {
-            auto* renderTextureBuffer = offscreenRenderTexture->GetResource();
+            auto* renderTextureBuffer = offscreenRenderTarget->GetColorBuffer();
 
             D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
-            D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTexture->GetWidth(), offscreenRenderTexture->GetHeight());
+            D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTarget->GetWidth(), offscreenRenderTarget->GetHeight());
             commandList->RSSetViewports(1, &viewport);
             commandList->RSSetScissorRects(1, &scissor);
 
@@ -393,8 +397,8 @@ namespace Graphics
                 D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-            auto rtvHandle = offscreenRenderTexture->GetRTV().cpuHandle;
-            auto dsvHandle = depthBuffer->GetCPUHandle();
+            auto rtvHandle = offscreenRenderTarget->GetRTV().cpuHandle;
+            auto dsvHandle = offscreenRenderTarget->GetDSV().cpuHandle;
             commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
             const float cc[4] = { 0, 0, 0, 0 };
             commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
@@ -466,7 +470,7 @@ namespace Graphics
         // バックバッファへ描画
         {
 		    UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
-		    auto* backBuffer = renderTargets[backBufferIndex]->GetResource();
+		    auto* backBuffer = renderTargets[backBufferIndex]->GetColorBuffer();
 
 		    D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(backBuffer);
 		    DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
@@ -480,7 +484,7 @@ namespace Graphics
 			    D3D12_RESOURCE_STATE_PRESENT,
 			    D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		    auto rtvHandle = renderTargets[backBufferIndex]->GetCPUHandle();
+		    auto rtvHandle = renderTargets[backBufferIndex]->GetRTV().cpuHandle;
 		    commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
 		    const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
 		    commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
@@ -491,9 +495,7 @@ namespace Graphics
             // ポストプロセス描画
             auto* postProcessMat = materialRegistry->Get("PostProcess");
             postProcessMat->Bind(commandContext);
-            commandContext.SetGraphicsRootDescriptorTable(
-                GetRootParameterIndex("srcTex", *postProcessMat),
-                offscreenRenderTexture->GetSRV().gpuHandle);
+            commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
             commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             commandContext.DrawInstanced(3);
 

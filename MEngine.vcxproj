@@ -151,7 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\GraphicsEngine\Resources\RenderTexture.h" />
     <ClInclude Include="src\ModelImporter.h" />
     <ClInclude Include="src\AssimpImporter.h" />
     <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h" />
@@ -178,7 +177,6 @@
     <ClInclude Include="src\GraphicsEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\GraphicsEngine\Renderer\SpriteRenderer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\ConstantBuffer.h" />
-    <ClInclude Include="src\GraphicsEngine\Resources\DepthBuffer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\IndexBuffer.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\RenderTarget.h" />
     <ClInclude Include="src\GraphicsEngine\Resources\Texture.h" />
@@ -209,7 +207,6 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\AssimpImporter.cpp" />
-    <ClCompile Include="src\GraphicsEngine\Resources\RenderTexture.cpp" />
     <ClCompile Include="src\ModelImporter.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandQueue.cpp" />
@@ -232,7 +229,6 @@
     <ClCompile Include="src\GraphicsEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer\SpriteRenderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\ConstantBuffer.cpp" />
-    <ClCompile Include="src\GraphicsEngine\Resources\DepthBuffer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\IndexBuffer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\RenderTarget.cpp" />
     <ClCompile Include="src\GraphicsEngine\Resources\Texture.cpp" />

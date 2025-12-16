@@ -201,9 +201,6 @@
     <ClInclude Include="src\GraphicsEngine\Resources\RenderTarget.h">
       <Filter>src\GraphicsEngine\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="src\GraphicsEngine\Resources\DepthBuffer.h">
-      <Filter>src\GraphicsEngine\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="src\ModelImporter.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -221,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="src\Scene\Light.h">
       <Filter>src\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsEngine\Resources\RenderTexture.h">
-      <Filter>src\GraphicsEngine\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -347,9 +341,6 @@
     <ClCompile Include="src\GraphicsEngine\Resources\RenderTarget.cpp">
       <Filter>src\GraphicsEngine\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsEngine\Resources\DepthBuffer.cpp">
-      <Filter>src\GraphicsEngine\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\ModelImporter.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -367,9 +358,6 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Light.cpp">
       <Filter>src\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsEngine\Resources\RenderTexture.cpp">
-      <Filter>src\GraphicsEngine\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

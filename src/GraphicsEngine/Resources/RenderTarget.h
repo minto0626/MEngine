@@ -11,19 +11,37 @@ namespace Graphics
 	class RenderTarget
 	{
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource> _renderTarget;
-		DescriptorHeap* _ownerHeap;
-		DescriptorHandle _descHandle;
+		Microsoft::WRL::ComPtr<ID3D12Resource> _colorBuffer;
+        Microsoft::WRL::ComPtr<ID3D12Resource> _depthBuffer;
+		DescriptorHeap* _rtvHeap;
+        DescriptorHeap* _dsvHeap;
+        DescriptorHeap* _cbvSrvHeap;
+		DescriptorHandle _rtvHandle;
+        DescriptorHandle _dsvHandle;
+        DescriptorHandle _colorTextureHandle;
+        DescriptorHandle _depthTextureHandle;
+        UINT _width;
+        UINT _height;
 
 	public:
+        RenderTarget() = default;
 		~RenderTarget();
 
-		void Init(GfxDevice* device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& descHeap);
-		void InitFromSwapChain(GfxDevice* device, GfxSwapChain* swapChain, DescriptorHeap& descHeap, UINT bufferIndex);
+		bool InitColor(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& rtvHeap, DescriptorHeap* cbvSrvHeap = nullptr);
+        bool InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& dsvHeap, DescriptorHeap* cbvSrvHeap = nullptr);
+		bool InitFromSwapChain(GfxDevice* device, GfxSwapChain* swapChain, DescriptorHeap& rtvHeap, UINT bufferIndex);
 
-		ID3D12Resource* GetResource() const { return _renderTarget.Get(); }
-		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return _descHandle.cpuHandle; }
-		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return _descHandle.gpuHandle; }
+        void Release();
+
+		ID3D12Resource* GetColorBuffer() const { return _colorBuffer.Get(); }
+        ID3D12Resource* GetDepthBuffer() const { return _depthBuffer.Get(); }
+        DescriptorHandle GetRTV() const { return _rtvHandle; }
+        DescriptorHandle GetDSV() const { return _dsvHandle; }
+        DescriptorHandle GetColorSRV() const { return _colorTextureHandle; }
+        DescriptorHandle GetDepthSRV() const { return _depthTextureHandle; }
+
+        UINT GetWidth() const { return _width; }
+        UINT GetHeight() const { return _height; }
 
 	};
 }
