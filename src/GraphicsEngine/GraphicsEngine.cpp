@@ -78,6 +78,7 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
+        // オフスクリーンレンダリングターゲット作成
         offscreenRenderTarget = std::make_unique<RenderTarget>();
         offscreenRenderTarget->InitColor(
             device,
@@ -91,8 +92,23 @@ namespace Graphics
             device,
             swapchainDesc.Width,
             swapchainDesc.Height,
-            DXGI_FORMAT_D32_FLOAT,  // 深度に32bit使用
+            DXGI_FORMAT_R32_TYPELESS,
+            DXGI_FORMAT_D32_FLOAT,
             *dsv_heap
+        );
+
+        // シャドウマップ用レンダリングターゲット作成
+        shadowMapRenderTarget = std::make_unique<RenderTarget>();
+        // 解像度は2048x2048
+        shadowMapRenderTarget->InitDepth(
+            device,
+            2048,
+            2048,
+            DXGI_FORMAT_R32_TYPELESS,
+            DXGI_FORMAT_D32_FLOAT,
+            *dsv_heap,
+            DXGI_FORMAT_R32_FLOAT,
+            cbv_srv_uav_heap.get()
         );
 
 		return true;
@@ -107,6 +123,8 @@ namespace Graphics
 	void GraphicsEngine::LoadContent()
 	{
         sceneCB = CreateConstantBuffer(sizeof(SceneConstantBuffer));
+
+        // todo: シェーダーごとに一つ、RootSignatureDesc、InputLayout を記述する
 
         {
 		    RootSignatureDesc rootDesc;
@@ -132,8 +150,10 @@ namespace Graphics
 		    RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
 		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
 		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
 		    MaterialDesc materialDesc =
 		    {
 			    L"Assets/shader/Basic3DShader.hlsl",
@@ -154,8 +174,10 @@ namespace Graphics
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -176,8 +198,10 @@ namespace Graphics
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -198,8 +222,10 @@ namespace Graphics
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -220,8 +246,10 @@ namespace Graphics
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -242,8 +270,10 @@ namespace Graphics
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -275,6 +305,26 @@ namespace Graphics
                 DepthStencilPreset::DepthDisable,
             };
             materialRegistry->Register("PostProcess", materialDesc);
+        }
+        {
+            RootSignatureDesc rootDesc;
+            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            MaterialDesc materialDesc =
+            {
+                L"Assets/shader/Basic3DShadowMap.hlsl",
+                L"",
+                {
+                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+                },
+                rootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("ShadowMap", materialDesc);
         }
 
 		// テクスチャ取得のメモ
@@ -383,6 +433,55 @@ namespace Graphics
 	{
 		auto* commandList = commandContext.GetCommandList();
 
+        // シャドウマップを描画
+        {
+            auto* renderTextureBuffer = shadowMapRenderTarget->GetDepthBuffer();
+
+            D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
+            D3D12_RECT scissor = CD3DX12_RECT(0, 0, shadowMapRenderTarget->GetWidth(), shadowMapRenderTarget->GetHeight());
+            commandList->RSSetViewports(1, &viewport);
+            commandList->RSSetScissorRects(1, &scissor);
+
+            auto dsvHandle = shadowMapRenderTarget->GetDSV().cpuHandle;
+            commandList->OMSetRenderTargets(0, nullptr, false, &dsvHandle);
+            commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+            ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+            commandList->SetDescriptorHeaps(1, heaps);
+
+            // ここでやれるなら、シーンの更新側でやるほうがいいかも。ついでにオフスクリーン時の設定も消す。
+            // シーン共通の定数バッファを更新
+            SceneConstantBuffer _sceneCB;
+            _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
+            _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
+            _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
+            Matrix lightView, lightProjection;
+            Vector3 targetPos = camera3D->GetTarget();
+            Vector3 lightVector = light->GetGameObject()->GetTransform()->GetForward().Normalized() * -1;
+            Vector3 eyePos = camera3D->GetGameObject()->GetTransform()->GetPos();
+            float distance = Vector3::Distance(targetPos, eyePos);
+            Vector3 lightPos = targetPos + lightVector * distance;
+            Vector3 up(0,1,0);
+            lightView.MakeLookAt(lightPos, targetPos, up);
+            lightProjection.MakeOrthographicMatrix(50.0f, 50.0f, 1.0f, 100.0f);
+            _sceneCB.light.lightViewMatrix = lightView * lightProjection;
+            _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
+            sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
+
+            auto* shadowMapMat = materialRegistry->Get("ShadowMap");
+            shadowMapMat->Bind(commandContext);
+
+            for (auto& renderer : scene3DRenderers)
+            {
+                // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
+                // 3Dシーン用の定数バッファをセット
+                auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *renderer->GetMaterial());
+                commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
+
+                renderer->Draw(&commandContext, camera3D, light);
+            }
+        }
+
         // オフスクリーンにシーンを描画
         {
             auto* renderTextureBuffer = offscreenRenderTarget->GetColorBuffer();
@@ -406,15 +505,6 @@ namespace Graphics
 
             ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
             commandList->SetDescriptorHeaps(1, heaps);
-
-            // ここでやれるなら、シーンの更新側でやるほうがいいかも
-            // シーン共通の定数バッファを更新
-            SceneConstantBuffer _sceneCB;
-            _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
-            _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
-            _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
-            _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
-            sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
 
             // 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
             std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
@@ -447,6 +537,8 @@ namespace Graphics
                     // 3Dシーン用の定数バッファをセット
                     auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
                     commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
+                    // シャドウマップのSRVをセット
+                    commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex(shadowMapParamName, *currentMaterial), shadowMapRenderTarget->GetDepthSRV().gpuHandle);
                 }
                 renderer->Draw(&commandContext, camera3D, light);
             }

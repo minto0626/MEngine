@@ -27,16 +27,22 @@ void PipelineState::CreateFromDesc(
 {
 	auto rootSignature = rootSignatureRegistry.GetOrCreate(device, desc.rootSignatureDesc);
 
-	Shader vs, ps;
-	vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
-	ps.LoadPS(desc.pixelShaderPath.c_str(), "ps");
+    Shader vs, ps;
 
 	auto inputLayout = InputLayoutHelper::CreateInputLayout(desc.inputElements);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = rootSignature->Get();
-	psoDesc.VS = vs.GetBytecode();
-	psoDesc.PS = ps.GetBytecode();
+    if (!desc.vertexShaderPath.empty())
+    {
+        vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
+        psoDesc.VS = vs.GetBytecode();
+    }
+    if (!desc.pixelShaderPath.empty())
+    {
+	    ps.LoadPS(desc.pixelShaderPath.c_str(), "ps");
+	    psoDesc.PS = ps.GetBytecode();
+    }
 	psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
 	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	psoDesc.RasterizerState = Graphics::StateFactory::GetRasterizerState(desc.rasterizerPreset);

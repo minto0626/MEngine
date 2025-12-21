@@ -91,7 +91,7 @@ namespace Graphics
         return true;
     }
 
-    bool RenderTarget::InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& dsvHeap, DescriptorHeap* cbvSrvHeap)
+    bool RenderTarget::InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT resourceFormat, DXGI_FORMAT dsvFormat, DescriptorHeap& dsvHeap, DXGI_FORMAT srvFormat, DescriptorHeap* cbvSrvHeap)
     {
         if (width == 0 || height == 0) return false;
 
@@ -101,10 +101,10 @@ namespace Graphics
         auto d3dDevice = device.Get();
 
         auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-        auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, 1);
+        auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(resourceFormat, width, height, 1, 1);
         texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-        CD3DX12_CLEAR_VALUE clearValue(format, 1.0f, 0);
+        CD3DX12_CLEAR_VALUE clearValue(dsvFormat, 1.0f, 0);
 
         auto result = d3dDevice->CreateCommittedResource(
             &heapProp,
@@ -123,7 +123,7 @@ namespace Graphics
         _dsvHeap = &dsvHeap;
         _dsvHandle = _dsvHeap->Allocate();
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-        dsvDesc.Format = format;
+        dsvDesc.Format = dsvFormat;
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         d3dDevice->CreateDepthStencilView(_depthBuffer.Get(), &dsvDesc, _dsvHandle.cpuHandle);
 
@@ -133,7 +133,7 @@ namespace Graphics
             _cbvSrvHeap = cbvSrvHeap;
             _depthTextureHandle = _cbvSrvHeap->Allocate();
             D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Format = format;
+            srvDesc.Format = srvFormat;
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
             srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
             srvDesc.Texture2D.MostDetailedMip = 0;

@@ -66,6 +66,14 @@ public:
         );
     }
 
+    void MakeOrthographicMatrix(float width, float height, float nearZ, float farZ)
+    {
+        DirectX::XMStoreFloat4x4(
+            &mat,
+            DirectX::XMMatrixOrthographicLH(width, height, nearZ, farZ)
+        );
+    }
+
     void MakeProjectionMatrix(float fov, float aspectRaito, float nearZ, float farZ)
     {
         DirectX::XMStoreFloat4x4(

@@ -28,7 +28,7 @@ namespace Graphics
 		~RenderTarget();
 
 		bool InitColor(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& rtvHeap, DescriptorHeap* cbvSrvHeap = nullptr);
-        bool InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& dsvHeap, DescriptorHeap* cbvSrvHeap = nullptr);
+        bool InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT resourceFormat, DXGI_FORMAT dsvFormat, DescriptorHeap& dsvHeap, DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, DescriptorHeap* cbvSrvHeap = nullptr);
 		bool InitFromSwapChain(GfxDevice* device, GfxSwapChain* swapChain, DescriptorHeap& rtvHeap, UINT bufferIndex);
 
         void Release();

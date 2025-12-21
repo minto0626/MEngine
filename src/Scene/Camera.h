@@ -35,6 +35,7 @@ public:
 	void SetPos(Vector3 pos);
 	void SetTarget(Vector3 target);
 	void SetRot(Quaternion rot);
+    Vector3 GetTarget() const { return _target; }
 	Matrix GetViewMatrix();
 	Matrix GetProjectionMatrix();
 	Matrix GetViewProjectionMatrix();

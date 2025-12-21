@@ -51,6 +51,8 @@ namespace Graphics
 
         std::unique_ptr<RenderTarget> offscreenRenderTarget;
 
+        std::unique_ptr<RenderTarget> shadowMapRenderTarget;
+
 		ModelImporter modelImporter;
 
 		TextureLoader textureLoader;
@@ -62,6 +64,7 @@ namespace Graphics
 
         const std::string sceneDataParamName = "sceneCB";
 		const std::string worldMatParamName = "worldMat";
+        const std::string shadowMapParamName = "shadowMap";
 
         ConstantBuffer* sceneCB = nullptr;
 
@@ -75,6 +78,7 @@ namespace Graphics
 
         struct SceneLightData
         {
+            Matrix lightViewMatrix;
             Vector3 lightDirection;
             float pad0;
         };
