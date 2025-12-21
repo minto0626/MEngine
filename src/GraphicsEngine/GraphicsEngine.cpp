@@ -124,202 +124,184 @@ namespace Graphics
 	{
         sceneCB = CreateConstantBuffer(sizeof(SceneConstantBuffer));
 
-        // todo: シェーダーごとに一つ、RootSignatureDesc、InputLayout を記述する
-
+        RootSignatureDesc basic2DRootDesc;
         {
-		    RootSignatureDesc rootDesc;
-		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+            basic2DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+            basic2DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            basic2DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+        }
+        std::wstring basic2DVSPath = L"Assets/shader/BasicVertexShader.hlsl";
+        std::wstring basic2DPSPath = L"Assets/shader/BasicPixelShader.hlsl";
+        std::vector<InputLayoutHelper::InputElement> basic2DInputElements =
+        {
+            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+        };
+
+        RootSignatureDesc basic3DRootDesc;
+        {
+            basic3DRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            basic3DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+            basic3DRootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            basic3DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            basic3DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            basic3DRootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+        }
+        std::wstring basic3DVSPath = L"Assets/shader/Basic3DShader.hlsl";
+        std::wstring basic3DPSPath = L"Assets/shader/Basic3DShader.hlsl";
+        std::vector<InputLayoutHelper::InputElement> basic3DInputElements =
+        {
+            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+        };
+
+        RootSignatureDesc postProcessRootDesc;
+        {
+            postProcessRootDesc.params.push_back({ "srcTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            postProcessRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+        }
+        std::wstring postProcessVSPath = L"Assets/shader/PostProcess.hlsl";
+        std::wstring postProcessPSPath = L"Assets/shader/PostProcess.hlsl";
+        std::vector<InputLayoutHelper::InputElement> postProcessInputElements = 
+        {
+            // SV_VertexIDを使う場合、入力レイアウトは空で良い
+        };
+
+        RootSignatureDesc shadowMapRootDesc;
+        {
+            shadowMapRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            shadowMapRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
+        }
+        std::wstring shadowMapVSPath = L"Assets/shader/Basic3DShadowMap.hlsl";
+        std::wstring shadowMapPSPath = L"";
+        std::vector<InputLayoutHelper::InputElement> shadowMapInputElements =
+        {
+            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
+            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
+        };
+
+        // 猫のスプライト
+        {
 		    MaterialDesc materialDesc =
 		    {
-			    L"Assets/shader/BasicVertexShader.hlsl",
-			    L"Assets/shader/BasicPixelShader.hlsl",
-			    {
-				    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-				    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-			    },
-			    rootDesc,
+			    basic2DVSPath,
+			    basic2DPSPath,
+			    basic2DInputElements,
+			    basic2DRootDesc,
 			    BlendPreset::AlphaBlend,
 			    RasterizerPreset::CullNode,
 			    DepthStencilPreset::DepthDisable,
 		    };
 		    materialRegistry->Register("cat_sprite_mat", materialDesc);
         }
+        // ティーポット
         {
-		    RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
 		    {
-			    L"Assets/shader/Basic3DShader.hlsl",
-			    L"Assets/shader/Basic3DShader.hlsl",
-			    {
-				    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-				    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-				    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-			    },
-			    rootDesc,
+			    basic3DVSPath,
+			    basic3DPSPath,
+			    basic3DInputElements,
+			    basic3DRootDesc,
 			    BlendPreset::Opaque,
 			    RasterizerPreset::CullBack,
 			    DepthStencilPreset::DepthEnable,
 		    };
 		    materialRegistry->Register("teapot_mat", materialDesc);
         }
+        // キューブ
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShader.hlsl",
-                L"Assets/shader/Basic3DShader.hlsl",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("cube_mat", materialDesc);
         }
+        // 馬の像
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShader.hlsl",
-                L"Assets/shader/Basic3DShader.hlsl",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("horse_mat", materialDesc);
         }
+        // おもちゃのアヒル
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShader.hlsl",
-                L"Assets/shader/Basic3DShader.hlsl",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("duck_mat", materialDesc);
         }
+        // ラウンジチェア
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShader.hlsl",
-                L"Assets/shader/Basic3DShader.hlsl",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("chair_mat", materialDesc);
         }
+        // 床
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShader.hlsl",
-                L"Assets/shader/Basic3DShader.hlsl",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("floor_mat", materialDesc);
         }
+        // ポストプロセス
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ "srcTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/PostProcess.hlsl",
-                L"Assets/shader/PostProcess.hlsl",
-                { /* SV_VertexIDを使う場合、入力レイアウトは空で良い */ },
-                rootDesc,
+                postProcessVSPath,
+                postProcessPSPath,
+                postProcessInputElements,
+                postProcessRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullNode,
                 DepthStencilPreset::DepthDisable,
             };
             materialRegistry->Register("PostProcess", materialDesc);
         }
+        // シャドウマップ
         {
-            RootSignatureDesc rootDesc;
-            rootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             MaterialDesc materialDesc =
             {
-                L"Assets/shader/Basic3DShadowMap.hlsl",
-                L"",
-                {
-                    { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-                    { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-                },
-                rootDesc,
+                shadowMapVSPath,
+                shadowMapPSPath,
+                shadowMapInputElements,
+                shadowMapRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
