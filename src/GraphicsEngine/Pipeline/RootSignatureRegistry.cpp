@@ -24,7 +24,10 @@ namespace Graphics
 		{
 			rootSignature->AddStaticSampler(
 				sampler.shaderRegister,
-				sampler.visibility);
+				sampler.visibility,
+                sampler.addressMode,
+                sampler.comparisonFunc,
+                sampler.filter);
 		}
 		rootSignature->Build(device.Get());
 

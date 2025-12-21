@@ -32,8 +32,7 @@ cbuffer Transform : register(b1)
 };
 
 Texture2D<float> shadow_map : register(t0);
-SamplerState shadow_smp : register(s0);
-//SamplerComparisonState shadow_smp : register(s0);
+SamplerComparisonState shadow_smp : register(s0);
 
 Texture2D<float4> main_tex : register(t1);
 SamplerState smp : register(s1);
@@ -69,8 +68,7 @@ float4 ps(BasicOutput input) : SV_TARGET
     // 投影変換後の座標を正規化デバイス座標に変換
     float3 shadowViewProj = input.light_view_pos.xyz / input.light_view_pos.w;
     float2 shadowMapUV = (shadowViewProj.xy + float2(1, -1)) * float2(0.5f, -0.5f);
-    float shadowWeight = shadow_map.Sample(shadow_smp, shadowMapUV) < shadowViewProj.z - 0.001f ? 0.5f : 1.0f;
-    //float shadowWeight = lerp(0.5f, 1.0f, shadow_map.SampleCmp(shadow_smp, shadowMapUV, shadowViewProj.z - 0.005f));
+    float shadowWeight = lerp(0.5f, 1.0f, shadow_map.SampleCmp(shadow_smp, shadowMapUV, shadowViewProj.z - 0.001f));
     color.rgb *= shadowWeight;
 
     return color;

@@ -130,7 +130,7 @@ namespace Graphics
 		    RootSignatureDesc rootDesc;
 		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
 		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
 		    MaterialDesc materialDesc =
 		    {
 			    L"Assets/shader/BasicVertexShader.hlsl",
@@ -152,9 +152,9 @@ namespace Graphics
 		    rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
 		    rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-		    rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
-		    MaterialDesc materialDesc =
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+            MaterialDesc materialDesc =
 		    {
 			    L"Assets/shader/Basic3DShader.hlsl",
 			    L"Assets/shader/Basic3DShader.hlsl",
@@ -176,8 +176,8 @@ namespace Graphics
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -200,8 +200,8 @@ namespace Graphics
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -224,8 +224,8 @@ namespace Graphics
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -248,8 +248,8 @@ namespace Graphics
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -272,8 +272,8 @@ namespace Graphics
             rootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
             rootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             rootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+            rootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/Basic3DShader.hlsl",
@@ -293,7 +293,7 @@ namespace Graphics
         {
             RootSignatureDesc rootDesc;
             rootDesc.params.push_back({ "srcTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            rootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
             MaterialDesc materialDesc =
             {
                 L"Assets/shader/PostProcess.hlsl",

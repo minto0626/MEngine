@@ -47,11 +47,14 @@ void RootSignature::Add32BitConstant(const std::string& name, UINT numValues, UI
     _rootIndexMap[name] = index;
 }
 
-void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility)
+void RootSignature::AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility, D3D12_TEXTURE_ADDRESS_MODE addressMode, D3D12_COMPARISON_FUNC comparisonFunc, D3D12_FILTER filter)
 {
 	CD3DX12_STATIC_SAMPLER_DESC desc = {};
 	desc.Init(shaderRegister);
-    desc.AddressU = desc.AddressV = desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    desc.AddressU = desc.AddressV = desc.AddressW = addressMode;
+    desc.ComparisonFunc = comparisonFunc;
+    desc.Filter = filter;
+    desc.MaxAnisotropy = filter & D3D12_ANISOTROPIC_FILTERING_BIT ? 16 : 1;
 	desc.ShaderVisibility = visibility;
 
 	_samplers.push_back(desc);

@@ -28,12 +28,18 @@ namespace Graphics
 	{
 		UINT shaderRegister;
 		D3D12_SHADER_VISIBILITY visibility;
+        D3D12_TEXTURE_ADDRESS_MODE addressMode;
+        D3D12_COMPARISON_FUNC comparisonFunc;
+        D3D12_FILTER filter;
 
 		bool operator ==(const StaticSamplerDesc& other) const
 		{
 			return
 				shaderRegister == other.shaderRegister &&
-				visibility == other.visibility;
+				visibility == other.visibility &&
+                addressMode == other.addressMode &&
+                comparisonFunc == other.comparisonFunc &&
+                filter == other.filter;
 		}
 	};
 
@@ -74,6 +80,9 @@ namespace std
 		{
 			size_t h = std::hash<UINT>{}(s.shaderRegister);
 			h ^= std::hash<int>{}(static_cast<int>(s.visibility)) << 1;
+            h ^= std::hash<int>{}(static_cast<int>(s.addressMode)) << 2;
+            h ^= std::hash<int>{}(static_cast<int>(s.comparisonFunc)) << 3;
+            h ^= std::hash<int>{}(static_cast<int>(s.filter)) << 4;
 			return h;
 		}
 	};

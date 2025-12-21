@@ -20,7 +20,7 @@ public:
 	void AddDescriptorTable(const std::string& name, UINT numDescriptors, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility, D3D12_DESCRIPTOR_RANGE_TYPE rangeType);
     void AddConstantBuffer(const std::string& name, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility);
     void Add32BitConstant(const std::string& name, UINT numValues, UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility);
-	void AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility);
+	void AddStaticSampler(UINT shaderRegister, D3D12_SHADER_VISIBILITY visibility, D3D12_TEXTURE_ADDRESS_MODE addressMode, D3D12_COMPARISON_FUNC comparisonFunc, D3D12_FILTER filter);
 	void Build(ID3D12Device* device);
 
 	ID3D12RootSignature* Get() const { return _rootSignature.Get(); }
