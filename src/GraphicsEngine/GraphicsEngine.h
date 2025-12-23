@@ -46,15 +46,12 @@ namespace Graphics
 		std::unique_ptr<DescriptorHeap> rtv_heap;
 		std::unique_ptr<DescriptorHeap> dsv_heap;
 
+        std::unique_ptr<RenderTarget> offscreenRenderTarget;
+        std::unique_ptr<RenderTarget> shadowMapRenderTarget;
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 		Color clearColor = Color::FromHex(0x6c9bd2);
 
-        std::unique_ptr<RenderTarget> offscreenRenderTarget;
-
-        std::unique_ptr<RenderTarget> shadowMapRenderTarget;
-
 		ModelImporter modelImporter;
-
 		TextureLoader textureLoader;
 		std::unique_ptr<MaterialCache> materialCache;
 		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;
@@ -104,6 +101,9 @@ namespace Graphics
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
 		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
 		void Render(class Camera* camera2D, class Camera* camera3D, Light* light);
+        void RenderShadowMap(class Camera* camera3D, Light* light);
+        void RenderScene(class Camera* camera2D, class Camera* camera3D, Light* light);
+        void RenderBackBuffer();
 
 	};
 }
