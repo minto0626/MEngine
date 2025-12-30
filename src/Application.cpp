@@ -35,11 +35,15 @@ bool Application::CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& 
 	}
 
 	RECT wrect = { 0, 0, window_width, window_height };
+    DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+
+    // 関数を使ってウィンドウのサイズを補正する
+    AdjustWindowRect(&wrect, style, false);
 
 	hwnd = CreateWindowW(
 		wc.lpszClassName,
 		L"MEngine",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        style,
 		200,
 		200,
 		wrect.right - wrect.left,
