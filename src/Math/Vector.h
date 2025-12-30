@@ -573,6 +573,41 @@ public:
 		return Quaternion(q);
 	}
 
+    static Vector3 ToEulerAngles(const Quaternion& q)
+    {
+        // 正規化
+        DirectX::XMVECTOR qv = DirectX::XMQuaternionNormalize(q.ToXMVECTOR());
+        float qw = DirectX::XMVectorGetW(qv);
+        float qx = DirectX::XMVectorGetX(qv);
+        float qy = DirectX::XMVectorGetY(qv);
+        float qz = DirectX::XMVectorGetZ(qv);
+
+        // 計算（参考: Tait-Bryan X(pitch), Y(yaw), Z(roll)）
+        // X (pitch)
+        double sinp = 2.0 * (qw * qx + qy * qz);
+        double cosp = 1.0 - 2.0 * (qx * qx + qy * qy);
+        double pitchRad = std::atan2(sinp, cosp);
+
+        // Y (yaw)
+        double siny = 2.0 * (qw * qy - qz * qx);
+        // asin の範囲外の数値を補正
+        if (siny >= 1.0) siny = 1.0;
+        if (siny <= -1.0) siny = -1.0;
+        double yawRad = std::asin(siny);
+
+        // Z (roll)
+        double sinr = 2.0 * (qw * qz + qx * qy);
+        double cosr = 1.0 - 2.0 * (qy * qy + qz * qz);
+        double rollRad = std::atan2(sinr, cosr);
+
+        // XM はラジアン単位、結果を度に変換して返す
+        float pitchDeg = DirectX::XMConvertToDegrees(static_cast<float>(pitchRad));
+        float yawDeg = DirectX::XMConvertToDegrees(static_cast<float>(yawRad));
+        float rollDeg = DirectX::XMConvertToDegrees(static_cast<float>(rollRad));
+
+        return Vector3(pitchDeg, yawDeg, rollDeg);
+    }
+
 	Quaternion operator *(const Quaternion& other) const
 	{
 		DirectX::XMVECTOR q1 = DirectX::XMQuaternionNormalize(ToXMVECTOR());
