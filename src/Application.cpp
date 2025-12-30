@@ -1,8 +1,8 @@
 ﻿#include "Application.h"
 #include "resource.h"
 
-const unsigned int window_width = 1280;
-const unsigned int window_height = 720;
+const unsigned int window_width = 1920;
+const unsigned int window_height = 1080;
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {

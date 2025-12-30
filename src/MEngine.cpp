@@ -77,7 +77,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("猫");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ 1200.0f, 640.0f, 0.0f });
+        obj->GetTransform()->SetPos({ 1920 - 64, 1080 - 64, 0.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
         obj->GetTransform()->SetScale({ 1.0f, 1.25f, 1.0f });
         auto spriteRenderer = obj->AddComponent<Graphics::SpriteRenderer>();
