@@ -1,6 +1,8 @@
 ﻿#include "MEngine.h"
 #include <string>
 #include <assert.h>
+#include <filesystem>
+
 #include "Utility/Debug.h"
 #include "Utility/GameTime.h"
 #include "Sprite/Sprite.h"
@@ -26,6 +28,12 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     if (FAILED(ret))
     {
         return false;
+    }
+
+    // エンジンの一時ファイルを保存する場所を生成
+    if (!std::filesystem::exists(MEngine::CacheDirectory))
+    {
+        std::filesystem::create_directory(MEngine::CacheDirectory);
     }
 
     // グラフィックスエンジン初期化

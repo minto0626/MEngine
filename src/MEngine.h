@@ -30,4 +30,6 @@ public:
 	bool Init(HWND hwnd, HINSTANCE hInstance, SIZE& windowSize);
 	void Update();
 	void Draw();
+
+    static inline const std::string CacheDirectory = "cache/";
 };
