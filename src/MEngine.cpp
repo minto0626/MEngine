@@ -13,6 +13,8 @@
 #include "Scene/Camera.h"
 #include "Scene/Light.h"
 
+GUISystem MEngine::guiSystem;
+
 MEngine::~MEngine()
 {
     graphicsEngine.UnInitialize();

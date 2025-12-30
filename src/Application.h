@@ -1,6 +1,5 @@
-#pragma once
+﻿#pragma once
 #include <windows.h>
-
 #include <memory>
 
 #include "MEngine.h"
@@ -11,6 +10,7 @@ private:
 	WNDCLASSW _windowClass;
 	bool CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& wc);
 	bool DispatchWindowMessage();
+    static LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	std::shared_ptr<MEngine> _engine;
 
@@ -22,4 +22,3 @@ public:
 	Application();
 	~Application();
 };
-

@@ -4,7 +4,7 @@
 const unsigned int window_width = 1920;
 const unsigned int window_height = 1080;
 
-LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+LRESULT CALLBACK Application::WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg)
 	{
@@ -12,6 +12,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		PostQuitMessage(0);
 		break;
 	default:
+        MEngine::GUI()->WinProc(hWnd, msg, wp, lp);
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}
 
@@ -101,6 +102,7 @@ void Application::Run()
 
 void Application::Terminate()
 {
+    MEngine::GUI()->Shutdown();
 	UnregisterClassW(_windowClass.lpszClassName, _windowClass.hInstance);
 }
 

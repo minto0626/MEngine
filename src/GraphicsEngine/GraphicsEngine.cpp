@@ -3,6 +3,9 @@
 #include "Pipeline/InputLayoutHelper.h"
 #include "Pipeline/StateFactory.h"
 
+#include "MEngine.h"
+#include "GUI/GUISystem.h"
+
 #include <wrl.h>
 #include <Core/d3dx12.h>
 
@@ -110,6 +113,12 @@ namespace Graphics
             DXGI_FORMAT_R32_FLOAT,
             cbv_srv_uav_heap.get()
         );
+
+        // ImGui 初期化
+        if (!MEngine::GUI()->Initialize(hwnd, &device, cbv_srv_uav_heap.get(), swapchainDesc.Format))
+        {
+            return false;
+        }
 
 		return true;
 	}
@@ -589,12 +598,20 @@ namespace Graphics
         ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
         commandList->SetDescriptorHeaps(1, heaps);
 
+        // todo: ポストプロセス用のレンダーパスを実装し、シーンを全て描画し終わった後にGUIを描画するようにする
         // ポストプロセス描画
-        auto* postProcessMat = materialRegistry->Get("PostProcess");
-        postProcessMat->Bind(commandContext);
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
-        commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        commandContext.DrawInstanced(3);
+        //auto* postProcessMat = materialRegistry->Get("PostProcess");
+        //postProcessMat->Bind(commandContext);
+        //commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
+        //commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //commandContext.DrawInstanced(3);
+
+        // GUIテスト描画
+        MEngine::GUI()->NewFrame();
+        MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())));
+        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), offscreenRenderTarget->GetColorSRV());
+        MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), *scene3DRenderers[0]->GetGameObject());
+        MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 
         commandContext.ResourceBarrier(
             backBuffer,
