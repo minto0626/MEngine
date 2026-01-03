@@ -599,7 +599,7 @@ namespace Graphics
 
         commandContext.ResourceBarrier(
             renderTextureBuffer,
-            D3D12_RESOURCE_STATE_PRESENT,
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
             D3D12_RESOURCE_STATE_RENDER_TARGET);
 
         auto rtvHandle = postProcessRenderTarget->GetRTV().cpuHandle;
@@ -620,7 +620,7 @@ namespace Graphics
         commandContext.ResourceBarrier(
             renderTextureBuffer,
             D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PRESENT);
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 
     void GraphicsEngine::RenderBackBuffer()
