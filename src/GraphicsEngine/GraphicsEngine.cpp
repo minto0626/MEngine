@@ -81,6 +81,20 @@ namespace Graphics
 		materialCache = std::make_unique<MaterialCache>(rootSignatureRegistry.get());
 		materialRegistry = std::make_unique<MaterialRegistry>(&device, materialCache.get());
 
+        // シャドウマップ用レンダリングターゲット作成
+        shadowMapRenderTarget = std::make_unique<RenderTarget>();
+        // 解像度は2048x2048
+        shadowMapRenderTarget->InitDepth(
+            device,
+            2048,
+            2048,
+            DXGI_FORMAT_R32_TYPELESS,
+            DXGI_FORMAT_D32_FLOAT,
+            *dsv_heap,
+            DXGI_FORMAT_R32_FLOAT,
+            cbv_srv_uav_heap.get()
+        );
+
         // オフスクリーンレンダリングターゲット作成
         offscreenRenderTarget = std::make_unique<RenderTarget>();
         offscreenRenderTarget->InitColor(
@@ -100,17 +114,14 @@ namespace Graphics
             *dsv_heap
         );
 
-        // シャドウマップ用レンダリングターゲット作成
-        shadowMapRenderTarget = std::make_unique<RenderTarget>();
-        // 解像度は2048x2048
-        shadowMapRenderTarget->InitDepth(
+        // ポストプロセス用レンダリングターゲット作成
+        postProcessRenderTarget = std::make_unique<RenderTarget>();
+        postProcessRenderTarget->InitColor(
             device,
-            2048,
-            2048,
-            DXGI_FORMAT_R32_TYPELESS,
-            DXGI_FORMAT_D32_FLOAT,
-            *dsv_heap,
-            DXGI_FORMAT_R32_FLOAT,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            swapchainDesc.Format,
+            *rtv_heap,
             cbv_srv_uav_heap.get()
         );
 
@@ -447,6 +458,9 @@ namespace Graphics
         // オフスクリーンにシーンを描画
         RenderScene(camera2D, camera3D, light);
 
+        // ポストプロセスを描画
+        RenderPostProcess();
+
         // バックバッファへ描画
         RenderBackBuffer();
 
@@ -572,6 +586,43 @@ namespace Graphics
             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 
+    void GraphicsEngine::RenderPostProcess()
+    {
+        auto* commandList = commandContext.GetCommandList();
+
+        auto* renderTextureBuffer = postProcessRenderTarget->GetColorBuffer();
+
+        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
+        D3D12_RECT scissor = CD3DX12_RECT(0, 0, postProcessRenderTarget->GetWidth(), postProcessRenderTarget->GetHeight());
+        commandList->RSSetViewports(1, &viewport);
+        commandList->RSSetScissorRects(1, &scissor);
+
+        commandContext.ResourceBarrier(
+            renderTextureBuffer,
+            D3D12_RESOURCE_STATE_PRESENT,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        auto rtvHandle = postProcessRenderTarget->GetRTV().cpuHandle;
+        commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+        const float cc[4] = { 0, 0, 0, 0 };
+        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+
+        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+        commandList->SetDescriptorHeaps(1, heaps);
+
+        // ポストプロセス描画
+        auto* postProcessMat = materialRegistry->Get("PostProcess");
+        postProcessMat->Bind(commandContext);
+        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
+        commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        commandContext.DrawInstanced(3);
+
+        commandContext.ResourceBarrier(
+            renderTextureBuffer,
+            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            D3D12_RESOURCE_STATE_PRESENT);
+    }
+
     void GraphicsEngine::RenderBackBuffer()
     {
         auto* commandList = commandContext.GetCommandList();
@@ -595,21 +646,12 @@ namespace Graphics
         const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
         commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
 
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
-
-        // todo: ポストプロセス用のレンダーパスを実装し、シーンを全て描画し終わった後にGUIを描画するようにする
-        // ポストプロセス描画
-        //auto* postProcessMat = materialRegistry->Get("PostProcess");
-        //postProcessMat->Bind(commandContext);
-        //commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
-        //commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        //commandContext.DrawInstanced(3);
-
         // GUIテスト描画
         MEngine::GUI()->NewFrame();
+        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+        commandList->SetDescriptorHeaps(1, heaps);
         MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())));
-        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), offscreenRenderTarget->GetColorSRV());
+        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorSRV());
         MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), *scene3DRenderers[0]->GetGameObject());
         MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 
