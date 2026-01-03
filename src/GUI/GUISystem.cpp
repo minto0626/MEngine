@@ -28,8 +28,8 @@ bool GUISystem::Initialize(HWND hwnd, Graphics::GfxDevice* device, DescriptorHea
 
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // 各背景の透明度を 1.0 に固定
-    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    // 各背景の透明度を固定
+    style.Colors[ImGuiCol_WindowBg] = ImColor(0.1f, 0.1f, 0.1f, 1.0f);
     style.Colors[ImGuiCol_TitleBgActive].w = 1.0f;
     style.Colors[ImGuiCol_TitleBg].w = 1.0f;
 
