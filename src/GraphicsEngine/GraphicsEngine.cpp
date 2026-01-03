@@ -526,7 +526,7 @@ namespace Graphics
         auto rtvHandle = offscreenRenderTarget->GetRTV().cpuHandle;
         auto dsvHandle = offscreenRenderTarget->GetDSV().cpuHandle;
         commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-        const float cc[4] = { 0, 0, 0, 0 };
+        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
         commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
         commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -604,7 +604,7 @@ namespace Graphics
 
         auto rtvHandle = postProcessRenderTarget->GetRTV().cpuHandle;
         commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-        const float cc[4] = { 0, 0, 0, 0 };
+        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
         commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
 
         ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };

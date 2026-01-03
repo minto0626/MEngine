@@ -49,7 +49,7 @@ namespace Graphics
         auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, 1);
         texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
-        float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         CD3DX12_CLEAR_VALUE clearValue(format, clearColor);
 
         auto result = d3dDevice->CreateCommittedResource(
