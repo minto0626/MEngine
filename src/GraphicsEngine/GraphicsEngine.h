@@ -101,11 +101,11 @@ namespace Graphics
 		Texture* GetTexture(const std::string& path);
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
 		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
-		void Render(class Camera* camera2D, class Camera* camera3D, Light* light);
+		void Render(Scene* scene, class Camera* camera2D, class Camera* camera3D, Light* light);
         void RenderShadowMap(class Camera* camera3D, Light* light);
         void RenderScene(class Camera* camera2D, class Camera* camera3D, Light* light);
         void RenderPostProcess();
-        void RenderBackBuffer();
+        void RenderBackBuffer(Scene* scene);
 
 	};
 }

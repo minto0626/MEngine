@@ -18,7 +18,7 @@ public:
     void Render(Graphics::GfxCommandContext* commandContext, DescriptorHeap* heap);
     void WinProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
-    void DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size/*, GameObject& rootGameObject, GameObject*& selectedGameObject*/);
+    void DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size, Scene& scene, GameObject*& selectGameObject);
     void DrawSceneViewWindow(Vector2 window_pos, Vector2 window_size, DescriptorHandle sceneSRVHandle);
-    void DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, GameObject& gameObject);
+    void DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, GameObject* gameObject);
 };

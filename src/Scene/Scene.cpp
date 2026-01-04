@@ -86,3 +86,8 @@ GameObject* Scene::CreateGameObject(const std::string& name)
 	AddGameObject(std::move(gameObject));
 	return ptr;
 }
+
+const std::vector<std::unique_ptr<GameObject>>& Scene::GetAllGameObjects() const
+{
+    return _gameObjects;
+}

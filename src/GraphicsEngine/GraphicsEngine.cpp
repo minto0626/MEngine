@@ -431,7 +431,7 @@ namespace Graphics
 		scene3DRenderers.push_back(meshRenderer);
 	}
 
-	void GraphicsEngine::Render(Camera* camera2D, Camera* camera3D, Light* light)
+	void GraphicsEngine::Render(Scene* scene, Camera* camera2D, Camera* camera3D, Light* light)
 	{
         // ここでやれるなら、シーンの更新側でやるほうがいいかも。
         // シーン共通の定数バッファを更新
@@ -462,7 +462,7 @@ namespace Graphics
         RenderPostProcess();
 
         // バックバッファへ描画
-        RenderBackBuffer();
+        RenderBackBuffer(scene);
 
 		commandContext.Close();
 		ID3D12CommandList* commandLists[] = { commandContext.GetCommandList() };
@@ -623,7 +623,7 @@ namespace Graphics
             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 
-    void GraphicsEngine::RenderBackBuffer()
+    void GraphicsEngine::RenderBackBuffer(Scene* scene)
     {
         auto* commandList = commandContext.GetCommandList();
 
@@ -650,9 +650,10 @@ namespace Graphics
         MEngine::GUI()->NewFrame();
         ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
         commandList->SetDescriptorHeaps(1, heaps);
-        MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())));
+        static GameObject* selectGameObject = nullptr;
+        MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())), *scene, selectGameObject);
         MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorSRV());
-        MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), *scene3DRenderers[0]->GetGameObject());
+        MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), selectGameObject);
         MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 
         commandContext.ResourceBarrier(

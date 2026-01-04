@@ -92,40 +92,45 @@ void GUISystem::WinProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     ImGui_ImplWin32_WndProcHandler(hWnd, msg, wp, lp);
 }
 
-void GUISystem::DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size/*, GameObject& rootGameObject, GameObject*& selectedGameObject*/)
+void GUISystem::DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size, Scene& scene, GameObject*& selectGameObject)
 {
-    // todo: GameObjectの階層構造を表示する
-
     ImGui::SetNextWindowPos(ImVec2(window_pos.GetX(), window_pos.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(window_size.GetX(), window_size.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::Begin("Hierarchy");
-    //std::function<void(GameObject&)> drawNode = [&](GameObject& gameObject)
-    //{
-    //    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-    //    if (&gameObject == selectedGameObject)
-    //    {
-    //        flags |= ImGuiTreeNodeFlags_Selected;
-    //    }
-    //    bool hasChildren = gameObject.GetChildren().size() > 0;
-    //    if (!hasChildren)
-    //    {
-    //        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-    //    }
-    //    bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)gameObject.GetID(), flags, gameObject.GetName().c_str());
-    //    if (ImGui::IsItemClicked())
-    //    {
-    //        selectedGameObject = &gameObject;
-    //    }
-    //    if (nodeOpen && hasChildren)
-    //    {
-    //        for (auto& child : gameObject.GetChildren())
-    //        {
-    //            drawNode(*child);
-    //        }
-    //        ImGui::TreePop();
-    //    }
-    //};
-    //drawNode(rootGameObject);
+    std::function<void(GameObject*)> drawNode = [&](GameObject* gameObject)
+    {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+        if (gameObject == selectGameObject)
+        {
+            flags |= ImGuiTreeNodeFlags_Selected;
+        }
+        // todo: 子オブジェクト対応
+        bool hasChildren = false/*gameObject.GetChildren().size() > 0*/;
+        if (!hasChildren)
+        {
+            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        }
+        bool nodeOpen = ImGui::TreeNodeEx(gameObject->GetName().c_str(), flags);
+        if (ImGui::IsItemClicked())
+        {
+            selectGameObject = gameObject;
+        }
+        if (nodeOpen && hasChildren)
+        {
+            // todo: 子オブジェクト対応
+            //for (auto& child : gameObject.GetChildren())
+            //{
+            //    drawNode(*child);
+            //}
+            ImGui::TreePop();
+        }
+    };
+
+    for (auto& rootGameObject : scene.GetAllGameObjects())
+    {
+        drawNode(rootGameObject.get());
+    }
+
     ImGui::End();
 }
 
@@ -138,48 +143,55 @@ void GUISystem::DrawSceneViewWindow(Vector2 window_pos, Vector2 window_size, Des
     ImGui::End();
 }
 
-void GUISystem::DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, GameObject& gameObject)
+void GUISystem::DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, GameObject* gameObject)
 {
     ImGui::SetNextWindowPos(ImVec2(window_pos.GetX(), window_pos.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(window_size.GetX(), window_size.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::Begin("Inspector");
 
-    ImGui::InputText("Name", (char*)gameObject.GetName().c_str(), 256);
-
-    ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-    if (ImGui::TreeNode("Transform"))
+    if (gameObject != nullptr)
     {
-        auto& transform = *gameObject.GetTransform();
-        Vector3 pos = transform.GetPos();
-        Vector3 rot = Quaternion::ToEulerAngles(transform.GetRot());
-        Vector3 scale = transform.GetScale();
-        float positionArray[] = { pos.GetX(), pos.GetY(), pos.GetZ() };
-        float rotationArray[] = { rot.GetX(), rot.GetY(), rot.GetZ() };
-        float scaleArray[] = { scale.GetX(), scale.GetY(), scale.GetZ() };
-        if (ImGui::DragFloat3("Position", positionArray, 0.01f))
-        {
-            pos.SetX(positionArray[0]);
-            pos.SetY(positionArray[1]);
-            pos.SetZ(positionArray[2]);
-            transform.SetPos(pos);
-        }
-        // todo: ジンバルロックの影響で表示がおかしくなる。Transform側で回避策を用意する（オイラー角も保持しておくなど）
-        if (ImGui::DragFloat3("Rotation", rotationArray, 0.01f))
-        {
-            rot.SetX(rotationArray[0]);
-            rot.SetY(rotationArray[1]);
-            rot.SetZ(rotationArray[2]);
-            transform.SetRot(Quaternion::FromEulerAngles(rot.GetX(), rot.GetY(), rot.GetZ()));
-        }
-        if (ImGui::DragFloat3("Scale", scaleArray, 0.01f))
-        {
-            scale.SetX(scaleArray[0]);
-            scale.SetY(scaleArray[1]);
-            scale.SetZ(scaleArray[2]);
-            transform.SetScale(scale);
-        }
+        ImGui::InputText("Name", (char*)gameObject->GetName().c_str(), 256);
 
-        ImGui::TreePop();
+        ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
+        // todo:
+        // CameraのTransformを直接更新しても、
+        // Cameraの関数を経由しないとビュープロジェクションマトリクスが更新できないため、別途対応が必要
+        // ついでにTargetの更新もテコ入れする
+        if (ImGui::TreeNode("Transform"))
+        {
+            auto& transform = *gameObject->GetTransform();
+            Vector3 pos = transform.GetPos();
+            Vector3 rot = Quaternion::ToEulerAngles(transform.GetRot());
+            Vector3 scale = transform.GetScale();
+            float positionArray[] = { pos.GetX(), pos.GetY(), pos.GetZ() };
+            float rotationArray[] = { rot.GetX(), rot.GetY(), rot.GetZ() };
+            float scaleArray[] = { scale.GetX(), scale.GetY(), scale.GetZ() };
+            if (ImGui::DragFloat3("Position", positionArray, 0.01f))
+            {
+                pos.SetX(positionArray[0]);
+                pos.SetY(positionArray[1]);
+                pos.SetZ(positionArray[2]);
+                transform.SetPos(pos);
+            }
+            // todo: ジンバルロックの影響で表示がおかしくなる。Transform側で回避策を用意する（オイラー角も保持しておくなど）
+            if (ImGui::DragFloat3("Rotation", rotationArray, 0.01f))
+            {
+                rot.SetX(rotationArray[0]);
+                rot.SetY(rotationArray[1]);
+                rot.SetZ(rotationArray[2]);
+                transform.SetRot(Quaternion::FromEulerAngles(rot.GetX(), rot.GetY(), rot.GetZ()));
+            }
+            if (ImGui::DragFloat3("Scale", scaleArray, 0.01f))
+            {
+                scale.SetX(scaleArray[0]);
+                scale.SetY(scaleArray[1]);
+                scale.SetZ(scaleArray[2]);
+                transform.SetScale(scale);
+            }
+
+            ImGui::TreePop();
+        }
     }
 
     ImGui::End();

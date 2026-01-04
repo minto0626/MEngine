@@ -28,5 +28,6 @@ public:
 	Graphics::GraphicsEngine* GetGraphicsEngine() const { return _graphicsEngine; };
 
 	GameObject* CreateGameObject(const std::string& name = "GameObject");
+    const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
 
 };
