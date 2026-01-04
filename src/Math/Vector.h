@@ -575,37 +575,57 @@ public:
 
     static Vector3 ToEulerAngles(const Quaternion& q)
     {
-        // 正規化
-        DirectX::XMVECTOR qv = DirectX::XMQuaternionNormalize(q.ToXMVECTOR());
-        float qw = DirectX::XMVectorGetW(qv);
-        float qx = DirectX::XMVectorGetX(qv);
-        float qy = DirectX::XMVectorGetY(qv);
-        float qz = DirectX::XMVectorGetZ(qv);
+        /*
+        * 左手座標系を前提とした場合のオイラー角（Tait-Bryan角、X=pitch, Y=yaw, Z=roll）への変換
+        * 回転順序: roll(Z) -> pitch(X) -> yaw(Y)
+        */
 
-        // 計算（参考: Tait-Bryan X(pitch), Y(yaw), Z(roll)）
-        // X (pitch)
-        double sinp = 2.0 * (qw * qx + qy * qz);
-        double cosp = 1.0 - 2.0 * (qx * qx + qy * qy);
-        double pitchRad = std::atan2(sinp, cosp);
+        DirectX::XMMATRIX m = DirectX::XMMatrixRotationQuaternion(q.ToXMVECTOR());
+        DirectX::XMFLOAT3 right, up, forward;
+        DirectX::XMStoreFloat3(&right, m.r[0]);
+        DirectX::XMStoreFloat3(&up, m.r[1]);
+        DirectX::XMStoreFloat3(&forward, m.r[2]);
 
-        // Y (yaw)
-        double siny = 2.0 * (qw * qy - qz * qx);
-        // asin の範囲外の数値を補正
-        if (siny >= 1.0) siny = 1.0;
-        if (siny <= -1.0) siny = -1.0;
-        double yawRad = std::asin(siny);
+        float pitch, yaw, roll;
 
-        // Z (roll)
-        double sinr = 2.0 * (qw * qz + qx * qy);
-        double cosr = 1.0 - 2.0 * (qy * qy + qz * qz);
-        double rollRad = std::atan2(sinr, cosr);
+        // ピッチ (X軸回りの回転)
+        float sp = -forward.y;
+        if (sp <= -1.0f)
+        {
+            pitch = -DirectX::XM_PIDIV2;
+        }
+        else if (sp >= 1.0f)
+        {
+            pitch = DirectX::XM_PIDIV2;
+        }
+        else
+        {
+            pitch = std::asin(sp);
+        }
 
-        // XM はラジアン単位、結果を度に変換して返す
-        float pitchDeg = DirectX::XMConvertToDegrees(static_cast<float>(pitchRad));
-        float yawDeg = DirectX::XMConvertToDegrees(static_cast<float>(yawRad));
-        float rollDeg = DirectX::XMConvertToDegrees(static_cast<float>(rollRad));
+        // ジンバルロックのチェック
+        if (std::abs(sp) > 0.9999f)
+        {
+            // 真上または真下を向いている場合
 
-        return Vector3(pitchDeg, yawDeg, rollDeg);
+            // ヨー (Y軸回りの回転)
+            yaw = 0.0f;
+            // ロール (Z軸回りの回転)
+            roll = std::atan2(-right.z, right.x);
+        }
+        else
+        {
+            // ヨー (Y軸回りの回転)
+            yaw = std::atan2(forward.x, forward.z);
+            // ロール (Z軸回りの回転)
+            roll = std::atan2(up.x, up.y);
+        }
+
+        return Vector3(
+            DirectX::XMConvertToDegrees(pitch),
+            DirectX::XMConvertToDegrees(yaw),
+            DirectX::XMConvertToDegrees(roll)
+        );
     }
 
 	Quaternion operator *(const Quaternion& other) const
