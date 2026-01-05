@@ -53,6 +53,15 @@
     <Filter Include="src\GraphicsEngine\Sprite">
       <UniqueIdentifier>{ca003c40-eb87-4ba1-9db8-bd8c8b4c3105}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Library">
+      <UniqueIdentifier>{7557660a-0083-4d3e-9595-c1edcac87264}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Library\imgui">
+      <UniqueIdentifier>{b8d6ee8d-897e-4299-b38e-8eb8452d5b1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GUI">
+      <UniqueIdentifier>{d0f771ff-51ad-40b5-9c5e-c2d95fe68ae6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon\ME_icon.ico">
@@ -219,6 +228,33 @@
     <ClInclude Include="src\Scene\Light.h">
       <Filter>src\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Library\imgui\imconfig.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imgui.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imgui_impl_dx12.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imgui_impl_win32.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imgui_internal.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imstb_rectpack.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imstb_textedit.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\imgui\imstb_truetype.h">
+      <Filter>src\Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\GUISystem.h">
+      <Filter>src\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -358,6 +394,30 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Light.cpp">
       <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_demo.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_draw.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_impl_dx12.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_impl_win32.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_tables.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\imgui\imgui_widgets.cpp">
+      <Filter>src\Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GUISystem.cpp">
+      <Filter>src\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

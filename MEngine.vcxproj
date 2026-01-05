@@ -151,6 +151,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\GUI\GUISystem.h" />
+    <ClInclude Include="src\Library\imgui\imconfig.h" />
+    <ClInclude Include="src\Library\imgui\imgui.h" />
+    <ClInclude Include="src\Library\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="src\Library\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\Library\imgui\imgui_internal.h" />
+    <ClInclude Include="src\Library\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\Library\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\Library\imgui\imstb_truetype.h" />
     <ClInclude Include="src\ModelImporter.h" />
     <ClInclude Include="src\AssimpImporter.h" />
     <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h" />
@@ -207,6 +216,14 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\AssimpImporter.cpp" />
+    <ClCompile Include="src\GUI\GUISystem.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\Library\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\ModelImporter.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandQueue.cpp" />

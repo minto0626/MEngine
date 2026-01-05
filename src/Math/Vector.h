@@ -573,6 +573,61 @@ public:
 		return Quaternion(q);
 	}
 
+    static Vector3 ToEulerAngles(const Quaternion& q)
+    {
+        /*
+        * 左手座標系を前提とした場合のオイラー角（Tait-Bryan角、X=pitch, Y=yaw, Z=roll）への変換
+        * 回転順序: roll(Z) -> pitch(X) -> yaw(Y)
+        */
+
+        DirectX::XMMATRIX m = DirectX::XMMatrixRotationQuaternion(q.ToXMVECTOR());
+        DirectX::XMFLOAT3 right, up, forward;
+        DirectX::XMStoreFloat3(&right, m.r[0]);
+        DirectX::XMStoreFloat3(&up, m.r[1]);
+        DirectX::XMStoreFloat3(&forward, m.r[2]);
+
+        float pitch, yaw, roll;
+
+        // ピッチ (X軸回りの回転)
+        float sp = -forward.y;
+        if (sp <= -1.0f)
+        {
+            pitch = -DirectX::XM_PIDIV2;
+        }
+        else if (sp >= 1.0f)
+        {
+            pitch = DirectX::XM_PIDIV2;
+        }
+        else
+        {
+            pitch = std::asin(sp);
+        }
+
+        // ジンバルロックのチェック
+        if (std::abs(sp) > 0.9999f)
+        {
+            // 真上または真下を向いている場合
+
+            // ヨー (Y軸回りの回転)
+            yaw = 0.0f;
+            // ロール (Z軸回りの回転)
+            roll = std::atan2(-right.z, right.x);
+        }
+        else
+        {
+            // ヨー (Y軸回りの回転)
+            yaw = std::atan2(forward.x, forward.z);
+            // ロール (Z軸回りの回転)
+            roll = std::atan2(up.x, up.y);
+        }
+
+        return Vector3(
+            DirectX::XMConvertToDegrees(pitch),
+            DirectX::XMConvertToDegrees(yaw),
+            DirectX::XMConvertToDegrees(roll)
+        );
+    }
+
 	Quaternion operator *(const Quaternion& other) const
 	{
 		DirectX::XMVECTOR q1 = DirectX::XMQuaternionNormalize(ToXMVECTOR());

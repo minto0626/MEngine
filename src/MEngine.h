@@ -3,6 +3,7 @@
 #include "Utility/GameTime.h"
 #include "Input/InputSystem.h"
 #include "Scene/Scene.h"
+#include "GUI/GUISystem.h"
 
 #include <vector>
 #include <memory>
@@ -13,6 +14,7 @@ private:
 
 	HWND _hwnd;
 	Graphics::GraphicsEngine graphicsEngine;
+    static GUISystem guiSystem;
 
 	std::unique_ptr<Scene> _scene;
 	InputSystem input;
@@ -30,4 +32,8 @@ public:
 	bool Init(HWND hwnd, HINSTANCE hInstance, SIZE& windowSize);
 	void Update();
 	void Draw();
+
+    static GUISystem* GUI() { return &guiSystem; }
+
+    static inline const std::string CacheDirectory = "cache/";
 };

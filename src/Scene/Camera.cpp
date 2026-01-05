@@ -5,6 +5,8 @@ Camera::Camera(GameObject* owner, int updateOrder)
 	: Component(owner, updateOrder)
 {
 	_transform = owner->GetTransform();
+    _lastTransformMatrix = _transform->GetWorldMatrix();
+    ForceUpdateMatrices();
 }
 
 void Camera::Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_t viewportHeight)
@@ -19,25 +21,8 @@ void Camera::Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_
 	_viewMatrix.SetIdentity();
 	_projectionMatrix.SetIdentity();
 	_viewProjectionMatrix.SetIdentity();
-	_isDirty = false;
-}
-
-void Camera::SetPos(Vector3 pos)
-{
-	_transform->SetPos(pos);
-	_isDirty = true;
-}
-
-void Camera::SetTarget(Vector3 target)
-{
-	_target = target;
-	_isDirty = true;
-}
-
-void Camera::SetRot(Quaternion rot)
-{
-	_transform->SetRot(rot);
-	_isDirty = true;
+    _lastTransformMatrix = _transform->GetWorldMatrix();
+    ForceUpdateMatrices();
 }
 
 Matrix Camera::GetViewMatrix()
@@ -63,8 +48,24 @@ Matrix Camera::GetViewProjectionMatrix()
 
 void Camera::Update(float deltaTime)
 {
-	if (!_isDirty) { return; }
+    // Transform の変化をチェックして、変化があれば行列を再計算する
+    auto currentMatrix = _transform->GetWorldMatrix();
+    if (currentMatrix == _lastTransformMatrix)
+    {
+        // 変化なし
+        return;
+    }
+    else
+    {
+        // 変化あり
+        _lastTransformMatrix = currentMatrix;
+    }
 
+    ForceUpdateMatrices();
+}
+
+void Camera::ForceUpdateMatrices()
+{
 	if (_projectionType == ProjectionType::Ortho)
 	{
 		// [2次元用]スクリーン座標に変換する行列
@@ -80,13 +81,11 @@ void Camera::Update(float deltaTime)
 	else if (_projectionType == ProjectionType::Perspective)
 	{
 		// [3次元用]スクリーン座標に変換する行列
-		_viewMatrix.MakeLookAt(_transform->GetPos(), _target, _transform->GetUp());
+		_viewMatrix.MakeLookAt(_transform->GetPos(), _transform->GetPos() + _transform->GetForward().Normalized(), _transform->GetUp());
 
 		_aspectRaito = static_cast<float>(_viewportWidth) / static_cast<float>(_viewportHeight);
 		_projectionMatrix.MakeProjectionMatrix(_fov, _aspectRaito, _nearZ, _farZ);
 
 		_viewProjectionMatrix = _viewMatrix * _projectionMatrix;
 	}
-
-	_isDirty = false;
 }

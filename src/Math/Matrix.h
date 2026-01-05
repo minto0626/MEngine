@@ -16,6 +16,24 @@ public:
         : mat(m00, m01, m02, m03, m10, m11, m12, m13,
             m20, m21, m22, m23, m30, m31, m32, m33) {}
 
+    bool Equals(const Matrix& other) const
+    {
+        for (int row = 0; row < 4; ++row)
+        {
+            for (int col = 0; col < 4; ++col)
+            {
+                if (this->GetElement(row, col) != other.GetElement(row, col))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool operator ==(const Matrix& other) const { return Equals(other); }
+    bool operator !=(const Matrix& other) const { return !Equals(other); }
+
     Matrix operator *(const Matrix& other) const
     {
         DirectX::XMMATRIX m1 = DirectX::XMLoadFloat4x4(&mat);

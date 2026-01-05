@@ -1,6 +1,8 @@
 ﻿#include "MEngine.h"
 #include <string>
 #include <assert.h>
+#include <filesystem>
+
 #include "Utility/Debug.h"
 #include "Utility/GameTime.h"
 #include "Sprite/Sprite.h"
@@ -10,6 +12,8 @@
 #include "Scene/GameObject.h"
 #include "Scene/Camera.h"
 #include "Scene/Light.h"
+
+GUISystem MEngine::guiSystem;
 
 MEngine::~MEngine()
 {
@@ -26,6 +30,12 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     if (FAILED(ret))
     {
         return false;
+    }
+
+    // エンジンの一時ファイルを保存する場所を生成
+    if (!std::filesystem::exists(MEngine::CacheDirectory))
+    {
+        std::filesystem::create_directory(MEngine::CacheDirectory);
     }
 
     // グラフィックスエンジン初期化
@@ -50,14 +60,14 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         camera2D = _scene->CreateGameObject("Camera2D")->AddComponent<Camera>();
         camera2D->Init(Camera::ProjectionType::Ortho, windowSize.cx, windowSize.cy);
-        camera2D->SetPos({ 0.0f, 0.0f, 0.0f });
+        camera2D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
 	}
     // 3Dカメラ
     {
         camera3D = _scene->CreateGameObject("Camera3D")->AddComponent<Camera>();
         camera3D->Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
-        camera3D->SetPos({ 0.0f, 5.0f, -10.0f });
-        camera3D->SetTarget({ 0.0f, 0.0f, 0.0f });
+        camera3D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 5.0f, -10.0f });
+        camera3D->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(30.0f, 0.0f, 0.0f));
     }
     // ライト
     {
@@ -69,7 +79,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("猫");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ 1200.0f, 640.0f, 0.0f });
+        obj->GetTransform()->SetPos({ 1920 - 64, 1080 - 64, 0.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
         obj->GetTransform()->SetScale({ 1.0f, 1.25f, 1.0f });
         auto spriteRenderer = obj->AddComponent<Graphics::SpriteRenderer>();
@@ -229,7 +239,7 @@ void MEngine::Update()
         move *= moveSpeed * deltaTime;
         auto pos = camera3D->GetGameObject()->GetTransform()->GetPos();
         pos += move;
-        camera3D->SetPos(pos);
+        camera3D->GetGameObject()->GetTransform()->SetPos(pos);
     }
 
     if (input.IsButtonDown(0, DIK_L))
@@ -241,5 +251,6 @@ void MEngine::Update()
 
 void MEngine::Draw()
 {
-    graphicsEngine.Render(camera2D, camera3D, directionalLight);
+    // todo: シーンにカメラとライトを持たせるようにすると良いかも
+    graphicsEngine.Render(_scene.get(), camera2D, camera3D, directionalLight);
 }

@@ -1,10 +1,10 @@
 ﻿#include "Application.h"
 #include "resource.h"
 
-const unsigned int window_width = 1280;
-const unsigned int window_height = 720;
+const unsigned int window_width = 1920;
+const unsigned int window_height = 1080;
 
-LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+LRESULT CALLBACK Application::WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg)
 	{
@@ -12,6 +12,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		PostQuitMessage(0);
 		break;
 	default:
+        MEngine::GUI()->WinProc(hWnd, msg, wp, lp);
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}
 
@@ -34,11 +35,15 @@ bool Application::CreateGameWindow(HWND& hwnd, HINSTANCE& hInstance, WNDCLASSW& 
 	}
 
 	RECT wrect = { 0, 0, window_width, window_height };
+    DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+
+    // 関数を使ってウィンドウのサイズを補正する
+    AdjustWindowRect(&wrect, style, false);
 
 	hwnd = CreateWindowW(
 		wc.lpszClassName,
 		L"MEngine",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        style,
 		200,
 		200,
 		wrect.right - wrect.left,
@@ -101,6 +106,7 @@ void Application::Run()
 
 void Application::Terminate()
 {
+    MEngine::GUI()->Shutdown();
 	UnregisterClassW(_windowClass.lpszClassName, _windowClass.hInstance);
 }
 
