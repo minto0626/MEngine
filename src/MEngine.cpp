@@ -60,14 +60,14 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         camera2D = _scene->CreateGameObject("Camera2D")->AddComponent<Camera>();
         camera2D->Init(Camera::ProjectionType::Ortho, windowSize.cx, windowSize.cy);
-        camera2D->SetPos({ 0.0f, 0.0f, 0.0f });
+        camera2D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
 	}
     // 3Dカメラ
     {
         camera3D = _scene->CreateGameObject("Camera3D")->AddComponent<Camera>();
         camera3D->Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
-        camera3D->SetPos({ 0.0f, 5.0f, -10.0f });
-        camera3D->SetTarget({ 0.0f, 0.0f, 0.0f });
+        camera3D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 5.0f, -10.0f });
+        camera3D->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(30.0f, 0.0f, 0.0f));
     }
     // ライト
     {
@@ -239,7 +239,7 @@ void MEngine::Update()
         move *= moveSpeed * deltaTime;
         auto pos = camera3D->GetGameObject()->GetTransform()->GetPos();
         pos += move;
-        camera3D->SetPos(pos);
+        camera3D->GetGameObject()->GetTransform()->SetPos(pos);
     }
 
     if (input.IsButtonDown(0, DIK_L))

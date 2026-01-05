@@ -440,14 +440,14 @@ namespace Graphics
         _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
         _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
         Matrix lightView, lightProjection;
-        Vector3 targetPos = camera3D->GetTarget();
         Vector3 lightVector = light->GetGameObject()->GetTransform()->GetForward().Normalized() * -1;
         Vector3 eyePos = camera3D->GetGameObject()->GetTransform()->GetPos();
-        float distance = Vector3::Distance(targetPos, eyePos);
+        Vector3 targetPos = eyePos + camera3D->GetGameObject()->GetTransform()->GetForward().Normalized();
+        float distance = 6.3;
         Vector3 lightPos = targetPos + lightVector * distance;
         Vector3 up(0, 1, 0);
         lightView.MakeLookAt(lightPos, targetPos, up);
-        lightProjection.MakeOrthographicMatrix(50.0f, 50.0f, 1.0f, 100.0f);
+        lightProjection.MakeOrthographicMatrix(40.0f, 40.0f, .001f, 100.0f);
         _sceneCB.light.lightViewMatrix = lightView * lightProjection;
         _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
         sceneCB->Update(&_sceneCB, sizeof(_sceneCB));

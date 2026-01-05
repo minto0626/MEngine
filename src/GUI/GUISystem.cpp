@@ -154,10 +154,6 @@ void GUISystem::DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, Gam
         ImGui::InputText("Name", (char*)gameObject->GetName().c_str(), 256);
 
         ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-        // todo:
-        // CameraのTransformを直接更新しても、
-        // Cameraの関数を経由しないとビュープロジェクションマトリクスが更新できないため、別途対応が必要
-        // ついでにTargetの更新もテコ入れする
         if (ImGui::TreeNode("Transform"))
         {
             auto& transform = *gameObject->GetTransform();

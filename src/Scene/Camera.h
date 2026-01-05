@@ -15,7 +15,7 @@ public:
 
 private:
 	class Transform* _transform;
-	Vector3 _target;
+    Matrix _lastTransformMatrix;
 	float _fov;
 	float _aspectRaito;
 	float _nearZ;
@@ -26,16 +26,11 @@ private:
 	uint32_t _viewportWidth;
 	uint32_t _viewportHeight;
 	ProjectionType _projectionType;
-	bool _isDirty;
 
 public:
 	Camera(class GameObject* owner, int updateOrder = 100);
 
 	void Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_t viewportHeight);
-	void SetPos(Vector3 pos);
-	void SetTarget(Vector3 target);
-	void SetRot(Quaternion rot);
-    Vector3 GetTarget() const { return _target; }
 	Matrix GetViewMatrix();
 	Matrix GetProjectionMatrix();
 	Matrix GetViewProjectionMatrix();
