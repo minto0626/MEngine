@@ -27,6 +27,8 @@ private:
 	uint32_t _viewportHeight;
 	ProjectionType _projectionType;
 
+    void ForceUpdateMatrices();
+
 public:
 	Camera(class GameObject* owner, int updateOrder = 100);
 

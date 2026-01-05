@@ -6,6 +6,7 @@ Camera::Camera(GameObject* owner, int updateOrder)
 {
 	_transform = owner->GetTransform();
     _lastTransformMatrix = _transform->GetWorldMatrix();
+    ForceUpdateMatrices();
 }
 
 void Camera::Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_t viewportHeight)
@@ -21,6 +22,7 @@ void Camera::Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_
 	_projectionMatrix.SetIdentity();
 	_viewProjectionMatrix.SetIdentity();
     _lastTransformMatrix = _transform->GetWorldMatrix();
+    ForceUpdateMatrices();
 }
 
 Matrix Camera::GetViewMatrix()
@@ -59,6 +61,11 @@ void Camera::Update(float deltaTime)
         _lastTransformMatrix = currentMatrix;
     }
 
+    ForceUpdateMatrices();
+}
+
+void Camera::ForceUpdateMatrices()
+{
 	if (_projectionType == ProjectionType::Ortho)
 	{
 		// [2次元用]スクリーン座標に変換する行列
