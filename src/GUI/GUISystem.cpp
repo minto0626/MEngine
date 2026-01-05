@@ -45,6 +45,8 @@ bool GUISystem::Initialize(HWND hwnd, Graphics::GfxDevice* device, DescriptorHea
         handle.cpuHandle,
         handle.gpuHandle);
 
+    // todo: ソースコードのエンコーディングがUTF-8でない限り、日本語が文字化けする。
+    //       utf8オプション付きでコンパイルする必要があるが、それだけだとVisual Studioのエディタ上で文字化けする。
     // 日本語フォントを追加
     ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\meiryo.ttc", 16.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 
