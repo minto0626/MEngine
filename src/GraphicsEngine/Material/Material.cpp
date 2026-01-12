@@ -38,7 +38,7 @@ namespace Graphics
 
 		for (auto& [rootIndex, texture] : _textures)
 		{
-			commandContext.SetGraphicsRootDescriptorTable(rootIndex, texture->GetGPUHandle());
+			commandContext.SetGraphicsRootDescriptorTable(rootIndex, texture->GetSRV().gpuHandle);
 		}
 	}
 }

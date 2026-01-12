@@ -371,6 +371,8 @@ namespace Graphics
                 DepthStencilPreset::DepthDisable,
             };
             materialRegistry->Register("PostProcess", materialDesc);
+            auto* mat = materialRegistry->Get("PostProcess");
+            mat->SetTexture(GetRootParameterIndex("srcTex", *mat), offscreenRenderTarget->GetColorTexture());
         }
         // シャドウマップ
         {
@@ -386,6 +388,8 @@ namespace Graphics
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("ShadowMap", materialDesc);
+            auto* mat = materialRegistry->Get("ShadowMap");
+            mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
         }
         // ライト描画
         {
@@ -403,6 +407,10 @@ namespace Graphics
             materialRegistry->Register("Lighting", materialDesc);
             auto* mat = materialRegistry->Get("Lighting");
             mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
+            mat->SetTexture(GetRootParameterIndex("albedoTex", *mat), gBuffer[0]->GetColorTexture());
+            mat->SetTexture(GetRootParameterIndex("normalTex", *mat), gBuffer[1]->GetColorTexture());
+            mat->SetTexture(GetRootParameterIndex("positionTex", *mat), gBuffer[2]->GetColorTexture());
+            mat->SetTexture(GetRootParameterIndex(shadowMapParamName, *mat), shadowMapRenderTarget->GetDepthTexture());
         }
 
 		// テクスチャ取得のメモ
@@ -493,7 +501,7 @@ namespace Graphics
 		{
 			res = textureLoader.GetWhiteTexture();
 		}
-		texture->Init(device.Get(), cbv_srv_uav_heap.get(), res.Get());
+		texture->Init(device.Get(), cbv_srv_uav_heap.get(), res.Get(), res->GetDesc().Format);
 		return texture.release();
 	}
 
@@ -577,11 +585,6 @@ namespace Graphics
 
         for (auto& renderer : scene3DRenderers)
         {
-            // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
-            // 3Dシーン用の定数バッファをセット
-            auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *renderer->GetMaterial());
-            commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
-
             renderer->Draw(&commandContext, camera3D);
         }
     }
@@ -622,6 +625,7 @@ namespace Graphics
 
         ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
         commandList->SetDescriptorHeaps(1, heaps);
+        bool setSceneCBV = false;
 
         // 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
         std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
@@ -650,10 +654,15 @@ namespace Graphics
             {
                 currentMaterial->Bind(commandContext);
                 lastMaterial = currentMaterial;
-                // ここでやるくらいならMaterial::Bind内で行うように変更したほうがいい
-                // 3Dシーン用の定数バッファをセット
-                auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
-                commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
+
+                // シーンの共通定数バッファは一度だけセットします
+                if (!setSceneCBV)
+                {
+                    // 3Dシーン用の定数バッファをセット
+                    auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
+                    commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
+                    setSceneCBV = true;
+                }
             }
             renderer->Draw(&commandContext, camera3D);
         }
@@ -704,11 +713,6 @@ namespace Graphics
         // ライティング描画
         auto* lightingMat = materialRegistry->Get("Lighting");
         lightingMat->Bind(commandContext);
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("albedoTex", *lightingMat), gBuffer[0]->GetColorSRV().gpuHandle);
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("normalTex", *lightingMat), gBuffer[1]->GetColorSRV().gpuHandle);
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("positionTex", *lightingMat), gBuffer[2]->GetColorSRV().gpuHandle);
-        // シャドウマップのSRVをセット
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex(shadowMapParamName, *lightingMat), shadowMapRenderTarget->GetDepthSRV().gpuHandle);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
 
@@ -745,7 +749,6 @@ namespace Graphics
         // ポストプロセス描画
         auto* postProcessMat = materialRegistry->Get("PostProcess");
         postProcessMat->Bind(commandContext);
-        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("srcTex", *postProcessMat), offscreenRenderTarget->GetColorSRV().gpuHandle);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
 
@@ -784,7 +787,7 @@ namespace Graphics
         commandList->SetDescriptorHeaps(1, heaps);
         static GameObject* selectGameObject = nullptr;
         MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())), *scene, selectGameObject);
-        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorSRV());
+        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorTexture()->GetSRV());
         MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), selectGameObject);
         MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 

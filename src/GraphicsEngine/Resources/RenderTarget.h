@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include <d3d12.h>
 #include <wrl.h>
+#include <memory>
 
 #include "Core/GfxDevice.h"
 #include "Core/GfxSwapChain.h"
 #include "DescriptorHeap/DescriptorHeap.h"
+#include "Resources/Texture.h"
 
 namespace Graphics
 {
@@ -15,11 +17,10 @@ namespace Graphics
         Microsoft::WRL::ComPtr<ID3D12Resource> _depthBuffer;
 		DescriptorHeap* _rtvHeap;
         DescriptorHeap* _dsvHeap;
-        DescriptorHeap* _cbvSrvHeap;
 		DescriptorHandle _rtvHandle;
         DescriptorHandle _dsvHandle;
-        DescriptorHandle _colorTextureHandle;
-        DescriptorHandle _depthTextureHandle;
+        std::unique_ptr<Texture> _colorTexture;
+        std::unique_ptr<Texture> _depthTexture;
         UINT _width;
         UINT _height;
 
@@ -37,8 +38,8 @@ namespace Graphics
         ID3D12Resource* GetDepthBuffer() const { return _depthBuffer.Get(); }
         DescriptorHandle GetRTV() const { return _rtvHandle; }
         DescriptorHandle GetDSV() const { return _dsvHandle; }
-        DescriptorHandle GetColorSRV() const { return _colorTextureHandle; }
-        DescriptorHandle GetDepthSRV() const { return _depthTextureHandle; }
+        Texture* GetColorTexture() const { return _colorTexture.get(); }
+        Texture* GetDepthTexture() const { return _depthTexture.get(); }
 
         UINT GetWidth() const { return _width; }
         UINT GetHeight() const { return _height; }

@@ -22,18 +22,17 @@ namespace Graphics
             _dsvHeap->Free(_dsvHandle);
             _dsvHandle = {};
         }
-        if (_colorTextureHandle.IsValid() && _cbvSrvHeap != nullptr)
-        {
-            _cbvSrvHeap->Free(_colorTextureHandle);
-            _colorTextureHandle = {};
-        }
-        if (_depthTextureHandle.IsValid() && _cbvSrvHeap != nullptr)
-        {
-            _cbvSrvHeap->Free(_depthTextureHandle);
-            _depthTextureHandle = {};
-        }
         _colorBuffer.Reset();
         _depthBuffer.Reset();
+
+        if (_colorTexture != nullptr)
+        {
+            _colorTexture->Release();
+        }
+        if (_depthTexture != nullptr)
+        {
+            _depthTexture->Release();
+        }
     }
 
     bool RenderTarget::InitColor(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& rtvHeap, DescriptorHeap* cbvSrvHeap)
@@ -77,15 +76,8 @@ namespace Graphics
         // SRV 作成
         if (cbvSrvHeap != nullptr)
         {
-            _cbvSrvHeap = cbvSrvHeap;
-            _colorTextureHandle = _cbvSrvHeap->Allocate();
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Format = format;
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            srvDesc.Texture2D.MostDetailedMip = 0;
-            srvDesc.Texture2D.MipLevels = 1;
-            d3dDevice->CreateShaderResourceView(_colorBuffer.Get(), &srvDesc, _colorTextureHandle.cpuHandle);
+            _colorTexture = std::make_unique<Texture>();
+            _colorTexture->Init(d3dDevice, cbvSrvHeap, _colorBuffer, format);
         }
 
         return true;
@@ -120,6 +112,7 @@ namespace Graphics
         }
         _depthBuffer->SetName(L"render_target_depth");
 
+        // DSV 作成
         _dsvHeap = &dsvHeap;
         _dsvHandle = _dsvHeap->Allocate();
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -130,15 +123,8 @@ namespace Graphics
         // SRV 作成
         if (cbvSrvHeap != nullptr)
         {
-            _cbvSrvHeap = cbvSrvHeap;
-            _depthTextureHandle = _cbvSrvHeap->Allocate();
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Format = srvFormat;
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            srvDesc.Texture2D.MostDetailedMip = 0;
-            srvDesc.Texture2D.MipLevels = 1;
-            d3dDevice->CreateShaderResourceView(_depthBuffer.Get(), &srvDesc, _depthTextureHandle.cpuHandle);
+            _depthTexture = std::make_unique<Texture>();
+            _depthTexture->Init(d3dDevice, cbvSrvHeap, _depthBuffer, srvFormat);
         }
 
         return true;

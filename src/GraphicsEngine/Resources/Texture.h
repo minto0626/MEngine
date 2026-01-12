@@ -8,11 +8,17 @@ class Texture
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _texture;
+    DescriptorHeap* _descHeap;
 	DescriptorHandle _descHandle;
 
 public:
-	void Init(ID3D12Device* device, DescriptorHeap* descHeap, Microsoft::WRL::ComPtr<ID3D12Resource> texture);
+    Texture() = default;
+    ~Texture();
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return _descHandle.cpuHandle; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return _descHandle.gpuHandle; }
+	void Init(ID3D12Device* device, DescriptorHeap* descHeap, Microsoft::WRL::ComPtr<ID3D12Resource> texture, DXGI_FORMAT format);
+
+    void Release();
+
+    DescriptorHandle GetSRV() const { return _descHandle; }
+
 };
