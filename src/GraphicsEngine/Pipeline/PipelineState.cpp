@@ -49,8 +49,11 @@ void PipelineState::CreateFromDesc(
 	psoDesc.BlendState = Graphics::StateFactory::GetBlendState(desc.blendPreset);
 	psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画
-	psoDesc.NumRenderTargets = 1; // レンダーターゲットは一つ
-	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.NumRenderTargets = static_cast<UINT>(desc.rtvFormats.size());
+    for (size_t i = 0; i < desc.rtvFormats.size() && i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+    {
+        psoDesc.RTVFormats[i] = desc.rtvFormats[i];
+    }
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.SampleDesc.Quality = 0;
 	psoDesc.DepthStencilState = Graphics::StateFactory::GetDepthStencilState(desc.depthStencilPreset);

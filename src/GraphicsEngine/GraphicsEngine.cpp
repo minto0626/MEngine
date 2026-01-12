@@ -95,6 +95,44 @@ namespace Graphics
             cbv_srv_uav_heap.get()
         );
 
+        // Gバッファ用レンダリングターゲット作成
+        gBuffer[0] = std::make_unique<RenderTarget>();
+        gBuffer[0]->InitColor(
+            device,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            DXGI_FORMAT_R8G8B8A8_UNORM,   // Albedo
+            *rtv_heap,
+            cbv_srv_uav_heap.get()
+        );
+        // 深度バッファはこれを使う
+        gBuffer[0]->InitDepth(
+            device,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            DXGI_FORMAT_R32_TYPELESS,
+            DXGI_FORMAT_D32_FLOAT,
+            *dsv_heap
+        );
+        gBuffer[1] = std::make_unique<RenderTarget>();
+        gBuffer[1]->InitColor(
+            device,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            DXGI_FORMAT_R8G8B8A8_UNORM,   // Normal
+            *rtv_heap,
+            cbv_srv_uav_heap.get()
+        );
+        gBuffer[2] = std::make_unique<RenderTarget>();
+        gBuffer[2]->InitColor(
+            device,
+            swapchainDesc.Width,
+            swapchainDesc.Height,
+            DXGI_FORMAT_R32G32B32A32_FLOAT,   // Position
+            *rtv_heap,
+            cbv_srv_uav_heap.get()
+        );
+
         // オフスクリーンレンダリングターゲット作成
         offscreenRenderTarget = std::make_unique<RenderTarget>();
         offscreenRenderTarget->InitColor(
@@ -104,14 +142,6 @@ namespace Graphics
             swapchainDesc.Format,
             *rtv_heap,
             cbv_srv_uav_heap.get()
-        );
-        offscreenRenderTarget->InitDepth(
-            device,
-            swapchainDesc.Width,
-            swapchainDesc.Height,
-            DXGI_FORMAT_R32_TYPELESS,
-            DXGI_FORMAT_D32_FLOAT,
-            *dsv_heap
         );
 
         // ポストプロセス用レンダリングターゲット作成
@@ -157,15 +187,14 @@ namespace Graphics
             { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
             { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
         };
+        std::vector<DXGI_FORMAT> basic2DRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
 
         RootSignatureDesc basic3DRootDesc;
         {
             basic3DRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
             basic3DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            basic3DRootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            basic3DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            basic3DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-            basic3DRootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+            basic3DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            basic3DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
         }
         std::wstring basic3DVSPath = L"Assets/shader/Basic3DShader.hlsl";
         std::wstring basic3DPSPath = L"Assets/shader/Basic3DShader.hlsl";
@@ -175,6 +204,7 @@ namespace Graphics
             { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
             { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
         };
+        std::vector<DXGI_FORMAT> basic3DRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT };
 
         RootSignatureDesc postProcessRootDesc;
         {
@@ -187,6 +217,7 @@ namespace Graphics
         {
             // SV_VertexIDを使う場合、入力レイアウトは空で良い
         };
+        std::vector<DXGI_FORMAT> postProcessRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
 
         RootSignatureDesc shadowMapRootDesc;
         {
@@ -201,6 +232,25 @@ namespace Graphics
             { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
             { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
         };
+        std::vector<DXGI_FORMAT> shadowMapRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+
+        RootSignatureDesc lightRootDesc;
+        {
+            lightRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
+            lightRootDesc.params.push_back({ "albedoTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
+            lightRootDesc.params.push_back({ "normalTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
+            lightRootDesc.params.push_back({ "positionTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, D3D12_SHADER_VISIBILITY_PIXEL });
+            lightRootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3, D3D12_SHADER_VISIBILITY_PIXEL });
+            lightRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
+            lightRootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
+        }
+        std::wstring lightVSPath = L"Assets/shader/SceneLighting.hlsl";
+        std::wstring lightPSPath = L"Assets/shader/SceneLighting.hlsl";
+        std::vector<InputLayoutHelper::InputElement> lightInputElements =
+        {
+            // SV_VertexIDを使う場合、入力レイアウトは空で良い
+        };
+        std::vector<DXGI_FORMAT> lightRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
 
         // 猫のスプライト
         {
@@ -209,6 +259,7 @@ namespace Graphics
 			    basic2DVSPath,
 			    basic2DPSPath,
 			    basic2DInputElements,
+                basic2DRTVFormats,
 			    basic2DRootDesc,
 			    BlendPreset::AlphaBlend,
 			    RasterizerPreset::CullNode,
@@ -223,6 +274,7 @@ namespace Graphics
 			    basic3DVSPath,
 			    basic3DPSPath,
 			    basic3DInputElements,
+                basic3DRTVFormats,
 			    basic3DRootDesc,
 			    BlendPreset::Opaque,
 			    RasterizerPreset::CullBack,
@@ -237,6 +289,7 @@ namespace Graphics
                 basic3DVSPath,
                 basic3DPSPath,
                 basic3DInputElements,
+                basic3DRTVFormats,
                 basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
@@ -251,6 +304,7 @@ namespace Graphics
                 basic3DVSPath,
                 basic3DPSPath,
                 basic3DInputElements,
+                basic3DRTVFormats,
                 basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
@@ -265,6 +319,7 @@ namespace Graphics
                 basic3DVSPath,
                 basic3DPSPath,
                 basic3DInputElements,
+                basic3DRTVFormats,
                 basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
@@ -279,6 +334,7 @@ namespace Graphics
                 basic3DVSPath,
                 basic3DPSPath,
                 basic3DInputElements,
+                basic3DRTVFormats,
                 basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
@@ -293,6 +349,7 @@ namespace Graphics
                 basic3DVSPath,
                 basic3DPSPath,
                 basic3DInputElements,
+                basic3DRTVFormats,
                 basic3DRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
@@ -307,6 +364,7 @@ namespace Graphics
                 postProcessVSPath,
                 postProcessPSPath,
                 postProcessInputElements,
+                postProcessRTVFormats,
                 postProcessRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullNode,
@@ -321,12 +379,30 @@ namespace Graphics
                 shadowMapVSPath,
                 shadowMapPSPath,
                 shadowMapInputElements,
+                shadowMapRTVFormats,
                 shadowMapRootDesc,
                 BlendPreset::Opaque,
                 RasterizerPreset::CullBack,
                 DepthStencilPreset::DepthEnable,
             };
             materialRegistry->Register("ShadowMap", materialDesc);
+        }
+        // ライト描画
+        {
+            MaterialDesc materialDesc =
+            {
+                lightVSPath,
+                lightPSPath,
+                lightInputElements,
+                lightRTVFormats,
+                lightRootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullNode,
+                DepthStencilPreset::DepthDisable,
+            };
+            materialRegistry->Register("Lighting", materialDesc);
+            auto* mat = materialRegistry->Get("Lighting");
+            mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
         }
 
 		// テクスチャ取得のメモ
@@ -453,10 +529,13 @@ namespace Graphics
         sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
 
         // シャドウマップを描画
-        RenderShadowMap(camera3D, light);
+        RenderShadowMap(camera3D);
 
-        // オフスクリーンにシーンを描画
-        RenderScene(camera2D, camera3D, light);
+        // G-Bufferにシーンを描画
+        RenderScene(camera2D, camera3D);
+
+        // ライティングを描画
+        RenderLighting();
 
         // ポストプロセスを描画
         RenderPostProcess();
@@ -475,7 +554,7 @@ namespace Graphics
 		swapChain.Present();
 	}
 
-    void GraphicsEngine::RenderShadowMap(Camera* camera3D, Light* light)
+    void GraphicsEngine::RenderShadowMap(Camera* camera3D)
     {
         auto* commandList = commandContext.GetCommandList();
 
@@ -503,31 +582,42 @@ namespace Graphics
             auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *renderer->GetMaterial());
             commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
 
-            renderer->Draw(&commandContext, camera3D, light);
+            renderer->Draw(&commandContext, camera3D);
         }
     }
 
-    void GraphicsEngine::RenderScene(Camera* camera2D, Camera* camera3D, Light* light)
+    void GraphicsEngine::RenderScene(Camera* camera2D, Camera* camera3D)
     {
         auto* commandList = commandContext.GetCommandList();
 
-        auto* renderTextureBuffer = offscreenRenderTarget->GetColorBuffer();
+        for (auto& renderTexture : gBuffer)
+        {
+            auto viewport = CD3DX12_VIEWPORT(renderTexture->GetColorBuffer());
+            auto scissor = CD3DX12_RECT(0, 0, renderTexture->GetWidth(), renderTexture->GetHeight());
+            commandList->RSSetViewports(1, &viewport);
+            commandList->RSSetScissorRects(1, &scissor);
+        }
 
-        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
-        D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTarget->GetWidth(), offscreenRenderTarget->GetHeight());
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissor);
+        for (auto& renderTexture : gBuffer)
+        {
+            commandContext.ResourceBarrier(
+                renderTexture->GetColorBuffer(),
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+                D3D12_RESOURCE_STATE_RENDER_TARGET);
+        }
 
-        commandContext.ResourceBarrier(
-            renderTextureBuffer,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-        auto rtvHandle = offscreenRenderTarget->GetRTV().cpuHandle;
-        auto dsvHandle = offscreenRenderTarget->GetDSV().cpuHandle;
-        commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+        for (auto& renderTexture : gBuffer)
+        {
+            rtvHandles.push_back(renderTexture->GetRTV().cpuHandle);
+        }
+        auto dsvHandle = gBuffer[0]->GetDSV().cpuHandle;
+        commandList->OMSetRenderTargets(static_cast<UINT>(rtvHandles.size()), rtvHandles.data(), false, &dsvHandle);
         const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
-        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+        for (auto& rtvHandle : rtvHandles)
+        {
+            commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+        }
         commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
         ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
@@ -564,10 +654,8 @@ namespace Graphics
                 // 3Dシーン用の定数バッファをセット
                 auto sceneCBVIndex = GetRootParameterIndex(sceneDataParamName, *currentMaterial);
                 commandContext.SetGraphicsRootDescriptorTable(sceneCBVIndex, sceneCB->GetGPUHandle());
-                // シャドウマップのSRVをセット
-                commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex(shadowMapParamName, *currentMaterial), shadowMapRenderTarget->GetDepthSRV().gpuHandle);
             }
-            renderer->Draw(&commandContext, camera3D, light);
+            renderer->Draw(&commandContext, camera3D);
         }
         for (auto& renderer : scene2DRenderers)
         {
@@ -577,8 +665,52 @@ namespace Graphics
                 currentMaterial->Bind(commandContext);
                 lastMaterial = currentMaterial;
             }
-            renderer->Draw(&commandContext, camera2D, light);
+            renderer->Draw(&commandContext, camera2D);
         }
+
+        for (auto& renderTexture : gBuffer)
+        {
+            commandContext.ResourceBarrier(
+                renderTexture->GetColorBuffer(),
+                D3D12_RESOURCE_STATE_RENDER_TARGET,
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        }
+    }
+
+    void GraphicsEngine::RenderLighting()
+    {
+        auto* commandList = commandContext.GetCommandList();
+        
+        auto* renderTextureBuffer = offscreenRenderTarget->GetColorBuffer();
+
+        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
+        D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTarget->GetWidth(), offscreenRenderTarget->GetHeight());
+        commandList->RSSetViewports(1, &viewport);
+        commandList->RSSetScissorRects(1, &scissor);
+
+        commandContext.ResourceBarrier(
+            renderTextureBuffer,
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        auto rtvHandle = offscreenRenderTarget->GetRTV().cpuHandle;
+        commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
+        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+
+        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
+        commandList->SetDescriptorHeaps(1, heaps);
+
+        // ライティング描画
+        auto* lightingMat = materialRegistry->Get("Lighting");
+        lightingMat->Bind(commandContext);
+        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("albedoTex", *lightingMat), gBuffer[0]->GetColorSRV().gpuHandle);
+        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("normalTex", *lightingMat), gBuffer[1]->GetColorSRV().gpuHandle);
+        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex("positionTex", *lightingMat), gBuffer[2]->GetColorSRV().gpuHandle);
+        // シャドウマップのSRVをセット
+        commandContext.SetGraphicsRootDescriptorTable(GetRootParameterIndex(shadowMapParamName, *lightingMat), shadowMapRenderTarget->GetDepthSRV().gpuHandle);
+        commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        commandContext.DrawInstanced(3);
 
         commandContext.ResourceBarrier(
             renderTextureBuffer,

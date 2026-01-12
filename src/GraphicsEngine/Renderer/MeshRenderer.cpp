@@ -26,7 +26,7 @@ namespace Graphics
 		}
 	}
 
-	void MeshRenderer::Draw(GfxCommandContext* commandContext, Camera* camera, Light* light)
+	void MeshRenderer::Draw(GfxCommandContext* commandContext, Camera* camera)
 	{
 		if (_owner != nullptr)
 		{

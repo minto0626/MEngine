@@ -13,6 +13,7 @@ namespace Graphics
 		std::wstring vertexShaderPath;
 		std::wstring pixelShaderPath;
 		std::vector<InputLayoutHelper::InputElement> inputElements;
+        std::vector<DXGI_FORMAT> rtvFormats;
 		RootSignatureDesc rootSignatureDesc;
 		BlendPreset blendPreset;
 		RasterizerPreset rasterizerPreset;

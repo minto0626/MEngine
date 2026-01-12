@@ -3,7 +3,6 @@
 #include "Core/GfxCommandContext.h"
 #include "Scene/Component.h"
 #include "Scene/Camera.h"
-#include "Scene/Light.h"
 
 namespace Graphics
 {
@@ -19,7 +18,7 @@ namespace Graphics
 		virtual void SetMaterial(Material* material) { _material = material; }
 		Material* GetMaterial() const { return _material; }
 
-		virtual void Draw(GfxCommandContext* commandContext, Camera* camera, Light* light) = 0;
+		virtual void Draw(GfxCommandContext* commandContext, Camera* camera) = 0;
 
 	};
 }

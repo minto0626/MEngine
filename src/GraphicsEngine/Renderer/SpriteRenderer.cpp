@@ -26,7 +26,7 @@ namespace Graphics
 		}
 	}
 
-	void SpriteRenderer::Draw(GfxCommandContext* commandContext, Camera* camera, Light* light)
+	void SpriteRenderer::Draw(GfxCommandContext* commandContext, Camera* camera)
 	{
 		if (_owner != nullptr)
 		{

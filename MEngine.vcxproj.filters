@@ -436,6 +436,9 @@
     <FxCompile Include="Assets\shader\Basic3DShadowMap.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
+    <FxCompile Include="Assets\shader\SceneLighting.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\shader\BasicShaderHeader.hlsli">

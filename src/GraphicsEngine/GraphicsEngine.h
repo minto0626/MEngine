@@ -47,6 +47,7 @@ namespace Graphics
 		std::unique_ptr<DescriptorHeap> dsv_heap;
 
         std::unique_ptr<RenderTarget> shadowMapRenderTarget;
+        std::unique_ptr<RenderTarget> gBuffer[3];   // 0:Albedo, 1:Normal, 2:Position
         std::unique_ptr<RenderTarget> offscreenRenderTarget;
         std::unique_ptr<RenderTarget> postProcessRenderTarget;
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
@@ -101,11 +102,12 @@ namespace Graphics
 		Texture* GetTexture(const std::string& path);
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
 		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
-		void Render(Scene* scene, class Camera* camera2D, class Camera* camera3D, Light* light);
-        void RenderShadowMap(class Camera* camera3D, Light* light);
-        void RenderScene(class Camera* camera2D, class Camera* camera3D, Light* light);
+		void Render(class Scene* scene, class Camera* camera2D, class Camera* camera3D, Light* light);
+        void RenderShadowMap(class Camera* camera3D);
+        void RenderScene(class Camera* camera2D, class Camera* camera3D);
+        void RenderLighting();
         void RenderPostProcess();
-        void RenderBackBuffer(Scene* scene);
+        void RenderBackBuffer(class Scene* scene);
 
 	};
 }

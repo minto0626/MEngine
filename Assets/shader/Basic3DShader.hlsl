@@ -14,6 +14,13 @@ struct BasicOutput
     float2 uv : TEXCOORD;
 };
 
+struct PSOutput
+{
+    float4 albedo : SV_TARGET0;
+    float4 normal : SV_TARGET1;
+    float4 world_pos : SV_TARGET2;
+};
+
 cbuffer SceneCB : register(b0)
 {
     matrix view;
@@ -31,11 +38,8 @@ cbuffer Transform : register(b1)
     matrix world;
 };
 
-Texture2D<float> shadow_map : register(t0);
-SamplerComparisonState shadow_smp : register(s0);
-
-Texture2D<float4> main_tex : register(t1);
-SamplerState smp : register(s1);
+Texture2D<float4> main_tex : register(t0);
+SamplerState smp : register(s0);
 
 BasicOutput vs(BasicInput input)
 {
@@ -50,26 +54,14 @@ BasicOutput vs(BasicInput input)
 	return output;
 }
 
-float4 ps(BasicOutput input) : SV_TARGET
+PSOutput ps(BasicOutput input)
 {
-    // Phongの拡散反射モデル
-
-    float3 light = normalize(lightVec);
-
-    float3 ref = reflect(light, input.normal.xyz);
-    float3 toEye = normalize(eyePos - input.world_pos.xyz);
-    float specular = pow(saturate(dot(ref, toEye)), 50);
-    float ambient = 0.3f;
-    float diffuse = saturate(dot(-light, input.normal.xyz));
-    float4 color = main_tex.Sample(smp, input.uv);
-    color.rgb *= diffuse + specular + ambient;
+    PSOutput output;
     
-    // シャドウマップによる影付け
-    // 投影変換後の座標を正規化デバイス座標に変換
-    float3 shadowViewProj = input.light_view_pos.xyz / input.light_view_pos.w;
-    float2 shadowMapUV = (shadowViewProj.xy + float2(1, -1)) * float2(0.5f, -0.5f);
-    float shadowWeight = lerp(0.5f, 1.0f, shadow_map.SampleCmp(shadow_smp, shadowMapUV, shadowViewProj.z - 0.001f));
-    color.rgb *= shadowWeight;
+    output.albedo = main_tex.Sample(smp, input.uv);
+    output.normal = float4(normalize(input.normal.xyz) * 0.5f + 0.5f, 1.0f);
+    output.world_pos = input.world_pos;
+    output.world_pos.w = 1.0f;
 
-    return color;
+    return output;
 }
