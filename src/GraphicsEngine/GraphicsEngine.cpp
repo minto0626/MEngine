@@ -551,34 +551,25 @@ namespace Graphics
         // バックバッファへ描画
         RenderBackBuffer(scene);
 
-		commandContext.Close();
-		ID3D12CommandList* commandLists[] = { commandContext.GetCommandList() };
-		commandQueue.Execute(_countof(commandLists), *commandLists);
-		commandQueue.Signal(fence);
-		fence.Wait();
+        graphicsContext.ExecuteCommand();
+        graphicsContext.WaitGPU();
 
-		commandContext.Reset();
+        graphicsContext.ResetCommand();
 
 		swapChain.Present();
 	}
 
     void GraphicsEngine::RenderShadowMap(Camera* camera3D)
     {
-        auto* commandList = commandContext.GetCommandList();
+        auto* renderTarget = shadowMapRenderTarget.get();
 
-        auto* renderTextureBuffer = shadowMapRenderTarget->GetDepthBuffer();
+        graphicsContext.SetViewportAndScissor(renderTarget);
 
-        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
-        D3D12_RECT scissor = CD3DX12_RECT(0, 0, shadowMapRenderTarget->GetWidth(), shadowMapRenderTarget->GetHeight());
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissor);
+        graphicsContext.SetRenderTarget(renderTarget);
+        graphicsContext.ClearRenderTarget(renderTarget, {0.0f, 0.0f, 0.0f, 1.0f});
 
-        auto dsvHandle = shadowMapRenderTarget->GetDSV().cpuHandle;
-        commandList->OMSetRenderTargets(0, nullptr, false, &dsvHandle);
-        commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
         auto* shadowMapMat = materialRegistry->Get("ShadowMap");
         shadowMapMat->Bind(commandContext);
@@ -591,40 +582,29 @@ namespace Graphics
 
     void GraphicsEngine::RenderScene(Camera* camera2D, Camera* camera3D)
     {
-        auto* commandList = commandContext.GetCommandList();
-
-        for (auto& renderTexture : gBuffer)
+        const RenderTarget* gBufferRTs[] =
         {
-            auto viewport = CD3DX12_VIEWPORT(renderTexture->GetColorBuffer());
-            auto scissor = CD3DX12_RECT(0, 0, renderTexture->GetWidth(), renderTexture->GetHeight());
-            commandList->RSSetViewports(1, &viewport);
-            commandList->RSSetScissorRects(1, &scissor);
+            gBuffer[0].get(),   // Albedo
+            gBuffer[1].get(),   // Normal
+            gBuffer[2].get(),   // Position
+        };
+
+        for (auto& renderTarget : gBufferRTs)
+        {
+            graphicsContext.SetViewportAndScissor(renderTarget);
         }
 
-        for (auto& renderTexture : gBuffer)
+        for (auto& renderTarget : gBufferRTs)
         {
-            commandContext.ResourceBarrier(
-                renderTexture->GetColorBuffer(),
-                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-                D3D12_RESOURCE_STATE_RENDER_TARGET);
+            graphicsContext.TransitionShaderResourceToRenderTarget(renderTarget);
         }
 
-        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
-        for (auto& renderTexture : gBuffer)
-        {
-            rtvHandles.push_back(renderTexture->GetRTV().cpuHandle);
-        }
-        auto dsvHandle = gBuffer[0]->GetDSV().cpuHandle;
-        commandList->OMSetRenderTargets(static_cast<UINT>(rtvHandles.size()), rtvHandles.data(), false, &dsvHandle);
-        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
-        for (auto& rtvHandle : rtvHandles)
-        {
-            commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
-        }
-        commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+        graphicsContext.SetRenderTargets(_countof(gBufferRTs), gBufferRTs);
+        graphicsContext.ClearRenderTargets(_countof(gBufferRTs), gBufferRTs, { 0.0, 0.0f, 0.0f, 1.0f });
 
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
+
         bool setSceneCBV = false;
 
         // 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
@@ -677,123 +657,78 @@ namespace Graphics
             renderer->Draw(&commandContext, camera2D);
         }
 
-        for (auto& renderTexture : gBuffer)
+        for (auto& renderTarget : gBufferRTs)
         {
-            commandContext.ResourceBarrier(
-                renderTexture->GetColorBuffer(),
-                D3D12_RESOURCE_STATE_RENDER_TARGET,
-                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+            graphicsContext.TransitionRenderTargetToShaderResource(renderTarget);
         }
     }
 
     void GraphicsEngine::RenderLighting()
     {
-        auto* commandList = commandContext.GetCommandList();
-        
-        auto* renderTextureBuffer = offscreenRenderTarget->GetColorBuffer();
+        auto* renderTarget = offscreenRenderTarget.get();
 
-        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
-        D3D12_RECT scissor = CD3DX12_RECT(0, 0, offscreenRenderTarget->GetWidth(), offscreenRenderTarget->GetHeight());
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissor);
+        graphicsContext.SetViewportAndScissor(renderTarget);
 
-        commandContext.ResourceBarrier(
-            renderTextureBuffer,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        graphicsContext.TransitionShaderResourceToRenderTarget(renderTarget);
 
-        auto rtvHandle = offscreenRenderTarget->GetRTV().cpuHandle;
-        commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
-        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+        graphicsContext.SetRenderTarget(renderTarget);
+        graphicsContext.ClearRenderTarget(renderTarget, { 0.0f, 0.0f, 0.0f, 1.0f });
 
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
-        // ライティング描画
         auto* lightingMat = materialRegistry->Get("Lighting");
         lightingMat->Bind(commandContext);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
 
-        commandContext.ResourceBarrier(
-            renderTextureBuffer,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        graphicsContext.TransitionRenderTargetToShaderResource(renderTarget);
     }
 
     void GraphicsEngine::RenderPostProcess()
     {
-        auto* commandList = commandContext.GetCommandList();
+        auto* renderTarget = postProcessRenderTarget.get();
 
-        auto* renderTextureBuffer = postProcessRenderTarget->GetColorBuffer();
+        graphicsContext.SetViewportAndScissor(renderTarget);
 
-        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(renderTextureBuffer);
-        D3D12_RECT scissor = CD3DX12_RECT(0, 0, postProcessRenderTarget->GetWidth(), postProcessRenderTarget->GetHeight());
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissor);
+        graphicsContext.TransitionShaderResourceToRenderTarget(renderTarget);
 
-        commandContext.ResourceBarrier(
-            renderTextureBuffer,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        graphicsContext.SetRenderTarget(renderTarget);
+        graphicsContext.ClearRenderTarget(renderTarget, { 0.0f, 0.0f, 0.0f, 1.0f });
 
-        auto rtvHandle = postProcessRenderTarget->GetRTV().cpuHandle;
-        commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-        const float cc[4] = { 0.0, 0.0f, 0.0f, 1.0f };
-        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
-
-        // ポストプロセス描画
         auto* postProcessMat = materialRegistry->Get("PostProcess");
         postProcessMat->Bind(commandContext);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
 
-        commandContext.ResourceBarrier(
-            renderTextureBuffer,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        graphicsContext.TransitionRenderTargetToShaderResource(renderTarget);
     }
 
     void GraphicsEngine::RenderBackBuffer(Scene* scene)
     {
-        auto* commandList = commandContext.GetCommandList();
-
         UINT backBufferIndex = swapChain.Get()->GetCurrentBackBufferIndex();
         auto* renderTarget = renderTargets[backBufferIndex].get();
-        auto* backBuffer = renderTarget->GetColorBuffer();
 
-        D3D12_VIEWPORT viewport = CD3DX12_VIEWPORT(backBuffer);
-        D3D12_RECT scissor = CD3DX12_RECT(0, 0, renderTarget->GetWidth(), renderTarget->GetHeight());
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissor);
+        graphicsContext.SetViewportAndScissor(renderTarget);
 
-        commandContext.ResourceBarrier(
-            backBuffer,
-            D3D12_RESOURCE_STATE_PRESENT,
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        graphicsContext.TransitionPresentToRenderTarget(renderTarget);
 
-        auto rtvHandle = renderTarget->GetRTV().cpuHandle;
-        commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-        const float cc[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
-        commandList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
+        graphicsContext.SetRenderTarget(renderTarget);
+        graphicsContext.ClearRenderTarget(renderTarget, clearColor);
 
         // GUIテスト描画
         MEngine::GUI()->NewFrame();
-        ID3D12DescriptorHeap* const heaps[] = { cbv_srv_uav_heap->GetHeap() };
-        commandList->SetDescriptorHeaps(1, heaps);
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
         static GameObject* selectGameObject = nullptr;
         MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())), *scene, selectGameObject);
         MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorTexture()->GetSRV());
         MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), selectGameObject);
         MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 
-        commandContext.ResourceBarrier(
-            backBuffer,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PRESENT);
+        graphicsContext.TransitionRenderTargetToPresent(renderTarget);
     }
 }

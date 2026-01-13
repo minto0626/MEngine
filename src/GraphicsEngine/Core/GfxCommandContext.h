@@ -25,6 +25,7 @@ namespace Graphics
 		void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY toplogy);
         void DrawInstanced(UINT vertexCount, UINT instanceCount = 1, UINT startVertex = 0, UINT startInstance = 0);
 		void DrawIndexedInstanced(UINT indexCount, UINT instanceCount = 1, UINT startIndex = 0, UINT baseVertex = 0, UINT startInstance = 0);
+        void SetDescriptorHeaps(UINT numHeaps, ID3D12DescriptorHeap* const* heaps);
 		void SetPipelineState(ID3D12PipelineState* pso);
 		void SetRootSignature(ID3D12RootSignature* rootSignature);
 		void SetGraphicsRootDescriptorTable(UINT index, D3D12_GPU_DESCRIPTOR_HANDLE handle);
@@ -32,6 +33,10 @@ namespace Graphics
         void SetGraphicsRoot32BitConstant(UINT index, UINT value, UINT offset);
 		void CopyResource(ID3D12Resource* dest, ID3D12Resource* src);
 		void ResourceBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
-
+        void SetRenderTargets(UINT numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvHandles, bool useDSV, const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle);
+        void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const float color[4]);
+        void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, D3D12_CLEAR_FLAGS flags, float depth, UINT8 stencil);
+        void SetViewport(D3D12_VIEWPORT& viewport);
+        void SetScissorRect(D3D12_RECT& scissor);
 	};
 }
