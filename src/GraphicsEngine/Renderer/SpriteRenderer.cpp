@@ -12,9 +12,16 @@ namespace Graphics
 		_transformCBRootParamIndex(0),
 		_transformCB(nullptr)
 	{
-		// 描画前に随時登録することになると思うので、ここでは登録しない
-		owner->GetScene()->GetGraphicsEngine()->RegisterSpriteRenderer(this);
+        owner->GetScene()->AddSpriteRenderer(this);
 	}
+
+    SpriteRenderer::~SpriteRenderer()
+    {
+        if (_owner != nullptr && _owner->GetScene() != nullptr)
+        {
+            _owner->GetScene()->RemoveSpriteRenderer(this);
+        }
+    }
 
 	void SpriteRenderer::SetMaterial(Material* material)
 	{

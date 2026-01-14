@@ -252,5 +252,5 @@ void MEngine::Update()
 void MEngine::Draw()
 {
     // todo: シーンにカメラとライトを持たせるようにすると良いかも
-    graphicsEngine.Render(_scene.get(), camera2D, camera3D, directionalLight);
+    _scene->Render(camera2D, camera3D, directionalLight);
 }

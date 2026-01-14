@@ -79,6 +79,65 @@ void Scene::RemoveGameObject(GameObject* gameObject)
 	}
 }
 
+void Scene::AddMeshRenderer(Graphics::MeshRenderer* meshRenderer)
+{
+    _meshRenderers.push_back(meshRenderer);
+}
+
+void Scene::RemoveMeshRenderer(Graphics::MeshRenderer* meshRenderer)
+{
+    auto iter = std::find(_meshRenderers.begin(), _meshRenderers.end(), meshRenderer);
+    if (iter != _meshRenderers.end())
+    {
+        _meshRenderers.erase(iter);
+    }
+}
+
+void Scene::AddSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer)
+{
+    _spriteRenderers.push_back(spriteRenderer);
+}
+
+void Scene::RemoveSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer)
+{
+    auto iter = std::find(_spriteRenderers.begin(), _spriteRenderers.end(), spriteRenderer);
+    if (iter != _spriteRenderers.end())
+    {
+        _spriteRenderers.erase(iter);
+    }
+}
+
+void Scene::Render(Camera* camera2D, Camera* camera3D, Light* light)
+{
+    for (auto& spriteRenderer : _spriteRenderers)
+    {
+        if (!spriteRenderer->IsEnabled())
+        {
+            continue;
+        }
+        if (spriteRenderer->GetGameObject()->GetState() != GameObject::State::Active)
+        {
+            continue;
+        }
+        _graphicsEngine->RegisterSpriteRenderer(spriteRenderer);
+    }
+
+    for (auto& meshRenderer : _meshRenderers)
+    {
+        if (!meshRenderer->IsEnabled())
+        {
+            continue;
+        }
+        if (meshRenderer->GetGameObject()->GetState() != GameObject::State::Active)
+        {
+            continue;
+        }
+        _graphicsEngine->RegisterMeshRenderer(meshRenderer);
+    }
+
+    _graphicsEngine->Render(this, camera2D, camera3D, light);
+}
+
 GameObject* Scene::CreateGameObject(const std::string& name)
 {
 	auto gameObject = std::make_unique<GameObject>(this, name);

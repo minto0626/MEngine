@@ -646,6 +646,8 @@ namespace Graphics
             }
             renderer->Draw(&commandContext, camera3D);
         }
+        scene3DRenderers.clear();
+
         for (auto& renderer : scene2DRenderers)
         {
             Material* currentMaterial = renderer->GetMaterial();
@@ -656,6 +658,7 @@ namespace Graphics
             }
             renderer->Draw(&commandContext, camera2D);
         }
+        scene2DRenderers.clear();
 
         for (auto& renderTarget : gBufferRTs)
         {

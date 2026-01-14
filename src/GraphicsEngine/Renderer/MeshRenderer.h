@@ -15,6 +15,7 @@ namespace Graphics
 
 	public:
 		MeshRenderer(class GameObject* owner, int updateOrder = 100);
+        ~MeshRenderer();
 
 		void SetMesh(Mesh* mesh) { _mesh = mesh; };
 		void SetMaterial(Material* material) override;

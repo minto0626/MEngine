@@ -15,6 +15,7 @@ namespace Graphics
 
 	public:
 		SpriteRenderer(class GameObject* owner, int updateOrder = 100);
+        ~SpriteRenderer();
 
 		void SetSprite(Sprite* sprite) { _sprite = sprite; };
 		void SetMaterial(Material* material) override;

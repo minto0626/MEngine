@@ -12,9 +12,16 @@ namespace Graphics
 		_transformCBRootParamIndex(0),
 		_transformCB(nullptr)
 	{
-		// 描画前に随時登録することになると思うので、ここでは登録しない
-		owner->GetScene()->GetGraphicsEngine()->RegisterMeshRenderer(this);
+        _owner->GetScene()->AddMeshRenderer(this);
 	}
+
+    MeshRenderer::~MeshRenderer()
+    {
+        if (_owner != nullptr && _owner->GetScene() != nullptr)
+        {
+            _owner->GetScene()->RemoveMeshRenderer(this);
+        }
+    }
 
 	void MeshRenderer::SetMaterial(Material* material)
 	{
