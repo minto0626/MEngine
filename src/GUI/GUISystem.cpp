@@ -153,7 +153,13 @@ void GUISystem::DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, Gam
 
     if (gameObject != nullptr)
     {
-        ImGui::InputText("Name", (char*)gameObject->GetName().c_str(), 256);
+        bool active = gameObject->GetState() == GameObject::State::Active;
+        if (ImGui::Checkbox("##Active", &active))
+        {
+            gameObject->SetState(active ? GameObject::State::Active : GameObject::State::InActive);
+        }
+        ImGui::SameLine();
+        ImGui::InputText("##Name", (char*)gameObject->GetName().c_str(), 256);
 
         ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
         if (ImGui::TreeNode("Transform"))
@@ -189,6 +195,30 @@ void GUISystem::DrawInspectorWindow(Vector2 window_pos, Vector2 window_size, Gam
             }
 
             ImGui::TreePop();
+        }
+
+        auto meshRenderer = gameObject->GetComponent<Graphics::MeshRenderer>();
+        if (meshRenderer != nullptr)
+        {
+            // todo: チェックボックスとノードツリーの表示の相性が悪いので改善する
+            bool enabled = meshRenderer->IsEnabled();
+            if (ImGui::Checkbox("##Enable", &enabled))
+            {
+                if (enabled)
+                {
+                    meshRenderer->OnEnable();
+                }
+                else
+                {
+                    meshRenderer->OnDisable();
+                }
+            }
+            ImGui::SameLine();
+            ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
+            if (ImGui::TreeNode("MeshRenderer"))
+            {
+                ImGui::TreePop();
+            }
         }
     }
 
