@@ -107,7 +107,7 @@ void Scene::RemoveSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer)
     }
 }
 
-void Scene::Render(Camera* camera2D, Camera* camera3D, Light* light)
+void Scene::Render()
 {
     for (auto& spriteRenderer : _spriteRenderers)
     {
@@ -135,7 +135,7 @@ void Scene::Render(Camera* camera2D, Camera* camera3D, Light* light)
         _graphicsEngine->RegisterMeshRenderer(meshRenderer);
     }
 
-    _graphicsEngine->Render(this, camera2D, camera3D, light);
+    _graphicsEngine->Render(this, _camera2D, _camera3D, _light);
 }
 
 GameObject* Scene::CreateGameObject(const std::string& name)

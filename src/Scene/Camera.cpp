@@ -1,5 +1,6 @@
 ﻿#include "Camera.h"
 #include "GameObject.h"
+#include "Scene/Scene.h"
 
 Camera::Camera(GameObject* owner, int updateOrder)
 	: Component(owner, updateOrder)
@@ -23,6 +24,16 @@ void Camera::Init(ProjectionType projectionType, uint32_t viewportWidth, uint32_
 	_viewProjectionMatrix.SetIdentity();
     _lastTransformMatrix = _transform->GetWorldMatrix();
     ForceUpdateMatrices();
+
+    // todo: キャンバスの概念ができたら、双方をコンストラクタで登録するようにする
+    if (projectionType == Camera::ProjectionType::Ortho)
+    {
+        _owner->GetScene()->SetCamera2D(this);
+    }
+    else if (projectionType == Camera::ProjectionType::Perspective)
+    {
+        _owner->GetScene()->SetCamera3D(this);
+    }
 }
 
 Matrix Camera::GetViewMatrix()

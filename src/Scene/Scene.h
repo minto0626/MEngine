@@ -15,6 +15,9 @@ private:
 	std::vector<std::unique_ptr<GameObject>> _pendingGameObjects;
 	bool _isUpdating = false;
 	Graphics::GraphicsEngine* _graphicsEngine;
+    class Camera* _camera2D;
+    class Camera* _camera3D;
+    class Light* _light;
     std::vector<Graphics::MeshRenderer*> _meshRenderers;
     std::vector<Graphics::SpriteRenderer*> _spriteRenderers;
 
@@ -30,11 +33,14 @@ public:
 	void AddGameObject(std::unique_ptr<GameObject> gameObject);
 	void RemoveGameObject(GameObject* gameObject);
 	Graphics::GraphicsEngine* GetGraphicsEngine() const { return _graphicsEngine; };
+    void SetCamera2D(Camera* camera) { _camera2D = camera; }
+    void SetCamera3D(Camera* camera) { _camera3D = camera; }
+    void SetLight(Light* light) { _light = light; }
     void AddMeshRenderer(Graphics::MeshRenderer* meshRenderer);
     void RemoveMeshRenderer(Graphics::MeshRenderer* meshRenderer);
     void AddSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer);
     void RemoveSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer);
-    void Render(class Camera* camera2D, class Camera* camera3D, class Light* light);
+    void Render();
 
 	GameObject* CreateGameObject(const std::string& name = "GameObject");
     const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
