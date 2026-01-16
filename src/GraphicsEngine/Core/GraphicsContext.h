@@ -21,8 +21,8 @@ namespace Graphics
         void SetViewportAndScissor(const RenderTarget* renderTarget);
         void SetRenderTarget(const RenderTarget* renderTarget);
         void SetRenderTargets(UINT numRTs, const RenderTarget* renderTargets[]);
-        void ClearRenderTarget(const RenderTarget* renderTarget, const Color& clearColor);
-        void ClearRenderTargets(UINT numRenderTargets, const RenderTarget* renderTargets[], const Color& clearColor);
+        void ClearRenderTarget(const RenderTarget* renderTarget);
+        void ClearRenderTargets(UINT numRenderTargets, const RenderTarget* renderTargets[]);
         void SetDescriptorHeaps(UINT numHeaps, const DescriptorHeap* heaps[]);
         void TransitionShaderResourceToRenderTarget(const RenderTarget* renderTarget);
         void TransitionRenderTargetToShaderResource(const RenderTarget* renderTarget);

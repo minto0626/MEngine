@@ -45,26 +45,27 @@ namespace Graphics
         commandContext->SetRenderTargets(numRenderTargets, rtvHandle, renderTargets[0]->GetDSV().IsValid(), &dsvHandle);
     }
 
-    void GraphicsContext::ClearRenderTarget(const RenderTarget* renderTarget, const Color& clearColor)
+    void GraphicsContext::ClearRenderTarget(const RenderTarget* renderTarget)
     {
         const RenderTarget* rtv[] = { renderTarget };
-        ClearRenderTargets(1, rtv, clearColor);
+        ClearRenderTargets(1, rtv);
     }
 
-    void GraphicsContext::ClearRenderTargets(UINT numRenderTargets, const RenderTarget* renderTargets[], const Color& clearColor)
+    void GraphicsContext::ClearRenderTargets(UINT numRenderTargets, const RenderTarget* renderTargets[])
     {
-        float color[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
         for (UINT i = 0; i < numRenderTargets; ++i)
         {
             if (renderTargets[i]->GetRTV().IsValid())
             {
+                Color& clearColor = *renderTargets[i]->GetRTVClearColor();
+                float color[4] = { clearColor.r, clearColor.g, clearColor.b, clearColor.a };
                 commandContext->ClearRenderTargetView(renderTargets[i]->GetRTV().cpuHandle, color);
             }
         }
 
         if (renderTargets[0]->GetDSV().IsValid())
         {
-            commandContext->ClearDepthStencilView(renderTargets[0]->GetDSV().cpuHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0);
+            commandContext->ClearDepthStencilView(renderTargets[0]->GetDSV().cpuHandle, D3D12_CLEAR_FLAG_DEPTH, renderTargets[0]->GetDSVClearValue(), 0);
         }
     }
 

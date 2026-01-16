@@ -47,10 +47,13 @@ namespace Graphics
 
         std::unique_ptr<RenderTarget> shadowMapRenderTarget;
         std::unique_ptr<RenderTarget> gBuffer[3];   // 0:Albedo, 1:Normal, 2:Position
+        Color gBuffer_clearColor = Color::Black();
         std::unique_ptr<RenderTarget> offscreenRenderTarget;
+        Color offsecreen_clearColor = Color::Black();
         std::unique_ptr<RenderTarget> postProcessRenderTarget;
+        Color postProcess_clearColor = Color::Black();
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
-		Color clearColor = Color::FromHex(0x6c9bd2);
+        Color buckBuffer_clearColor = Color::FromHex(0x6c9bd2);
 
 		ModelImporter modelImporter;
 		TextureLoader textureLoader;

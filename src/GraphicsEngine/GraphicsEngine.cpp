@@ -70,7 +70,7 @@ namespace Graphics
 		for (UINT i = 0; i < renderTargets.size(); ++i)
 		{
 			renderTargets[i] = std::make_unique<RenderTarget>();
-			renderTargets[i]->InitFromSwapChain(&device, &swapChain, *rtv_heap, i);
+			renderTargets[i]->InitFromSwapChain(&device, &swapChain, *rtv_heap, buckBuffer_clearColor, i);
 		}
 
 		textureLoader.Init(&graphicsContext);
@@ -90,6 +90,7 @@ namespace Graphics
             2048,
             DXGI_FORMAT_R32_TYPELESS,
             DXGI_FORMAT_D32_FLOAT,
+            1.0f,
             *dsv_heap,
             DXGI_FORMAT_R32_FLOAT,
             cbv_srv_uav_heap.get()
@@ -102,6 +103,7 @@ namespace Graphics
             swapchainDesc.Width,
             swapchainDesc.Height,
             DXGI_FORMAT_R8G8B8A8_UNORM,   // Albedo
+            gBuffer_clearColor,
             *rtv_heap,
             cbv_srv_uav_heap.get()
         );
@@ -112,6 +114,7 @@ namespace Graphics
             swapchainDesc.Height,
             DXGI_FORMAT_R32_TYPELESS,
             DXGI_FORMAT_D32_FLOAT,
+            1.0f,
             *dsv_heap
         );
         gBuffer[1] = std::make_unique<RenderTarget>();
@@ -120,6 +123,7 @@ namespace Graphics
             swapchainDesc.Width,
             swapchainDesc.Height,
             DXGI_FORMAT_R8G8B8A8_UNORM,   // Normal
+            gBuffer_clearColor,
             *rtv_heap,
             cbv_srv_uav_heap.get()
         );
@@ -129,6 +133,7 @@ namespace Graphics
             swapchainDesc.Width,
             swapchainDesc.Height,
             DXGI_FORMAT_R32G32B32A32_FLOAT,   // Position
+            gBuffer_clearColor,
             *rtv_heap,
             cbv_srv_uav_heap.get()
         );
@@ -140,6 +145,7 @@ namespace Graphics
             swapchainDesc.Width,
             swapchainDesc.Height,
             swapchainDesc.Format,
+            offsecreen_clearColor,
             *rtv_heap,
             cbv_srv_uav_heap.get()
         );
@@ -151,6 +157,7 @@ namespace Graphics
             swapchainDesc.Width,
             swapchainDesc.Height,
             swapchainDesc.Format,
+            postProcess_clearColor,
             *rtv_heap,
             cbv_srv_uav_heap.get()
         );
@@ -562,7 +569,7 @@ namespace Graphics
         graphicsContext.SetViewportAndScissor(renderTarget);
 
         graphicsContext.SetRenderTarget(renderTarget);
-        graphicsContext.ClearRenderTarget(renderTarget, {0.0f, 0.0f, 0.0f, 1.0f});
+        graphicsContext.ClearRenderTarget(renderTarget);
 
         const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
         graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
@@ -596,7 +603,7 @@ namespace Graphics
         }
 
         graphicsContext.SetRenderTargets(_countof(gBufferRTs), gBufferRTs);
-        graphicsContext.ClearRenderTargets(_countof(gBufferRTs), gBufferRTs, { 0.0, 0.0f, 0.0f, 1.0f });
+        graphicsContext.ClearRenderTargets(_countof(gBufferRTs), gBufferRTs);
 
         const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
         graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
@@ -680,7 +687,7 @@ namespace Graphics
         graphicsContext.TransitionShaderResourceToRenderTarget(renderTarget);
 
         graphicsContext.SetRenderTarget(renderTarget);
-        graphicsContext.ClearRenderTarget(renderTarget, { 0.0f, 0.0f, 0.0f, 1.0f });
+        graphicsContext.ClearRenderTarget(renderTarget);
 
         const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
         graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
@@ -702,7 +709,7 @@ namespace Graphics
         graphicsContext.TransitionShaderResourceToRenderTarget(renderTarget);
 
         graphicsContext.SetRenderTarget(renderTarget);
-        graphicsContext.ClearRenderTarget(renderTarget, { 0.0f, 0.0f, 0.0f, 1.0f });
+        graphicsContext.ClearRenderTarget(renderTarget);
 
         const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
         graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
@@ -725,7 +732,7 @@ namespace Graphics
         graphicsContext.TransitionPresentToRenderTarget(renderTarget);
 
         graphicsContext.SetRenderTarget(renderTarget);
-        graphicsContext.ClearRenderTarget(renderTarget, clearColor);
+        graphicsContext.ClearRenderTarget(renderTarget);
 
         // GUIテスト描画
         MEngine::GUI()->NewFrame();

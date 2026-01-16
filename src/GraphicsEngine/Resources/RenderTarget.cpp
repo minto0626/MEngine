@@ -35,7 +35,7 @@ namespace Graphics
         }
     }
 
-    bool RenderTarget::InitColor(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, DescriptorHeap& rtvHeap, DescriptorHeap* cbvSrvHeap)
+    bool RenderTarget::InitColor(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT format, Color& clearColor, DescriptorHeap& rtvHeap, DescriptorHeap* cbvSrvHeap)
     {
         if (width == 0 || height == 0) return false;
 
@@ -48,8 +48,9 @@ namespace Graphics
         auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, 1);
         texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
-        float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        CD3DX12_CLEAR_VALUE clearValue(format, clearColor);
+        _rtvClearColor = &clearColor;
+        const float cc[4]{ _rtvClearColor->r, _rtvClearColor->g, _rtvClearColor->b, _rtvClearColor->a };
+        CD3DX12_CLEAR_VALUE clearValue(format, cc);
 
         auto result = d3dDevice->CreateCommittedResource(
             &heapProp,
@@ -83,7 +84,7 @@ namespace Graphics
         return true;
     }
 
-    bool RenderTarget::InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT resourceFormat, DXGI_FORMAT dsvFormat, DescriptorHeap& dsvHeap, DXGI_FORMAT srvFormat, DescriptorHeap* cbvSrvHeap)
+    bool RenderTarget::InitDepth(GfxDevice& device, UINT width, UINT height, DXGI_FORMAT resourceFormat, DXGI_FORMAT dsvFormat, float clearValue, DescriptorHeap& dsvHeap, DXGI_FORMAT srvFormat, DescriptorHeap* cbvSrvHeap)
     {
         if (width == 0 || height == 0) return false;
 
@@ -96,14 +97,15 @@ namespace Graphics
         auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(resourceFormat, width, height, 1, 1);
         texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-        CD3DX12_CLEAR_VALUE clearValue(dsvFormat, 1.0f, 0);
+        _dsvClearValue = clearValue;
+        CD3DX12_CLEAR_VALUE _clearValue(dsvFormat, _dsvClearValue, 0);
 
         auto result = d3dDevice->CreateCommittedResource(
             &heapProp,
             D3D12_HEAP_FLAG_NONE,
             &texDesc,
             D3D12_RESOURCE_STATE_DEPTH_WRITE,
-            &clearValue,
+            &_clearValue,
             IID_PPV_ARGS(_depthBuffer.ReleaseAndGetAddressOf()));
         if (FAILED(result))
         {
@@ -130,7 +132,7 @@ namespace Graphics
         return true;
     }
 
-	bool RenderTarget::InitFromSwapChain(GfxDevice* device, GfxSwapChain* swapChain, DescriptorHeap& rtvHeap, UINT bufferIndex)
+	bool RenderTarget::InitFromSwapChain(GfxDevice* device, GfxSwapChain* swapChain, DescriptorHeap& rtvHeap, Color& clearColor, UINT bufferIndex)
 	{
 		auto result = swapChain->Get()->GetBuffer(bufferIndex, IID_PPV_ARGS(_colorBuffer.ReleaseAndGetAddressOf()));
 		if (FAILED(result))
@@ -139,6 +141,8 @@ namespace Graphics
 			return false;
 		}
 		_colorBuffer->SetName(L"render_target");
+
+        _rtvClearColor = &clearColor;
 
         _width = static_cast<UINT>(_colorBuffer->GetDesc().Width);
         _height = _colorBuffer->GetDesc().Height;
