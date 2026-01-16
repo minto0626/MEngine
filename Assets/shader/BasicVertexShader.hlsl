@@ -1,6 +1,11 @@
 #include "BasicShaderHeader.hlsli"
 
-cbuffer Transform : register(b0)
+cbuffer ScreenCB : register(b0)
+{
+    matrix viewProjection;
+};
+
+cbuffer Transform : register(b1)
 {
     matrix world;
 };
@@ -8,7 +13,7 @@ cbuffer Transform : register(b0)
 BasicOutput vs(float4 pos : POSITION, float2 uv : TEXCOORD)
 {
     BasicOutput o;
-    o.sv_pos = mul(world, pos);
+    o.sv_pos = mul(mul(viewProjection, world), pos);
     o.uv = uv;
 	return o;
 }

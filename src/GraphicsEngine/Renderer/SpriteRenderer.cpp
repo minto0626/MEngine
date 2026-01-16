@@ -33,13 +33,12 @@ namespace Graphics
 		}
 	}
 
-	void SpriteRenderer::Draw(GfxCommandContext* commandContext, Camera* camera)
+	void SpriteRenderer::Draw(GfxCommandContext* commandContext)
 	{
 		if (_owner != nullptr)
 		{
 			ScreenConstantBuffer screenCB;
 			screenCB.worldMatrix = _owner->GetTransform()->GetWorldMatrix();
-			screenCB.worldMatrix *= camera->GetViewProjectionMatrix();
 			_transformCB->Update(&screenCB, sizeof(screenCB));
 		}
 		commandContext->SetGraphicsRootDescriptorTable(_transformCBRootParamIndex, _transformCB->GetGPUHandle());

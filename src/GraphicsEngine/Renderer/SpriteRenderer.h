@@ -20,7 +20,7 @@ namespace Graphics
 		void SetSprite(Sprite* sprite) { _sprite = sprite; };
 		void SetMaterial(Material* material) override;
 
-		void Draw(GfxCommandContext* commandContext, Camera* camera) override;
+		void Draw(GfxCommandContext* commandContext) override;
 
 	};
 }

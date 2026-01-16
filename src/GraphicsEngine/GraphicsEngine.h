@@ -24,7 +24,6 @@
 #include "Scene/Transform.h"
 #include "Scene/GameObject.h"
 #include "Math/Color.h"
-#include "Scene/Light.h"
 
 #include <memory>
 #include <vector>
@@ -61,32 +60,13 @@ namespace Graphics
 		std::vector<Renderer*> scene2DRenderers;
 		std::vector<Renderer*> scene3DRenderers;
 
+        const std::string canvasDataParamName = "canvasCB";
         const std::string sceneDataParamName = "sceneCB";
 		const std::string worldMatParamName = "worldMat";
         const std::string shadowMapParamName = "shadowMap";
 
+        ConstantBuffer* canvasCB = nullptr;
         ConstantBuffer* sceneCB = nullptr;
-
-        struct SceneCameraData
-        {
-            Matrix viewMatrix;
-            Matrix projectionMatrix;
-            Vector3 cameraPosition;
-            float pad0;
-        };
-
-        struct SceneLightData
-        {
-            Matrix lightViewMatrix;
-            Vector3 lightDirection;
-            float pad0;
-        };
-
-        struct SceneConstantBuffer
-        {
-            SceneCameraData camera;
-            SceneLightData light;
-        };
 
 		IDXGIFactory6* CreateDXGIFactory();
 
@@ -100,11 +80,14 @@ namespace Graphics
 		UINT GetRootParameterIndex(const std::string& name, const Material& mat);
 		ConstantBuffer* CreateConstantBuffer(size_t size);
 		Texture* GetTexture(const std::string& path);
+        void InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize);
+        void UpdateSceneConstantBuffer(void* buffer, UINT size);
+        void UpdateCanvasConstantBuffer(void* buffer, UINT size);
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);
 		void RegisterMeshRenderer(MeshRenderer* meshRenderer);
-		void Render(class Scene* scene, class Camera* camera2D, class Camera* camera3D, Light* light);
-        void RenderShadowMap(class Camera* camera3D);
-        void RenderScene(class Camera* camera2D, class Camera* camera3D);
+		void Render(class Scene* scene);
+        void RenderShadowMap();
+        void RenderScene();
         void RenderLighting();
         void RenderPostProcess();
         void RenderBackBuffer(class Scene* scene);

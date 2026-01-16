@@ -1,8 +1,10 @@
 ﻿#include "Scene.h"
+#include "Scene/Light.h"
 
 void Scene::Init(Graphics::GraphicsEngine* graphicsEngine)
 {
 	_graphicsEngine = graphicsEngine;
+    _graphicsEngine->InitSceneConstantBuffers(sizeof(CanvasConstantBuffer), sizeof(SceneConstantBuffer));
 }
 
 void Scene::Update(float deltaTime)
@@ -44,8 +46,55 @@ void Scene::UpdateGameObjects(float deltaTime)
 
 void Scene::Draw()
 {
-	// 描画はここでは行わない
-	// 描画はGraphicsEngine側で行う
+    for (auto& spriteRenderer : _spriteRenderers)
+    {
+        if (!spriteRenderer->IsEnabled())
+        {
+            continue;
+        }
+        if (spriteRenderer->GetGameObject()->GetState() != GameObject::State::Active)
+        {
+            continue;
+        }
+        _graphicsEngine->RegisterSpriteRenderer(spriteRenderer);
+    }
+
+    for (auto& meshRenderer : _meshRenderers)
+    {
+        if (!meshRenderer->IsEnabled())
+        {
+            continue;
+        }
+        if (meshRenderer->GetGameObject()->GetState() != GameObject::State::Active)
+        {
+            continue;
+        }
+        _graphicsEngine->RegisterMeshRenderer(meshRenderer);
+    }
+
+    CanvasConstantBuffer _canvasCB;
+    _canvasCB.viewProjectionMatrix = _camera2D->GetViewProjectionMatrix();
+    _graphicsEngine->UpdateCanvasConstantBuffer(&_canvasCB, sizeof(_canvasCB));
+
+    // シーン共通の定数バッファを更新
+    SceneConstantBuffer _sceneCB;
+    _sceneCB.camera.viewMatrix = _camera3D->GetViewMatrix();
+    _sceneCB.camera.projectionMatrix = _camera3D->GetProjectionMatrix();
+    _sceneCB.camera.cameraPosition = _camera3D->GetGameObject()->GetTransform()->GetPos();
+    Matrix lightView, lightProjection;
+    Vector3 lightVector = _light->GetGameObject()->GetTransform()->GetForward().Normalized() * -1;
+    Vector3 eyePos = _camera3D->GetGameObject()->GetTransform()->GetPos();
+    Vector3 targetPos = eyePos + _camera3D->GetGameObject()->GetTransform()->GetForward().Normalized();
+    float distance = 6.3f;
+    Vector3 lightPos = targetPos + lightVector * distance;
+    Vector3 up(0, 1, 0);
+    lightView.MakeLookAt(lightPos, targetPos, up);
+    lightProjection.MakeOrthographicMatrix(40.0f, 40.0f, .001f, 100.0f);
+    _sceneCB.light.lightViewMatrix = lightView * lightProjection;
+    _sceneCB.light.lightDirection = _light->GetGameObject()->GetTransform()->GetForward();
+    _graphicsEngine->UpdateSceneConstantBuffer(&_sceneCB, sizeof(_sceneCB));
+
+    _graphicsEngine->Render(this);
 }
 
 void Scene::AddGameObject(std::unique_ptr<GameObject> gameObject)
@@ -105,37 +154,6 @@ void Scene::RemoveSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer)
     {
         _spriteRenderers.erase(iter);
     }
-}
-
-void Scene::Render()
-{
-    for (auto& spriteRenderer : _spriteRenderers)
-    {
-        if (!spriteRenderer->IsEnabled())
-        {
-            continue;
-        }
-        if (spriteRenderer->GetGameObject()->GetState() != GameObject::State::Active)
-        {
-            continue;
-        }
-        _graphicsEngine->RegisterSpriteRenderer(spriteRenderer);
-    }
-
-    for (auto& meshRenderer : _meshRenderers)
-    {
-        if (!meshRenderer->IsEnabled())
-        {
-            continue;
-        }
-        if (meshRenderer->GetGameObject()->GetState() != GameObject::State::Active)
-        {
-            continue;
-        }
-        _graphicsEngine->RegisterMeshRenderer(meshRenderer);
-    }
-
-    _graphicsEngine->Render(this, _camera2D, _camera3D, _light);
 }
 
 GameObject* Scene::CreateGameObject(const std::string& name)

@@ -44,12 +44,12 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         return false;
     }
 
-    // リソース読み込み
-    graphicsEngine.LoadContent();
-
 	// シーン生成
 	_scene = std::make_unique<Scene>();
 	_scene->Init(&graphicsEngine);
+
+    // リソース読み込み
+    graphicsEngine.LoadContent();
 
     input.Init(hInstancce, hwnd);
     time.Init();
@@ -251,5 +251,5 @@ void MEngine::Update()
 
 void MEngine::Draw()
 {
-    _scene->Render();
+    _scene->Draw();
 }

@@ -20,7 +20,7 @@ namespace Graphics
 		void SetMesh(Mesh* mesh) { _mesh = mesh; };
 		void SetMaterial(Material* material) override;
 
-		void Draw(GfxCommandContext* commandContext, Camera* camera) override;
+		void Draw(GfxCommandContext* commandContext) override;
 
 	};
 }

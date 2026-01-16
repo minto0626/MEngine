@@ -18,7 +18,7 @@ namespace Graphics
 		virtual void SetMaterial(Material* material) { _material = material; }
 		Material* GetMaterial() const { return _material; }
 
-		virtual void Draw(GfxCommandContext* commandContext, Camera* camera) = 0;
+		virtual void Draw(GfxCommandContext* commandContext) = 0;
 
 	};
 }

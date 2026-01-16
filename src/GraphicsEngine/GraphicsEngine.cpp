@@ -172,11 +172,10 @@ namespace Graphics
 
 	void GraphicsEngine::LoadContent()
 	{
-        sceneCB = CreateConstantBuffer(sizeof(SceneConstantBuffer));
-
         RootSignatureDesc basic2DRootDesc;
         {
-            basic2DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+            basic2DRootDesc.params.push_back({ canvasDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
+            basic2DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_VERTEX });
             basic2DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
             basic2DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
         }
@@ -505,6 +504,22 @@ namespace Graphics
 		return texture.release();
 	}
 
+    void GraphicsEngine::InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize)
+    {
+        canvasCB = CreateConstantBuffer(canvasDataSize);
+        sceneCB = CreateConstantBuffer(sceneDataSize);
+    }
+
+    void GraphicsEngine::UpdateSceneConstantBuffer(void* buffer, UINT size)
+    {
+        sceneCB->Update(buffer, size);
+    }
+
+    void GraphicsEngine::UpdateCanvasConstantBuffer(void* buffer, UINT size)
+    {
+        canvasCB->Update(buffer, size);
+    }
+
 	void GraphicsEngine::RegisterSpriteRenderer(SpriteRenderer* spriteRenderer)
 	{
 		scene2DRenderers.push_back(spriteRenderer);
@@ -515,32 +530,13 @@ namespace Graphics
 		scene3DRenderers.push_back(meshRenderer);
 	}
 
-	void GraphicsEngine::Render(Scene* scene, Camera* camera2D, Camera* camera3D, Light* light)
+	void GraphicsEngine::Render(Scene* scene)
 	{
-        // ここでやれるなら、シーンの更新側でやるほうがいいかも。
-        // シーン共通の定数バッファを更新
-        SceneConstantBuffer _sceneCB;
-        _sceneCB.camera.viewMatrix = camera3D->GetViewMatrix();
-        _sceneCB.camera.projectionMatrix = camera3D->GetProjectionMatrix();
-        _sceneCB.camera.cameraPosition = camera3D->GetGameObject()->GetTransform()->GetPos();
-        Matrix lightView, lightProjection;
-        Vector3 lightVector = light->GetGameObject()->GetTransform()->GetForward().Normalized() * -1;
-        Vector3 eyePos = camera3D->GetGameObject()->GetTransform()->GetPos();
-        Vector3 targetPos = eyePos + camera3D->GetGameObject()->GetTransform()->GetForward().Normalized();
-        float distance = 6.3;
-        Vector3 lightPos = targetPos + lightVector * distance;
-        Vector3 up(0, 1, 0);
-        lightView.MakeLookAt(lightPos, targetPos, up);
-        lightProjection.MakeOrthographicMatrix(40.0f, 40.0f, .001f, 100.0f);
-        _sceneCB.light.lightViewMatrix = lightView * lightProjection;
-        _sceneCB.light.lightDirection = light->GetGameObject()->GetTransform()->GetForward();
-        sceneCB->Update(&_sceneCB, sizeof(_sceneCB));
-
         // シャドウマップを描画
-        RenderShadowMap(camera3D);
+        RenderShadowMap();
 
         // G-Bufferにシーンを描画
-        RenderScene(camera2D, camera3D);
+        RenderScene();
 
         // ライティングを描画
         RenderLighting();
@@ -559,7 +555,7 @@ namespace Graphics
 		swapChain.Present();
 	}
 
-    void GraphicsEngine::RenderShadowMap(Camera* camera3D)
+    void GraphicsEngine::RenderShadowMap()
     {
         auto* renderTarget = shadowMapRenderTarget.get();
 
@@ -576,11 +572,11 @@ namespace Graphics
 
         for (auto& renderer : scene3DRenderers)
         {
-            renderer->Draw(&commandContext, camera3D);
+            renderer->Draw(&commandContext);
         }
     }
 
-    void GraphicsEngine::RenderScene(Camera* camera2D, Camera* camera3D)
+    void GraphicsEngine::RenderScene()
     {
         const RenderTarget* gBufferRTs[] =
         {
@@ -606,6 +602,7 @@ namespace Graphics
         graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
         bool setSceneCBV = false;
+        bool setCanvasCBV = false;
 
         // 同じマテリアルでソートする。パイプラインの切り替えを最小限に抑えるため。
         std::sort(scene2DRenderers.begin(), scene2DRenderers.end(),
@@ -644,7 +641,7 @@ namespace Graphics
                     setSceneCBV = true;
                 }
             }
-            renderer->Draw(&commandContext, camera3D);
+            renderer->Draw(&commandContext);
         }
         scene3DRenderers.clear();
 
@@ -655,8 +652,16 @@ namespace Graphics
             {
                 currentMaterial->Bind(commandContext);
                 lastMaterial = currentMaterial;
+
+                if (!setCanvasCBV)
+                {
+                    // 2Dキャンバス用の定数バッファをセット
+                    auto canvasCBVIndex = GetRootParameterIndex(canvasDataParamName, *currentMaterial);
+                    commandContext.SetGraphicsRootDescriptorTable(canvasCBVIndex, canvasCB->GetGPUHandle());
+                    setCanvasCBV = true;
+                }
             }
-            renderer->Draw(&commandContext, camera2D);
+            renderer->Draw(&commandContext);
         }
         scene2DRenderers.clear();
 

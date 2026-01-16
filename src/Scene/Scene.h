@@ -21,8 +21,33 @@ private:
     std::vector<Graphics::MeshRenderer*> _meshRenderers;
     std::vector<Graphics::SpriteRenderer*> _spriteRenderers;
 
+    struct CanvasConstantBuffer
+    {
+        Matrix viewProjectionMatrix;
+    };
+
+    struct SceneCameraData
+    {
+        Matrix viewMatrix;
+        Matrix projectionMatrix;
+        Vector3 cameraPosition;
+        float pad0;
+    };
+
+    struct SceneLightData
+    {
+        Matrix lightViewMatrix;
+        Vector3 lightDirection;
+        float pad0;
+    };
+
+    struct SceneConstantBuffer
+    {
+        SceneCameraData camera;
+        SceneLightData light;
+    };
+
 	void UpdateGameObjects(float deltaTime);
-	void Draw();
 
 public:
 	Scene() = default;
@@ -30,6 +55,7 @@ public:
 
 	void Init(Graphics::GraphicsEngine* graphicsEngine);
 	void Update(float deltaTime);
+    void Draw();
 	void AddGameObject(std::unique_ptr<GameObject> gameObject);
 	void RemoveGameObject(GameObject* gameObject);
 	Graphics::GraphicsEngine* GetGraphicsEngine() const { return _graphicsEngine; };
@@ -40,7 +66,6 @@ public:
     void RemoveMeshRenderer(Graphics::MeshRenderer* meshRenderer);
     void AddSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer);
     void RemoveSpriteRenderer(Graphics::SpriteRenderer* spriteRenderer);
-    void Render();
 
 	GameObject* CreateGameObject(const std::string& name = "GameObject");
     const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
