@@ -539,6 +539,10 @@ namespace Graphics
 
 	void GraphicsEngine::Render(Scene* scene)
 	{
+        // 共有デスクリプタヒープをセット
+        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
+        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
+
         // シャドウマップを描画
         RenderShadowMap();
 
@@ -571,9 +575,6 @@ namespace Graphics
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
 
-        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
-        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
-
         auto* shadowMapMat = materialRegistry->Get("ShadowMap");
         shadowMapMat->Bind(commandContext);
 
@@ -604,9 +605,6 @@ namespace Graphics
 
         graphicsContext.SetRenderTargets(_countof(gBufferRTs), gBufferRTs);
         graphicsContext.ClearRenderTargets(_countof(gBufferRTs), gBufferRTs);
-
-        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
-        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
         bool setSceneCBV = false;
         bool setCanvasCBV = false;
@@ -689,9 +687,6 @@ namespace Graphics
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
 
-        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
-        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
-
         auto* lightingMat = materialRegistry->Get("Lighting");
         lightingMat->Bind(commandContext);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -710,9 +705,6 @@ namespace Graphics
 
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
-
-        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
-        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
 
         auto* postProcessMat = materialRegistry->Get("PostProcess");
         postProcessMat->Bind(commandContext);
@@ -736,8 +728,6 @@ namespace Graphics
 
         // GUIテスト描画
         MEngine::GUI()->NewFrame();
-        const DescriptorHeap* heaps[] = { cbv_srv_uav_heap.get() };
-        graphicsContext.SetDescriptorHeaps(_countof(heaps), heaps);
         static GameObject* selectGameObject = nullptr;
         MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())), *scene, selectGameObject);
         MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorTexture()->GetSRV());
