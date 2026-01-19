@@ -49,6 +49,20 @@ namespace Graphics
 
 		_device->SetName(L"main_device");
 
+#if _DEBUG
+        _device->QueryInterface(IID_PPV_ARGS(_debugDevice.ReleaseAndGetAddressOf()));
+#endif
+
 		return true;
 	}
+
+    void GfxDevice::ReportLiveObjects()
+    {
+#if _DEBUG
+        if (_debugDevice)
+        {
+            _debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+        }
+#endif
+    }
 }
