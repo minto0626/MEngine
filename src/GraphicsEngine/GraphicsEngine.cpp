@@ -13,38 +13,42 @@ using namespace Microsoft::WRL;
 
 namespace Graphics
 {
-	IDXGIFactory6* GraphicsEngine::CreateDXGIFactory()
+	ComPtr<IDXGIFactory6> GraphicsEngine::CreateDXGIFactory()
 	{
 		UINT dxgiFactoryFlag = 0;
 
 #if _DEBUG
-		ID3D12Debug* debugLayer = nullptr;
-		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugLayer))))
+		ComPtr<ID3D12Debug> debugLayer = nullptr;
+		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugLayer.ReleaseAndGetAddressOf()))))
 		{
 			dxgiFactoryFlag |= DXGI_CREATE_FACTORY_DEBUG;
 
 			debugLayer->EnableDebugLayer();
-			debugLayer->Release();
 		}
 #endif
-		IDXGIFactory6* factory;
+        HRESULT result;
+		ComPtr<IDXGIFactory6> factory;
 #if _DEBUG
-		CreateDXGIFactory2(dxgiFactoryFlag, IID_PPV_ARGS(&factory));
+		result = CreateDXGIFactory2(dxgiFactoryFlag, IID_PPV_ARGS(factory.ReleaseAndGetAddressOf()));
 #else
-		CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+		result = CreateDXGIFactory1(IID_PPV_ARGS(factory.ReleaseAndGetAddressOf()));
 #endif
+        if (FAILED(result))
+        {
+            return nullptr;
+        }
+
 		return factory;
 	}
 
 	bool GraphicsEngine::Initialize(HWND hwnd, SIZE& windowSize)
 	{
-		auto* factory = CreateDXGIFactory();
-		if (!device.Initialize(factory)) { return false; }
+		auto factory = CreateDXGIFactory();
+		if (!device.Initialize(factory.Get())) { return false; }
 		if (!commandQueue.Initialize(&device, D3D12_COMMAND_LIST_TYPE_DIRECT)) { return false; }
-		if (!swapChain.Initialize(hwnd, windowSize, &commandQueue, factory)) { return false; }
+		if (!swapChain.Initialize(hwnd, windowSize, &commandQueue, factory.Get())) { return false; }
 		if (!commandContext.Initialize(&device, &commandQueue)) { return false; }
 		if (!fence.Initialize(&device)) { return false; }
-		factory->Release();
 
 		// モデルインポーター初期化
 		modelImporter.Init();

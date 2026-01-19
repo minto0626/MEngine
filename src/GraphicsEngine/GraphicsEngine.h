@@ -71,7 +71,7 @@ namespace Graphics
         ConstantBuffer* canvasCB = nullptr;
         ConstantBuffer* sceneCB = nullptr;
 
-		IDXGIFactory6* CreateDXGIFactory();
+        Microsoft::WRL::ComPtr<IDXGIFactory6> CreateDXGIFactory();
 
 	public:
 		bool Initialize(HWND hwnd, SIZE& windowSize);
