@@ -10,6 +10,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> _buffer;
 	UINT _bufferSize;
 	void* _mappedData;
+    DescriptorHeap* _descHeap;
 	DescriptorHandle _descHandle;
 
 public:

@@ -9,6 +9,10 @@ ConstantBuffer::~ConstantBuffer()
 	{
 		_buffer->Unmap(0, nullptr);
 	}
+    if (_descHeap != nullptr && _descHandle.IsValid())
+    {
+        _descHeap->Free(_descHandle);
+    }
 }
 
 void ConstantBuffer::Init(ID3D12Device* device, DescriptorHeap* descHeap, UINT size)
@@ -39,6 +43,7 @@ void ConstantBuffer::Init(ID3D12Device* device, DescriptorHeap* descHeap, UINT s
 		return;
 	}
 
+    _descHeap = descHeap;
 	_descHandle = descHeap->Allocate();
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
