@@ -3,45 +3,35 @@
 #include <map>
 #include <string>
 #include <functional>
+#include <memory>
 #include <DirectXTex.h>
 #include <wrl.h>
 
 #include "Core/GraphicsContext.h"
+#include "Resources/Texture.h"
 
 class TextureLoader
 {
 private:
 
 	Graphics::GraphicsContext* _graphicsContext;
+    class DescriptorHeap* _cbvSrvUavHeap;
 
 	// ロード用テーブル
 	using LoadLamda_t = std::function<HRESULT(const std::wstring& path, DirectX::TexMetadata*, DirectX::ScratchImage&)>;
 	std::map<std::string, LoadLamda_t> _loadLamdaTable;
 
 	// ファイル名パスとリソースのマップテーブル
-	std::map<std::string, ID3D12Resource*> _resourceTable;
+    std::map<std::string, std::shared_ptr<Texture>> _textures;
 
 	// テクスチャローダテーブルの作成
 	void CreateTextureLoaderTable();
 
 	// 指定テクスチャのロード
-	ID3D12Resource* CreateTextureFromFile(const char* texPath);
-
-	// デフォルトテクスチャ
-	Microsoft::WRL::ComPtr<ID3D12Resource> _whiteTexture;
-	Microsoft::WRL::ComPtr<ID3D12Resource> _blackTexture;
-	Microsoft::WRL::ComPtr<ID3D12Resource> _gradationTexture;
-	ID3D12Resource* CreateDefaultTexture(size_t width, size_t height);
-	ID3D12Resource* CreateWhiteTexture();
-	ID3D12Resource* CreateBlackTexture();
-	ID3D12Resource* CreateGrayGradationTexture();
+    std::shared_ptr<Texture> CreateTexture(const char* texPath);
 
 public:
-	void Init(Graphics::GraphicsContext* graphicsContext);
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetTextureByPath(const char* texPath);
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetWhiteTexture() const { return _whiteTexture.Get(); }
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetBlackTexture() const { return _blackTexture.Get(); }
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetGradationTexture() const { return _gradationTexture.Get(); }
+	void Init(Graphics::GraphicsContext* graphicsContext, class DescriptorHeap* descHeap);
+    Texture* GetTexture(const char* texPath);
 
 };

@@ -1,6 +1,7 @@
 ﻿#include "TextureLoader.h"
 #include "Core/d3dx12.h"
 #include "Core/GraphicsContext.h"
+#include "DescriptorHeap/DescriptorHeap.h"
 #include "Utility/StringUtility.h"
 
 using namespace std;
@@ -16,36 +17,6 @@ namespace
 	{
 		size_t idx = path.rfind('.');
 		return path.substr(idx + 1, path.length() - idx - 1);
-	}
-
-	// std::string（マルチバイト文字列）から std::wstring（ワイド文字列）を得る
-	// @param str マルチバイト文字列
-	// @return 変換されたワイド文字列
-	wstring GetWideStringFromString(const string& str)
-	{
-		// 呼び出し１回目（文字列数を得る）
-		auto num1 = MultiByteToWideChar(
-			CP_ACP,
-			MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-			str.c_str(),
-			-1,
-			nullptr,
-			0);
-
-		wstring wstr;		// stringのwchar_t版
-		wstr.resize(num1);	// 得られた文字列数でリサイズ
-
-		// 呼び出し２回目（確保済のwstrに変換文字列をコピー）
-		auto num2 = MultiByteToWideChar(
-			CP_ACP,
-			MB_PRECOMPOSED | MB_ERR_INVALID_CHARS,
-			str.c_str(),
-			-1,
-			&wstr[0],
-			num1);
-
-		assert(num1 == num2);
-		return wstr;
 	}
 }
 
@@ -76,271 +47,117 @@ void TextureLoader::CreateTextureLoaderTable()
 		};
 }
 
-ID3D12Resource* TextureLoader::CreateTextureFromFile(const char* texPath)
+std::shared_ptr<Texture> TextureLoader::CreateTexture(const char* texPath)
 {
-	auto wtexPath = GetWideStringFromString(texPath);	// テクスチャのファイルパス
-	auto ext = GetExtension(texPath);	// 拡張子を取得
-	TexMetadata metadata = {};
-	ScratchImage scratchImage = {};
-	// 読み込める拡張子が存在しない
-	if (_loadLamdaTable.find(ext) == _loadLamdaTable.end())
-	{
-		return nullptr;
-	}
-	auto result = _loadLamdaTable[ext](wtexPath, &metadata, scratchImage);
-	if (FAILED(result))
-	{
-		return nullptr;
-	}
+    auto ext = GetExtension(texPath);
+    // 読み込める拡張子が存在しない
+    if (_loadLamdaTable.find(ext) == _loadLamdaTable.end())
+    {
+        return nullptr;
+    }
 
-	auto image = scratchImage.GetImage(0, 0, 0);	// 生データ抽出
+    auto wtexPath = StringUtility::ToWideString(texPath);
+    TexMetadata metadata = {};
+    ScratchImage scratchImage = {};
+    auto result = _loadLamdaTable[ext](wtexPath, &metadata, scratchImage);
+    if (FAILED(result))
+    {
+        return nullptr;
+    }
 
-#if false
-	// WriteToSubresource で転送する用のヒープ設定
-	D3D12_HEAP_PROPERTIES texHeapProp = CD3DX12_HEAP_PROPERTIES(
-		D3D12_CPU_PAGE_PROPERTY_WRITE_BACK,
-		D3D12_MEMORY_POOL_L0);
-	// リソースの設定
-	D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-		metadata.format,
-		metadata.width,
-		static_cast<UINT>(metadata.height),
-		static_cast<UINT16>(metadata.arraySize),
-		static_cast<UINT16>(metadata.mipLevels));
+    auto* device = _graphicsContext->device->Get();
+    auto* commandList = _graphicsContext->commandContext->GetCommandList();
 
-	// バッファー作成
-	ID3D12Resource* texBuffer = nullptr;
-	result = _device->CreateCommittedResource(
-		&texHeapProp,
-		D3D12_HEAP_FLAG_NONE,
-		&resDesc,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-		nullptr,
-		IID_PPV_ARGS(&texBuffer));
-	if (FAILED(result))
-	{
-		return nullptr;
-	}
+	// 生データ抽出
+    auto image = scratchImage.GetImage(0, 0, 0);
 
-	result = texBuffer->WriteToSubresource(
-		0,
-		nullptr,			// 全領域コピー
-		image->pixels,		// 元データアドレス
-		static_cast<UINT>(image->rowPitch),	// １ラインサイズ
-		static_cast<UINT>(image->slicePitch));	// 全サイズ
-	if (FAILED(result))
-	{
-		return nullptr;
-	}
+    // GPU用テクスチャを作成
+    auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+        metadata.format,
+        metadata.width,
+        static_cast<UINT>(metadata.height),
+        static_cast<UINT16>(metadata.arraySize),
+        static_cast<UINT16>(metadata.mipLevels));
 
-	_resourceTable[texPath] = texBuffer;
-	return texBuffer;
-#else
-	auto* device = _graphicsContext->device->Get();
+    ID3D12Resource* texBuffer = nullptr;
+    result = device->CreateCommittedResource(
+        &texHeapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &texDesc,
+        D3D12_RESOURCE_STATE_COPY_DEST,
+        nullptr,
+        IID_PPV_ARGS(&texBuffer));
+    if (FAILED(result))
+    {
+        return nullptr;
+    }
 
-	// CopyTextureRegion で転送する
-	// GPU用テクスチャを作成
-	auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-	auto texDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-		metadata.format,
-		metadata.width,
-		static_cast<UINT>(metadata.height),
-		static_cast<UINT16>(metadata.arraySize),
-		static_cast<UINT16>(metadata.mipLevels));
+    // 中間アップロード用のバッファを作成
+    auto uploadHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    UINT64 uploadBufferSize = GetRequiredIntermediateSize(texBuffer, 0, 1);
+    auto uploadDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
 
-	ID3D12Resource* texBuffer = nullptr;
-	result = device->CreateCommittedResource(
-		&texHeapProp,
-		D3D12_HEAP_FLAG_NONE,
-		&texDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
-		nullptr,
-		IID_PPV_ARGS(&texBuffer));
-	if (FAILED(result))
-	{
-		return nullptr;
-	}
+    ComPtr<ID3D12Resource> uploadBuffer;
+    result = device->CreateCommittedResource(
+        &uploadHeapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &uploadDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
+    if (FAILED(result))
+    {
+        return nullptr;
+    }
 
-	// 中間アップロード用のバッファを作成
-	auto uploadHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	UINT64 uploadBufferSize = 0;
-	device->GetCopyableFootprints(&texDesc, 0, 1, 0, nullptr, nullptr, nullptr, &uploadBufferSize);
-	auto uploadDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+    // デフォルトヒープにデータ転送
+    D3D12_SUBRESOURCE_DATA subresourceData = {};
+    subresourceData.pData = image->pixels;
+    subresourceData.RowPitch = image->rowPitch;
+    subresourceData.SlicePitch = image->slicePitch;
+    UpdateSubresources(commandList, texBuffer, uploadBuffer.Get(), 0, 0, 1, &subresourceData);
 
-	ComPtr<ID3D12Resource> uploadBuffer;
-	result = device->CreateCommittedResource(
-		&uploadHeapProp,
-		D3D12_HEAP_FLAG_NONE,
-		&uploadDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
-	if (FAILED(result))
-	{
-		return nullptr;
-	}
+    _graphicsContext->commandContext->ResourceBarrier(
+        texBuffer,
+        D3D12_RESOURCE_STATE_COPY_DEST,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	// CPUからアップロードバッファへ書き込む
-	D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
-	UINT numRows;
-	UINT64 rowSizeInBytes;
-	UINT64 totalBytes;
-	device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &totalBytes);
+    _graphicsContext->ExecuteCommand();
+    _graphicsContext->WaitGPU();
+    _graphicsContext->ResetCommand();
 
-	void* mappedData = nullptr;
-	uploadBuffer->Map(0, nullptr, &mappedData);
+    std::wstring name = L"texture";
+    name += wtexPath;
+    texBuffer->SetName(name.c_str());
 
-	// 1ラインずつコピーする（RowPitchのパディング対応）
-	BYTE* destSlice = static_cast<BYTE*>(mappedData) + footprint.Offset;
-	const BYTE* srcSlice = image->pixels;
-	for (UINT y = 0; y < numRows; ++y)
-	{
-		memcpy(destSlice + y * footprint.Footprint.RowPitch,
-			srcSlice + y * image->rowPitch,
-			image->rowPitch);
-	}
-	uploadBuffer->Unmap(0, nullptr);
+    auto texture = make_shared<Texture>();
+    texture->Init(device, _cbvSrvUavHeap, ComPtr<ID3D12Resource>(texBuffer), texDesc.Format);
 
-	// GPU側テクスチャへ転送
-	D3D12_TEXTURE_COPY_LOCATION dst = {};
-	dst.pResource = texBuffer;
-	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-	dst.SubresourceIndex = 0;
-
-	D3D12_TEXTURE_COPY_LOCATION src = {};
-	src.pResource = uploadBuffer.Get();
-	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-	src.PlacedFootprint = footprint;
-
-	_graphicsContext->commandContext->GetCommandList()->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
-
-	_graphicsContext->commandContext->ResourceBarrier(
-		texBuffer,
-		D3D12_RESOURCE_STATE_COPY_DEST,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-	_graphicsContext->ExecuteCommand();
-	_graphicsContext->WaitGPU();
-	_graphicsContext->ResetCommand();
-
-	std::wstring name = L"texture";
-	name += StringUtility::ToWideString(texPath);
-	texBuffer->SetName(name.c_str());
-	_resourceTable[texPath] = texBuffer;
-	return texBuffer;
-#endif
+    return texture;
 }
 
-ID3D12Resource* TextureLoader::CreateDefaultTexture(size_t width, size_t height)
-{
-	auto texHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
-	auto resDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, static_cast<UINT>(height));
-
-	ID3D12Resource* buffer = nullptr;
-	auto result = _graphicsContext->device->Get()->CreateCommittedResource(
-		&texHeapProp,
-		D3D12_HEAP_FLAG_NONE,
-		&resDesc,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-		nullptr,
-		IID_PPV_ARGS(&buffer));
-
-	if (FAILED(result))
-	{
-		assert(SUCCEEDED(result));
-		return nullptr;
-	}
-
-	return buffer;
-}
-
-ID3D12Resource* TextureLoader::CreateWhiteTexture()
-{
-	ID3D12Resource* whiteBuffer = CreateDefaultTexture(4, 4);
-
-	vector<unsigned char> data(4 * 4 * 4);
-	fill(data.begin(), data.end(), 0xff);	// 全て255で埋める
-	// データ転送
-	auto result = whiteBuffer->WriteToSubresource(
-		0,
-		nullptr,
-		data.data(),
-		4 * 4,
-		static_cast<UINT>(data.size()));
-
-	assert(SUCCEEDED(result));
-
-	whiteBuffer->SetName(L"white_texture");
-	return whiteBuffer;
-}
-
-ID3D12Resource* TextureLoader::CreateBlackTexture()
-{
-	ID3D12Resource* blackBuffer = CreateDefaultTexture(4, 4);
-
-	vector<unsigned char> data(4 * 4 * 4);
-	fill(data.begin(), data.end(), 0x00);	// 全て0で埋める
-	// データ転送
-	auto result = blackBuffer->WriteToSubresource(
-		0,
-		nullptr,
-		data.data(),
-		4 * 4,
-		static_cast<UINT>(data.size()));
-
-	assert(SUCCEEDED(result));
-
-	blackBuffer->SetName(L"black_texture");
-	return blackBuffer;
-}
-
-ID3D12Resource* TextureLoader::CreateGrayGradationTexture()
-{
-	ID3D12Resource* gradBuffer = CreateDefaultTexture(4, 256);
-
-	// 上が白くて下が黒いテクスチャデータを作成
-	vector<unsigned int> data(4 * 256);
-	auto iterator = data.begin();
-	unsigned int c = 0xff;
-	for (; iterator != data.end(); iterator += 4)
-	{
-		auto color = (c << 0xff) | (c << 16) | (c << 8) | c;
-		fill(iterator, iterator + 4, color);
-		--c;
-	}
-
-	auto result = gradBuffer->WriteToSubresource(
-		0,
-		nullptr,
-		data.data(),
-		4 * sizeof(unsigned int),
-		sizeof(unsigned int) * static_cast<UINT>(data.size()));
-
-	assert(SUCCEEDED(result));
-
-	gradBuffer->SetName(L"gray_gradation_texture");
-	return gradBuffer;
-}
-
-void TextureLoader::Init(Graphics::GraphicsContext* graphicsContext)
+void TextureLoader::Init(Graphics::GraphicsContext* graphicsContext, DescriptorHeap* descHeap)
 {
 	_graphicsContext = graphicsContext;
+    _cbvSrvUavHeap = descHeap;
 
 	CreateTextureLoaderTable();
-	_whiteTexture = CreateWhiteTexture();
-	_blackTexture = CreateBlackTexture();
-	_gradationTexture = CreateGrayGradationTexture();
 }
 
-ComPtr<ID3D12Resource> TextureLoader::GetTextureByPath(const char* texPath)
+Texture* TextureLoader::GetTexture(const char* texPath)
 {
-	auto it = _resourceTable.find(texPath);
-	if (it != _resourceTable.end()) {
-		//テーブルに内にあったらロードするのではなくマップ内の
-		//リソースを返す
-		return _resourceTable[texPath];
-	}
-	else {
-		return ComPtr<ID3D12Resource>(CreateTextureFromFile(texPath));
-	}
+    auto it = _textures.find(texPath);
+    if (it != _textures.end())
+    {
+        //テーブルに内にあったらロードするのではなくマップ内の
+        //リソースを返す
+        return _textures[texPath].get();
+    }
+    else
+    {
+        auto texture = CreateTexture(texPath);
+        _textures[texPath] = texture;
+        return texture.get();
+    }
 }

@@ -77,7 +77,7 @@ namespace Graphics
 			renderTargets[i]->InitFromSwapChain(&device, &swapChain, *rtv_heap, buckBuffer_clearColor, i);
 		}
 
-		textureLoader.Init(&graphicsContext);
+		textureLoader.Init(&graphicsContext, cbv_srv_uav_heap.get());
 		scene2DRenderers.clear();
 		scene3DRenderers.clear();
 
@@ -433,11 +433,10 @@ namespace Graphics
 				return;
 			}
 			ImportMeshData& meshDataSrc = meshDataList[0];
-			ComPtr<ID3D12Resource> textureRes = nullptr;
 			if (materialDataList.size() > 0 &&
 				materialDataList[meshDataSrc.materialIndex].useDiffuseTexture)
 			{
-				textureRes = textureLoader.GetTextureByPath(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
+                auto texture = GetTexture(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
 			}
 		}
 	}
@@ -503,16 +502,9 @@ namespace Graphics
 		return constantBuffer.release();
 	}
 
-	Texture* GraphicsEngine::GetTexture(const std::string& path)
+    Texture* GraphicsEngine::GetTexture(const std::string& path)
 	{
-		auto texture = std::make_unique<Texture>();
-		auto res = textureLoader.GetTextureByPath(path.c_str());
-		if (res == nullptr)
-		{
-			res = textureLoader.GetWhiteTexture();
-		}
-		texture->Init(device.Get(), cbv_srv_uav_heap.get(), res.Get(), res->GetDesc().Format);
-		return texture.release();
+		return textureLoader.GetTexture(path.c_str());
 	}
 
     void GraphicsEngine::InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize)
