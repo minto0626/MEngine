@@ -68,8 +68,8 @@ namespace Graphics
 		const std::string worldMatParamName = "worldMat";
         const std::string shadowMapParamName = "shadowMap";
 
-        ConstantBuffer* canvasCB = nullptr;
-        ConstantBuffer* sceneCB = nullptr;
+        std::shared_ptr<ConstantBuffer> canvasCB = nullptr;
+        std::shared_ptr<ConstantBuffer> sceneCB = nullptr;
 
         Microsoft::WRL::ComPtr<IDXGIFactory6> CreateDXGIFactory();
 
@@ -81,7 +81,7 @@ namespace Graphics
 		Mesh* GetMesh(const std::wstring& path);
 		Material* GetMaterial(const std::string& name);
 		UINT GetRootParameterIndex(const std::string& name, const Material& mat);
-		ConstantBuffer* CreateConstantBuffer(size_t size);
+        std::shared_ptr<ConstantBuffer> CreateConstantBuffer(size_t size);
 		Texture* GetTexture(const std::string& path);
         void InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize);
         void UpdateSceneConstantBuffer(void* buffer, UINT size);

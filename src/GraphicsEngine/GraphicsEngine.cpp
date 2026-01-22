@@ -495,11 +495,11 @@ namespace Graphics
 		return rootSignature->GetRootIndex(name);
 	}
 
-	ConstantBuffer* GraphicsEngine::CreateConstantBuffer(size_t size)
+    std::shared_ptr<ConstantBuffer> GraphicsEngine::CreateConstantBuffer(size_t size)
 	{
-		auto constantBuffer = std::make_unique<ConstantBuffer>();
+		auto constantBuffer = std::make_shared<ConstantBuffer>();
 		constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), size);
-		return constantBuffer.release();
+		return constantBuffer;
 	}
 
     Texture* GraphicsEngine::GetTexture(const std::string& path)

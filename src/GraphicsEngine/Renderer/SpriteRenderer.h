@@ -4,6 +4,8 @@
 #include "Material/Material.h"
 #include "Resources/ConstantBuffer.h"
 
+#include <memory>
+
 namespace Graphics
 {
 	class SpriteRenderer : public Renderer
@@ -11,7 +13,7 @@ namespace Graphics
 	private:
 		Sprite* _sprite;
 		UINT _transformCBRootParamIndex;
-		ConstantBuffer* _transformCB;
+		std::shared_ptr<ConstantBuffer> _transformCB;
 
 	public:
 		SpriteRenderer(class GameObject* owner, int updateOrder = 100);

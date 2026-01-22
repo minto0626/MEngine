@@ -7,7 +7,7 @@ namespace Graphics
 	{
 	}
 
-	void Material::SetConstantBuffer(UINT rootIndex, ConstantBuffer* constantBuffer)
+	void Material::SetConstantBuffer(UINT rootIndex, std::shared_ptr<ConstantBuffer> constantBuffer)
 	{
 		_constantBuffers[rootIndex] = constantBuffer;
 	}

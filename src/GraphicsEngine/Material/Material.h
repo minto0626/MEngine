@@ -6,6 +6,7 @@
 #include "MaterialDesc.h"
 
 #include <unordered_map>
+#include <memory>
 
 namespace Graphics
 {
@@ -15,7 +16,7 @@ namespace Graphics
 		UINT64 _instanceID;
 		MaterialDesc _desc;
 		PipelineState* _pipelineState = nullptr;
-		std::unordered_map<UINT, ConstantBuffer*> _constantBuffers;
+        std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> _constantBuffers;
 		std::unordered_map<UINT, Texture*> _textures;
 
 	public:
@@ -25,7 +26,7 @@ namespace Graphics
 		void SetPipelineState(const MaterialDesc& desc, PipelineState* pipelineState) { _desc = desc; _pipelineState = pipelineState; }
 		const MaterialDesc& GetDesc() const { return _desc; }
 		PipelineState* GetPipelineState() const { return _pipelineState; }
-		void SetConstantBuffer(UINT rootIndex, ConstantBuffer* constantBuffer);
+		void SetConstantBuffer(UINT rootIndex, std::shared_ptr<ConstantBuffer> constantBuffer);
 		void SetTexture(UINT rootIndex, Texture* texture);
 
 		void UploadConstantBuffer(UINT rootIndex, const void* data, UINT size);
