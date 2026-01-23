@@ -472,6 +472,11 @@ namespace Graphics
 
 	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
 	{
+        if (meshes.find(path) != meshes.end())
+        {
+            return meshes[path].get();
+        }
+
 		std::vector<ImportMeshData> meshDataList;
 		std::vector<ImportMaterialData> materialDataList;
 		if (!modelImporter.Load(path.c_str(), meshDataList, materialDataList))
@@ -486,7 +491,9 @@ namespace Graphics
 		meshData.indices = meshDataSrc.indices;
 		auto mesh = std::make_unique<Mesh>();
 		mesh->Initialize(device.Get(), commandContext, meshData);
-		return mesh.release();
+        auto ptr = mesh.get();
+        meshes[path] = std::move(mesh);
+		return ptr;
 	}
 
 	Material* GraphicsEngine::GetMaterial(const std::string& name)

@@ -61,6 +61,7 @@ namespace Graphics
 		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;
 		std::unique_ptr<MaterialRegistry> materialRegistry;
         std::unordered_map<std::string, std::unique_ptr<Sprite>> sprites;
+        std::unordered_map<std::wstring, std::unique_ptr<Mesh>> meshes;
 
 		std::vector<Renderer*> scene2DRenderers;
 		std::vector<Renderer*> scene3DRenderers;
