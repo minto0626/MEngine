@@ -27,6 +27,9 @@ void AssimpModelImporter::SetDirectoryAndLoadDll()
 #endif
 		SetDllDirectoryA(rootPathStr.c_str());
 		LoadLibraryExA(dllName.c_str(), NULL, NULL);
+
+        free(rootPath);
+        rootPath = nullptr;
 	}
 }
 
