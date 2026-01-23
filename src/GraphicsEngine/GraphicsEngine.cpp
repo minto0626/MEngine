@@ -443,7 +443,11 @@ namespace Graphics
 
 	Sprite* GraphicsEngine::GetSprite(const std::string& path)
 	{
-		// todo: pathで指定されたSpriteを読み込む
+        if (sprites.find(path) != sprites.end())
+        {
+            return sprites[path].get();
+        }
+
 		SpriteData spriteData;
 		auto width = 100.0f;
 		auto height = 100.0f;
@@ -461,7 +465,9 @@ namespace Graphics
 		};
 		auto sprite = std::make_unique<Sprite>();
 		sprite->Initialize(device.Get(), commandContext, spriteData);
-		return sprite.release();
+        auto ptr = sprite.get();
+        sprites[path] = std::move(sprite);
+		return ptr;
 	}
 
 	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
