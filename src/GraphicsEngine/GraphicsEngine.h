@@ -84,9 +84,9 @@ namespace Graphics
 		Mesh* GetMesh(const std::wstring& path);
 		Material* GetMaterial(const std::string& name);
 		UINT GetRootParameterIndex(const std::string& name, const Material& mat);
-        std::shared_ptr<ConstantBuffer> CreateConstantBuffer(size_t size);
+        std::shared_ptr<ConstantBuffer> CreateConstantBuffer(UINT size);
 		Texture* GetTexture(const std::string& path);
-        void InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize);
+        void InitSceneConstantBuffers(UINT canvasDataSize, UINT sceneDataSize);
         void UpdateSceneConstantBuffer(void* buffer, UINT size);
         void UpdateCanvasConstantBuffer(void* buffer, UINT size);
 		void RegisterSpriteRenderer(SpriteRenderer* spriteRenderer);

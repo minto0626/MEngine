@@ -508,7 +508,7 @@ namespace Graphics
 		return rootSignature->GetRootIndex(name);
 	}
 
-    std::shared_ptr<ConstantBuffer> GraphicsEngine::CreateConstantBuffer(size_t size)
+    std::shared_ptr<ConstantBuffer> GraphicsEngine::CreateConstantBuffer(UINT size)
 	{
 		auto constantBuffer = std::make_shared<ConstantBuffer>();
 		constantBuffer->Init(device.Get(), cbv_srv_uav_heap.get(), size);
@@ -520,7 +520,7 @@ namespace Graphics
 		return textureLoader.GetTexture(path.c_str());
 	}
 
-    void GraphicsEngine::InitSceneConstantBuffers(size_t canvasDataSize, size_t sceneDataSize)
+    void GraphicsEngine::InitSceneConstantBuffers(UINT canvasDataSize, UINT sceneDataSize)
     {
         canvasCB = CreateConstantBuffer(canvasDataSize);
         sceneCB = CreateConstantBuffer(sceneDataSize);
@@ -738,9 +738,11 @@ namespace Graphics
         // GUIテスト描画
         MEngine::GUI()->NewFrame();
         static GameObject* selectGameObject = nullptr;
-        MEngine::GUI()->DrawHierarchyWindow(Vector2(0, 0), Vector2((renderTarget->GetWidth()) * 0.25, (renderTarget->GetHeight())), *scene, selectGameObject);
-        MEngine::GUI()->DrawSceneViewWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.75, 0), Vector2((renderTarget->GetWidth() - 32) * 0.5, (renderTarget->GetHeight() - 32) * 0.5), postProcessRenderTarget->GetColorTexture()->GetSRV());
-        MEngine::GUI()->DrawInspectorWindow(Vector2(renderTarget->GetWidth() - renderTarget->GetWidth() * 0.25, 0), Vector2(renderTarget->GetWidth() * 0.25, renderTarget->GetHeight()), selectGameObject);
+        float screen_width = static_cast<float>(renderTarget->GetWidth());
+        float screen_height = static_cast<float>(renderTarget->GetHeight());
+        MEngine::GUI()->DrawHierarchyWindow(Vector2(0.0f, 0.0f), Vector2(screen_width * 0.25f, screen_height), *scene, selectGameObject);
+        MEngine::GUI()->DrawSceneViewWindow(Vector2(screen_width - screen_width * 0.75f, 0.0f), Vector2((screen_width - 32.0f) * 0.5f, (screen_height - 32.0f) * 0.5f), postProcessRenderTarget->GetColorTexture()->GetSRV());
+        MEngine::GUI()->DrawInspectorWindow(Vector2(screen_width - screen_width * 0.25f, 0.0f), Vector2(screen_width * 0.25f, screen_height), selectGameObject);
         MEngine::GUI()->Render(&commandContext, cbv_srv_uav_heap.get());
 
         graphicsContext.TransitionRenderTargetToPresent(renderTarget);
