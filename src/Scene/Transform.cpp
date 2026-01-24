@@ -5,6 +5,8 @@
 
 using namespace DirectX;
 
+static_assert(alignof(Transform) >= 16, "Transform must be 16-byte aligned!");
+
 Transform::Transform(GameObject* owner, int updateOrder) :
 	Component(owner, updateOrder),
 	_pos(0.0f, 0.0f, 0.0f),
@@ -64,28 +66,4 @@ std::string Transform::ToString() const
 	ss << "rot: " << _rot.ToString() << "(degrees)\n";
 	ss << "scale: " << _scale.ToString() << "\n";
 	return ss.str();
-}
-
-void* Transform::operator new(size_t size)
-{
-	void* ptr = _aligned_malloc(size, 16);
-	if (ptr == nullptr) throw std::bad_alloc();
-	return ptr;
-}
-
-void Transform::operator delete(void* ptr)
-{
-	if (ptr != nullptr) _aligned_free(ptr);
-}
-
-void* Transform::operator new[](size_t size)
-{
-	void* ptr = _aligned_malloc(size, 16);
-	if (ptr == nullptr) throw std::bad_alloc();
-	return ptr;
-}
-
-void Transform::operator delete[](void* ptr)
-{
-	if (ptr != nullptr) _aligned_free(ptr);
 }

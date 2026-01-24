@@ -5,7 +5,7 @@
 
 #include <string>
 
-class Transform : public Component
+class alignas(16) Transform : public Component
 {
 private:
 	Vector3 _pos;
@@ -34,10 +34,6 @@ public:
 
 	Vector3 TransformPoint(const Vector3& point);
 	Vector3 TrasnformDirection(const Vector3& dir);
-	std::string ToString()const;
+	std::string ToString() const;
 
-	void* operator new(size_t size);
-	void operator delete(void* ptr);
-	void* operator new[](size_t size);
-	void operator delete[](void* ptr);
 };
