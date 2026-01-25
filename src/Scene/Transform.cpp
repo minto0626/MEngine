@@ -17,6 +17,21 @@ Transform::Transform(GameObject* owner, int updateOrder) :
 {
 }
 
+void Transform::OnDestroy()
+{
+    // 親から外す
+    SetParent(nullptr);
+    // 子供の親を外す
+    for (auto* child : _children)
+    {
+        if (child->_owner != nullptr)
+        {
+            child->_owner->SetState(GameObject::State::Dead);
+        }
+    }
+    _children.clear();
+}
+
 void Transform::MarkDirty()
 {
     _isDirty = true;
@@ -89,7 +104,10 @@ void Transform::SetParent(Transform* parent, TransformSpace space)
     if (_parent != nullptr)
     {
         auto& siblings = _parent->_children;
-        siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
+        if (siblings.size() > 0)
+        {
+            siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
+        }
     }
 
     // 新しい親を設定

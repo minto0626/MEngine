@@ -33,6 +33,7 @@ public:
 
 public:
 	Transform(class GameObject* owner, int updateOrder = 100);
+    void OnDestroy() override;
 
     void SetPos(const Vector3& pos) { _pos = pos; MarkDirty(); }
 	void SetRot(const Quaternion& rot) { _rot = rot; MarkDirty(); }
