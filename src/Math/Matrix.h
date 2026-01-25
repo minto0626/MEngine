@@ -67,6 +67,48 @@ public:
         return Matrix(result);
     }
 
+    Matrix Inverse() const
+    {
+        DirectX::XMMATRIX m = DirectX::XMLoadFloat4x4(&mat);
+        DirectX::XMVECTOR det;
+        DirectX::XMMATRIX inv = DirectX::XMMatrixInverse(&det, m);
+
+        float detVal = DirectX::XMVectorGetX(det);
+        if (std::fabsf(detVal) < 1e-6f)
+        {
+            // 非可逆行列の場合、単位行列を返す
+            return Matrix::Identity();
+        }
+
+        DirectX::XMFLOAT4X4 result;
+        DirectX::XMStoreFloat4x4(&result, inv);
+        return Matrix(result);
+    }
+
+    bool Decomose(Vector3& outPosition, Quaternion& outRotation, Vector3& outScale) const
+    {
+        DirectX::XMVECTOR scale, rotation, translation;
+        DirectX::XMMATRIX m = DirectX::XMLoadFloat4x4(&mat);
+        bool result = DirectX::XMMatrixDecompose(&scale, &rotation, &translation, m);
+        if (!result)
+        {
+            outPosition = Vector3::Zero();
+            outRotation = Quaternion::Identity();
+            outScale = Vector3::One();
+            return false;
+        }
+
+        DirectX::XMFLOAT3 scaleF3, translationF3;
+        DirectX::XMStoreFloat3(&scaleF3, scale);
+        DirectX::XMStoreFloat3(&translationF3, translation);
+
+        outPosition = Vector3(translationF3);
+        outRotation = Quaternion(rotation);
+        outScale = Vector3(scaleF3);
+
+        return true;
+    }
+
     Vector3 TransformPoint(const Vector3& point) const
     {
         DirectX::XMMATRIX m = DirectX::XMLoadFloat4x4(&mat);
@@ -116,6 +158,13 @@ public:
     DirectX::XMMATRIX ToXMMatrix() const { return DirectX::XMLoadFloat4x4(&mat); }
 
 public:
+    static Matrix Identity()
+    {
+        Matrix m;
+        m.SetIdentity();
+        return m;
+    }
+
     static Matrix Scaling(float sx, float sy, float sz)
     {
         Matrix m;

@@ -17,16 +17,44 @@ Transform::Transform(GameObject* owner, int updateOrder) :
 {
 }
 
-void Transform::UpdateMatrix()
+void Transform::MarkDirty()
 {
-	if (!_isDirty) { return; }
+    _isDirty = true;
+    MarkChildrenDirty();
+}
 
-	Matrix scaleMatrix = Matrix::Scaling(_scale.GetX(), _scale.GetY(), _scale.GetZ());
-	Matrix rotMatrix = Matrix::RotationQuaternion(_rot);
-	Matrix transMatrix = Matrix::Translation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
-	_world = scaleMatrix * rotMatrix * transMatrix;
+void Transform::MarkChildrenDirty()
+{
+    for (auto* child : _children)
+    {
+        child->_isDirty = true;
+        child->MarkChildrenDirty();
+    }
+}
 
-	_isDirty = false;
+void Transform::UpdateWorldMatrix()
+{
+    // 変更がなければ何もしない
+    if (!_isDirty)
+    {
+        return;
+    }
+
+    Matrix localMatrix =
+        Matrix::Scaling(_scale.GetX(), _scale.GetY(), _scale.GetZ()) *
+        Matrix::RotationQuaternion(_rot) *
+        Matrix::Translation(_pos.GetX(), _pos.GetY(), _pos.GetZ());
+
+    // 親がいる場合は親のワールド行列を掛ける
+    _world = _parent != nullptr ? localMatrix * _parent->GetWorldMatrix() : localMatrix;
+
+    _isDirty = false;
+
+    // 子供の行列も更新
+    for (auto* child : _children)
+    {
+        child->UpdateWorldMatrix();
+    }
 }
 
 Vector3 Transform::GetForward() const
@@ -44,15 +72,58 @@ Vector3 Transform::GetUp() const
 	return _rot.Rotate(Vector3(0.0f, 1.0f, 0.0f));
 }
 
+void Transform::SetParent(Transform* parent, TransformSpace space)
+{
+    if (parent == this)
+    {
+        // 自分自身を親に設定しようとした場合は無視
+        return;
+    }
+    if (_parent == parent)
+    {
+        // すでに同じ親が設定されている場合は無視
+        return;
+    }
+
+    // すでに親がいる場合は、現在の親から外す
+    if (_parent != nullptr)
+    {
+        auto& siblings = _parent->_children;
+        siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
+    }
+
+    // 新しい親を設定
+    _parent = parent;
+
+    // 新しい親の子リストに追加
+    if (_parent != nullptr)
+    {
+        _parent->_children.push_back(this);
+    }
+
+    if (space == TransformSpace::KeepWorld)
+    {
+        Matrix parentWorld = parent != nullptr ? parent->GetWorldMatrix() : Matrix::Identity();
+        Matrix worldMatrix = GetWorldMatrix();
+        Matrix localWorld = worldMatrix * parentWorld.Inverse();
+
+        // ローカル変換を抽出
+        auto ret = localWorld.Decomose(_pos, _rot, _scale);
+    }
+
+    MarkDirty();
+    UpdateWorldMatrix();
+}
+
 Vector3 Transform::TransformPoint(const Vector3& point)
 {
-	UpdateMatrix();
+	UpdateWorldMatrix();
 	return _world.TransformPoint(point);
 }
 
 Vector3 Transform::TrasnformDirection(const Vector3& dir)
 {
-	UpdateMatrix();
+	UpdateWorldMatrix();
 	XMVECTOR v = dir.ToXMVECTOR();
 	XMFLOAT3 ret;
 	XMStoreFloat3(&ret, XMVector3TransformNormal(v, _world.ToXMMatrix()));
