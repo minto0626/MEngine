@@ -77,7 +77,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
     // スプライト
     {
-        auto obj = _scene->CreateGameObject("猫");
+        auto obj = _scene->CreateGameObject("cat");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ 1920 - 64, 1080 - 64, 0.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 0.0f, 0.0f));
@@ -94,7 +94,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 
 	// メッシュ
     {
-        auto obj = _scene->CreateGameObject("ティーポット");
+        auto obj = _scene->CreateGameObject("tea_pot");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
 	    auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
@@ -107,7 +107,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 		meshRenderer->SetMaterial(material);
     }
     {
-        auto obj = _scene->CreateGameObject("キューブ");
+        auto obj = _scene->CreateGameObject("cube");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ 2.0f, 1.0f, 2.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 45.0f, 0.0f));
@@ -121,7 +121,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         meshRenderer->SetMaterial(material);
     }
     {
-        auto obj = _scene->CreateGameObject("馬の像");
+        auto obj = _scene->CreateGameObject("horse_statue");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ -2.0f, 0.0f, -2.0f });
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
@@ -134,7 +134,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         meshRenderer->SetMaterial(material);
     }
     {
-        auto obj = _scene->CreateGameObject("おもちゃのアヒル");
+        auto obj = _scene->CreateGameObject("rubber_duck");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ 3.0f, 0.0f, -3.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 30.0f, 0.0f));
@@ -148,7 +148,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         meshRenderer->SetMaterial(material);
     }
     {
-        auto obj = _scene->CreateGameObject("ラウンジチェア");
+        auto obj = _scene->CreateGameObject("lounge_chair");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ -4.0f, 0.0f, 1.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, -20.0f, 0.0f));
@@ -162,7 +162,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         meshRenderer->SetMaterial(material);
     }
     {
-        auto obj = _scene->CreateGameObject("床");
+        auto obj = _scene->CreateGameObject("checker_floar");
         sample_objects.push_back(obj);
         obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
@@ -173,6 +173,17 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
         material->SetTexture(texIdx, texture);
         meshRenderer->SetMaterial(material);
+    }
+
+    // 親を設定する実験
+    {
+        auto obj1 = sample_objects[5];
+        auto obj2 = sample_objects[1];
+        auto obj3 = sample_objects[2];
+        auto obj4 = sample_objects[3];
+        obj2->GetTransform()->SetParent(obj1->GetTransform());
+        obj4->GetTransform()->SetParent(obj1->GetTransform());
+        obj3->GetTransform()->SetParent(obj2->GetTransform());
     }
 
     for (auto& obj : sample_objects)

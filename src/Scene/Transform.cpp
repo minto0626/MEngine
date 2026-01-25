@@ -133,6 +133,15 @@ void Transform::SetParent(Transform* parent, TransformSpace space)
     UpdateWorldMatrix();
 }
 
+Transform* Transform::GetChild(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(_children.size()))
+    {
+        return nullptr;
+    }
+    return _children[index];
+}   
+
 Vector3 Transform::TransformPoint(const Vector3& point)
 {
 	UpdateWorldMatrix();

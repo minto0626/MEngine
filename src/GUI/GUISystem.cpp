@@ -99,6 +99,8 @@ void GUISystem::DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size, Sce
     ImGui::SetNextWindowPos(ImVec2(window_pos.GetX(), window_pos.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(window_size.GetX(), window_size.GetY()), ImGuiCond_::ImGuiCond_Always);
     ImGui::Begin("Hierarchy");
+
+    // 再帰的にノードを描画する関数
     std::function<void(GameObject*)> drawNode = [&](GameObject* gameObject)
     {
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -106,8 +108,7 @@ void GUISystem::DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size, Sce
         {
             flags |= ImGuiTreeNodeFlags_Selected;
         }
-        // todo: 子オブジェクト対応
-        bool hasChildren = false/*gameObject.GetChildren().size() > 0*/;
+        bool hasChildren = gameObject->GetTransform()->GetChildCount() > 0;
         if (!hasChildren)
         {
             flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
@@ -119,17 +120,23 @@ void GUISystem::DrawHierarchyWindow(Vector2 window_pos, Vector2 window_size, Sce
         }
         if (nodeOpen && hasChildren)
         {
-            // todo: 子オブジェクト対応
-            //for (auto& child : gameObject.GetChildren())
-            //{
-            //    drawNode(*child);
-            //}
+            for (int i = 0; i < gameObject->GetTransform()->GetChildCount(); ++i)
+            {
+                auto child = gameObject->GetTransform()->GetChild(i);
+                drawNode(child->GetGameObject());
+            }
             ImGui::TreePop();
         }
     };
 
+    // ルートノードのみ描画
     for (auto& rootGameObject : scene.GetAllGameObjects())
     {
+        // 親を持たないものがルートノード
+        if (rootGameObject->GetTransform()->GetParent() != nullptr)
+        {
+            continue;
+        }
         drawNode(rootGameObject.get());
     }
 

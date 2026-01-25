@@ -49,6 +49,9 @@ public:
 	Vector3 GetUp() const;
 
     void SetParent(Transform* parent, TransformSpace space = TransformSpace::KeepWorld);
+    Transform* GetParent() const { return _parent; }
+    int GetChildCount() const { return static_cast<int>(_children.size()); }
+    Transform* GetChild(int index) const;
 
 	Vector3 TransformPoint(const Vector3& point);
 	Vector3 TrasnformDirection(const Vector3& dir);
