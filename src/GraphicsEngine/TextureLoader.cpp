@@ -28,6 +28,7 @@ void TextureLoader::CreateTextureLoaderTable()
 		= _loadLamdaTable["bmp"]
 		= _loadLamdaTable["png"]
 		= _loadLamdaTable["jpg"]
+        = _loadLamdaTable["jpeg"]
 		= [](const wstring& path, TexMetadata* meta, ScratchImage& image)
 		-> HRESULT
 		{

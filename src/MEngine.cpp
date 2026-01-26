@@ -66,13 +66,13 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         camera3D = _scene->CreateGameObject("Camera3D")->AddComponent<Camera>();
         camera3D->Init(Camera::ProjectionType::Perspective, windowSize.cx, windowSize.cy);
-        camera3D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 5.0f, -10.0f });
+        camera3D->GetGameObject()->GetTransform()->SetPos({ 0.0f, 7.5f, -11.0f });
         camera3D->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(30.0f, 0.0f, 0.0f));
     }
     // ライト
     {
         directionalLight = _scene->CreateGameObject("DirectionalLight")->AddComponent<Light>();
-        directionalLight->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(45.0f, 45.0f, 0.0f));
+        directionalLight->GetGameObject()->GetTransform()->SetRot(Quaternion::FromEulerAngles(45.0f, -45.0f, 0.0f));
     }
 
     // スプライト
@@ -96,7 +96,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("tea_pot");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
+        obj->GetTransform()->SetPos({ 2.0f, 0.0f, 0.0f });
 	    auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
 	    auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/teapot/teapot.fbx");
 	    meshRenderer->SetMesh(mesh);
@@ -109,7 +109,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("cube");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ 2.0f, 1.0f, 2.0f });
+        obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 45.0f, 0.0f));
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/cube/cube.fbx");
@@ -123,7 +123,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("horse_statue");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ -2.0f, 0.0f, -2.0f });
+        obj->GetTransform()->SetPos({ 0.0f, 0.0f, 0.0f });
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/horse/horse_statue_01.fbx");
         meshRenderer->SetMesh(mesh);
@@ -136,7 +136,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("rubber_duck");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ 3.0f, 0.0f, -3.0f });
+        obj->GetTransform()->SetPos({ 3.0f, 0.0f, -1.5f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, 30.0f, 0.0f));
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/duck_toy/rubber_duck_toy.fbx");
@@ -150,7 +150,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
     {
         auto obj = _scene->CreateGameObject("lounge_chair");
         sample_objects.push_back(obj);
-        obj->GetTransform()->SetPos({ -4.0f, 0.0f, 1.0f });
+        obj->GetTransform()->SetPos({ -5.0f, 0.0f, 1.0f });
         obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, -20.0f, 0.0f));
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/chair/mid_century_lounge_chair.fbx");
@@ -174,16 +174,85 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         material->SetTexture(texIdx, texture);
         meshRenderer->SetMaterial(material);
     }
-
-    // 親を設定する実験
     {
-        auto obj1 = sample_objects[5];
+        auto obj = _scene->CreateGameObject("roza");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ -2.0f, 0.0f, 5.0f });
+        obj->GetTransform()->SetRot(Quaternion::FromEulerAngles(0.0f, -30.0f, 0.0f));
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/scene.gltf");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("roza");
+        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/textures/defaultMat_diffuse.jpeg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("marble_bust_01");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 5.0f, 0.0f, 4.0f });
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/marble_bust_01/marble_bust_01.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("marble_bust_01");
+        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/marble_bust_01/textures/marble_bust_01_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("potted_plant_04");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 5.0f, 0.0f, -3.0f });
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/potted_plant_04/potted_plant_04.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("potted_plant_04");
+        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/potted_plant_04/textures/potted_plant_04_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("round_wooden_table_01");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ -2.0f, 0.0f, -4.0f });
+        auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
+        auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/round_wooden_table_01/round_wooden_table_01.fbx");
+        meshRenderer->SetMesh(mesh);
+        Graphics::Material* material = graphicsEngine.GetMaterial("round_wooden_table_01");
+        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/round_wooden_table_01/textures/round_wooden_table_01_diff.jpg");
+        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
+        material->SetTexture(texIdx, texture);
+        meshRenderer->SetMaterial(material);
+    }
+    {
+        auto obj = _scene->CreateGameObject("root_object");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 0.0f, 3.0f, 0.0f });
+    }
+    {
+        auto obj = _scene->CreateGameObject("table_top_root");
+        sample_objects.push_back(obj);
+        obj->GetTransform()->SetPos({ 0.0f, 1.0f, 0.0f });
+    }
+
+    // 親を設定する
+    {
+        // root_objectにcube, cubeにtea_potをぶら下げる
+        auto obj1 = sample_objects[11];
         auto obj2 = sample_objects[1];
         auto obj3 = sample_objects[2];
-        auto obj4 = sample_objects[3];
-        obj2->GetTransform()->SetParent(obj1->GetTransform());
-        obj4->GetTransform()->SetParent(obj1->GetTransform());
-        obj3->GetTransform()->SetParent(obj2->GetTransform());
+        obj3->GetTransform()->SetParent(obj1->GetTransform());
+        obj2->GetTransform()->SetParent(obj3->GetTransform());
+
+        // round_wooden_table_01にtable_top_root, table_top_rootにhorse_statueをぶら下げる
+        auto obj4 = sample_objects[12];
+        auto obj5 = sample_objects[10];
+        auto obj6 = sample_objects[3];
+        obj4->GetTransform()->SetParent(obj5->GetTransform());
+        obj6->GetTransform()->SetParent(obj4->GetTransform());
     }
 
     for (auto& obj : sample_objects)

@@ -367,6 +367,66 @@ namespace Graphics
             };
             materialRegistry->Register("floor_mat", materialDesc);
         }
+        // 女の像
+        {
+            MaterialDesc materialDesc =
+            {
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRTVFormats,
+                basic3DRootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("roza", materialDesc);
+        }
+        // 大理石の胸像
+        {
+            MaterialDesc materialDesc =
+            {
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRTVFormats,
+                basic3DRootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("marble_bust_01", materialDesc);
+        }
+        // 植物
+        {
+            MaterialDesc materialDesc =
+            {
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRTVFormats,
+                basic3DRootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("potted_plant_04", materialDesc);
+        }
+        // 木製テーブル
+        {
+            MaterialDesc materialDesc =
+            {
+                basic3DVSPath,
+                basic3DPSPath,
+                basic3DInputElements,
+                basic3DRTVFormats,
+                basic3DRootDesc,
+                BlendPreset::Opaque,
+                RasterizerPreset::CullBack,
+                DepthStencilPreset::DepthEnable,
+            };
+            materialRegistry->Register("round_wooden_table_01", materialDesc);
+        }
         // ポストプロセス
         {
             MaterialDesc materialDesc =
