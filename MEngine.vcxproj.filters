@@ -62,6 +62,9 @@
     <Filter Include="src\GUI">
       <UniqueIdentifier>{d0f771ff-51ad-40b5-9c5e-c2d95fe68ae6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Library\nlohmann_json">
+      <UniqueIdentifier>{7b4dc310-2827-457c-a807-37b8e16aed07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon\ME_icon.ico">
@@ -254,6 +257,9 @@
     </ClInclude>
     <ClInclude Include="src\GUI\GUISystem.h">
       <Filter>src\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\nlohmann_json\json.hpp">
+      <Filter>src\Library\nlohmann_json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

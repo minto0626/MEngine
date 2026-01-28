@@ -160,6 +160,7 @@
     <ClInclude Include="src\Library\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\Library\imgui\imstb_textedit.h" />
     <ClInclude Include="src\Library\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Library\nlohmann_json\json.hpp" />
     <ClInclude Include="src\ModelImporter.h" />
     <ClInclude Include="src\AssimpImporter.h" />
     <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h" />
