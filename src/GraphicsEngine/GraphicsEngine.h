@@ -32,6 +32,15 @@
 
 namespace Graphics
 {
+    // フォーマット変換用マップ
+    static const std::unordered_map<std::string, DXGI_FORMAT> StringToFormat =
+    {
+        { "R32G32B32A32_FLOAT", DXGI_FORMAT_R32G32B32A32_FLOAT },
+        { "R32G32B32_FLOAT", DXGI_FORMAT_R32G32B32_FLOAT },
+        { "R32G32_FLOAT", DXGI_FORMAT_R32G32_FLOAT },
+        { "R8G8B8A8_UNORM", DXGI_FORMAT_R8G8B8A8_UNORM },
+    };
+
 	class GraphicsEngine
 	{
 	private:
@@ -46,12 +55,15 @@ namespace Graphics
 		std::unique_ptr<DescriptorHeap> dsv_heap;
 
         std::unique_ptr<RenderTarget> shadowMapRenderTarget;
+        Material* shadowMapMat = nullptr;
         std::unique_ptr<RenderTarget> gBuffer[3];   // 0:Albedo, 1:Normal, 2:Position
         Color gBuffer_clearColor = Color::Black();
         std::unique_ptr<RenderTarget> offscreenRenderTarget;
         Color offsecreen_clearColor = Color::Black();
+        Material* lightingMat = nullptr;
         std::unique_ptr<RenderTarget> postProcessRenderTarget;
         Color postProcess_clearColor = Color::Black();
+        Material* postProcessMat = nullptr;
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
         Color buckBuffer_clearColor = Color::FromHex(0x6c9bd2);
 

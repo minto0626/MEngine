@@ -2,9 +2,50 @@
 #include <vector>
 #include <d3d12.h>
 #include <string>
+#include <unordered_map>
 
 namespace Graphics
 {
+    static const std::unordered_map<std::string, D3D12_DESCRIPTOR_RANGE_TYPE> StringToRangeType =
+    {
+        { "cbv", D3D12_DESCRIPTOR_RANGE_TYPE_CBV },
+        { "srv", D3D12_DESCRIPTOR_RANGE_TYPE_SRV },
+        { "uav", D3D12_DESCRIPTOR_RANGE_TYPE_UAV },
+        { "sampler", D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER },
+    };
+
+    static const std::unordered_map<std::string, D3D12_SHADER_VISIBILITY> StringToShaderVisibility =
+    {
+        { "all", D3D12_SHADER_VISIBILITY_ALL },
+        { "vertex", D3D12_SHADER_VISIBILITY_VERTEX },
+        { "hull", D3D12_SHADER_VISIBILITY_HULL },
+        { "domain", D3D12_SHADER_VISIBILITY_DOMAIN },
+        { "geometry", D3D12_SHADER_VISIBILITY_GEOMETRY },
+        { "pixel", D3D12_SHADER_VISIBILITY_PIXEL },
+        { "amplification", D3D12_SHADER_VISIBILITY_AMPLIFICATION },
+        { "mesh", D3D12_SHADER_VISIBILITY_MESH },
+    };
+
+    static const std::unordered_map<std::string, D3D12_TEXTURE_ADDRESS_MODE> StringToTextureAddressMode =
+    {
+        { "warp", D3D12_TEXTURE_ADDRESS_MODE_WRAP },
+        { "mirror", D3D12_TEXTURE_ADDRESS_MODE_MIRROR },
+        { "clamp", D3D12_TEXTURE_ADDRESS_MODE_CLAMP },
+        { "border", D3D12_TEXTURE_ADDRESS_MODE_BORDER },
+        { "mirror_once", D3D12_TEXTURE_ADDRESS_MODE_MIRROR_ONCE },
+    };
+
+    static const std::unordered_map<std::string, D3D12_COMPARISON_FUNC> StringToComparisonFunc =
+    {
+        { "less_equal", D3D12_COMPARISON_FUNC_LESS_EQUAL },
+    };
+
+    static const std::unordered_map<std::string, D3D12_FILTER> StringToFilter =
+    {
+        { "anisotropic", D3D12_FILTER_ANISOTROPIC },
+        { "comparison_min_mag_mip_linear", D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR },
+    };
+
 	struct RootParamDesc
 	{
 		std::string name;

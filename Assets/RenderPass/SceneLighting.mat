@@ -1,0 +1,6 @@
+{
+    "shader": "Assets/shader/SceneLighting.shader",
+    "blend": "opaque",
+    "rasterizer": "cull_none",
+    "depthStencil": "depth_disable"
+}

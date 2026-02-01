@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\GraphicsEngine\Shader\ShaderDesc.h" />
     <ClInclude Include="src\GUI\GUISystem.h" />
     <ClInclude Include="src\Library\imgui\imconfig.h" />
     <ClInclude Include="src\Library\imgui\imgui.h" />

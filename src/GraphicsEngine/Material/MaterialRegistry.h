@@ -16,6 +16,8 @@ namespace Graphics
 		MaterialCache* _materialCache;
 		std::unordered_map<std::string, std::unique_ptr<Material>> _materials;
 
+        MaterialDesc LoadFromFile(const std::string& filePath);
+
 	public:
 		MaterialRegistry(GfxDevice* device, MaterialCache* materialCache);
 

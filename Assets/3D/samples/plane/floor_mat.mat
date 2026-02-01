@@ -1,0 +1,6 @@
+{
+    "shader": "Assets/shader/Basic3D.shader",
+    "blend": "opaque",
+    "rasterizer": "cull_back",
+    "depthStencil": "depth_enable"
+}

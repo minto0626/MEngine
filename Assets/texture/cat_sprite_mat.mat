@@ -1,0 +1,6 @@
+{
+    "shader": "Assets/shader/Basic2D.shader",
+    "blend": "alpha_blend",
+    "rasterizer": "cull_none",
+    "depthStencil": "depth_disable"
+}

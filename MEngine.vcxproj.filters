@@ -261,6 +261,9 @@
     <ClInclude Include="src\Library\nlohmann_json\json.hpp">
       <Filter>src\Library\nlohmann_json</Filter>
     </ClInclude>
+    <ClInclude Include="src\GraphicsEngine\Shader\ShaderDesc.h">
+      <Filter>src\GraphicsEngine\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
