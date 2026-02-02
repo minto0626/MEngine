@@ -12,7 +12,7 @@ namespace Graphics
 	{
 	}
 
-    MaterialDesc MaterialRegistry::LoadFromFile(const std::string& filePath)
+    void MaterialRegistry::LoadFromFile(const std::string& filePath, MaterialDesc& materialDesc, ShaderParam& shaderParam)
     {
         std::ifstream inFile(filePath);
         if (!inFile.is_open())
@@ -24,8 +24,7 @@ namespace Graphics
         inFile >> data;
         inFile.close();
 
-        MaterialDesc desc;
-        auto& shaderDesc = desc.shaderDesc;
+        auto& shaderDesc = materialDesc.shaderDesc;
 
         std::string shaderPath = data["shader"].get<std::string>();
         std::ifstream shaderDescFile(shaderPath);
@@ -79,11 +78,28 @@ namespace Graphics
         }
         shaderDescFile.close();
 
-        desc.blendPreset = StringToBlendPreset.at(data["blend"].get<std::string>());
-        desc.rasterizerPreset = StringToRasterizerPreset.at(data["rasterizer"].get<std::string>());
-        desc.depthStencilPreset = StringToDepthStencilPreset.at(data["depthStencil"].get<std::string>());
+        for (const auto& constant : data["shaderParams"]["constants"])
+        {
+            shaderParam.constants.push_back(
+                {
+                    constant["name"].get<std::string>(),
+                    constant["value"].get<std::vector<float>>(),
+                }
+            );
+        }
+        for (const auto& texture : data["shaderParams"]["textures"])
+        {
+            shaderParam.textures.push_back(
+                {
+                    texture["name"].get<std::string>(),
+                    texture["path"].get<std::string>(),
+                }
+            );
+        }
 
-        return desc;
+        materialDesc.blendPreset = StringToBlendPreset.at(data["blend"].get<std::string>());
+        materialDesc.rasterizerPreset = StringToRasterizerPreset.at(data["rasterizer"].get<std::string>());
+        materialDesc.depthStencilPreset = StringToDepthStencilPreset.at(data["depthStencil"].get<std::string>());
     }
 
 	void MaterialRegistry::Register(const std::string& key, const MaterialDesc& desc)
@@ -97,7 +113,7 @@ namespace Graphics
 		_materials[key] = std::move(material);
 	}
 
-	Material* MaterialRegistry::Get(const std::string key)
+	Material* MaterialRegistry::Get(const std::string key, ShaderParam& shaderParam)
 	{
 		auto it = _materials.find(key);
 		if (it != _materials.end())
@@ -105,7 +121,9 @@ namespace Graphics
 			return it->second.get();
 		}
 
-        Register(key, LoadFromFile(key));
+        MaterialDesc materialDesc;
+        LoadFromFile(key, materialDesc, shaderParam);
+        Register(key, materialDesc);
 
 		return _materials[key].get();
 	}

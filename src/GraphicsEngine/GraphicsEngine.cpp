@@ -185,19 +185,19 @@ namespace Graphics
 	{
         // ポストプロセス
         {
-            auto* mat = materialRegistry->Get("Assets/RenderPass/PostProcess.mat");
+            auto* mat = GetMaterial("Assets/RenderPass/PostProcess.mat");
             postProcessMat = mat;
             mat->SetTexture(GetRootParameterIndex("srcTex", *mat), offscreenRenderTarget->GetColorTexture());
         }
         // シャドウマップ
         {
-            auto* mat = materialRegistry->Get("Assets/RenderPass/ShadowMap.mat");
+            auto* mat = GetMaterial("Assets/RenderPass/ShadowMap.mat");
             shadowMapMat = mat;
             mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
         }
         // ライト描画
         {
-            auto* mat = materialRegistry->Get("Assets/RenderPass/SceneLighting.mat");
+            auto* mat = GetMaterial("Assets/RenderPass/SceneLighting.mat");
             lightingMat = mat;
             mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
             mat->SetTexture(GetRootParameterIndex("albedoTex", *mat), gBuffer[0]->GetColorTexture());
@@ -281,7 +281,23 @@ namespace Graphics
 
 	Material* GraphicsEngine::GetMaterial(const std::string& name)
 	{
-		return materialRegistry->Get(name);
+        ShaderParam shaderParam;
+        auto material = materialRegistry->Get(name, shaderParam);
+
+        // 定数バッファおよびテクスチャは、マテリアルが初めて作成されたときに設定されます。
+        for (auto& constant : shaderParam.constants)
+        {
+            UINT size = static_cast<UINT>(constant.value.size()) * sizeof(constant.value[0]);
+            auto constantBuffer = CreateConstantBuffer(size);
+            constantBuffer->Update(constant.value.data(), size);
+            material->SetConstantBuffer(GetRootParameterIndex(constant.paramName, *material), constantBuffer);
+        }
+        for (auto& texture : shaderParam.textures)
+        {
+            material->SetTexture(GetRootParameterIndex(texture.paramName, *material), GetTexture(texture.path));
+        }
+
+        return material;
 	}
 
 	UINT GraphicsEngine::GetRootParameterIndex(const std::string& name, const Material& mat)

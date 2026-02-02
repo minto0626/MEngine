@@ -1,5 +1,19 @@
 {
     "shader": "Assets/shader/Basic2D.shader",
+    "shaderParams": {
+        "constants": [
+            {
+                "name": "albedoColor",
+                "value": [1.0, 1.0, 1.0, 1.0]
+            }
+        ],
+        "textures": [
+            {
+                "name": "mainTex",
+                "path": "Assets/texture/free_cat.png"
+            }
+        ]
+    },
     "blend": "alpha_blend",
     "rasterizer": "cull_none",
     "depthStencil": "depth_disable"

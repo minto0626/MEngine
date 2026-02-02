@@ -32,6 +32,13 @@
                 "visibility": "vertex"
             },
             {
+                "name": "albedoColor",
+                "type": "cbv",
+                "numDescriptors": 1,
+                "shaderRegister": 2,
+                "visibility": "pixel"
+            },
+            {
                 "name": "mainTex",
                 "type": "srv",
                 "numDescriptors": 1,
