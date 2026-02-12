@@ -208,18 +208,17 @@ namespace Graphics
 
 		// テクスチャ取得のメモ
 		{
-			std::vector<ImportMeshData> meshDataList;
-			std::vector<ImportMaterialData> materialDataList;
-			if (!modelImporter.Load(L"Assets/3D/samples/teapot/teapot.fbx", meshDataList, materialDataList))
+            ImportModelData modelData;
+			if (!modelImporter.Load(L"Assets/3D/samples/teapot/teapot.fbx", modelData))
 			{
 				assert(0 && "モデル読み込み失敗");
 				return;
 			}
-			ImportMeshData& meshDataSrc = meshDataList[0];
-			if (materialDataList.size() > 0 &&
-				materialDataList[meshDataSrc.materialIndex].useDiffuseTexture)
+			ImportMeshData& meshDataSrc = modelData.model.meshs[0];
+			if (modelData.materials.size() > 0 &&
+                modelData.materials[meshDataSrc.materialIndex].useDiffuseTexture)
 			{
-                auto texture = GetTexture(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
+                auto texture = GetTexture(modelData.materials[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
 			}
 		}
 	}
@@ -255,23 +254,23 @@ namespace Graphics
 
 	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
 	{
+        // todo:
+        // modelを読み込んで.mesh（もしくは.model）ファイルを生成する。
+        // そのファイルを読み込んでMeshを生成する。      
         if (meshes.find(path) != meshes.end())
         {
             return meshes[path].get();
         }
 
-		std::vector<ImportMeshData> meshDataList;
-		std::vector<ImportMaterialData> materialDataList;
-		if (!modelImporter.Load(path.c_str(), meshDataList, materialDataList))
+        ImportModelData modelData;
+		if (!modelImporter.Load(path.c_str(), modelData))
 		{
 			assert(0 && "モデル読み込み失敗");
 			return nullptr;
 		}
 		// 今はメッシュが一つだけの想定
-		ImportMeshData& meshDataSrc = meshDataList[0];
-		MeshData meshData;
-		meshData.vertices = meshDataSrc.vertices;
-		meshData.indices = meshDataSrc.indices;
+		ImportMeshData& meshDataSrc = modelData.model.meshs[0];
+        MeshData meshData = meshDataSrc.data;
 		auto mesh = std::make_unique<Mesh>();
 		mesh->Initialize(device.Get(), commandContext, meshData);
         auto ptr = mesh.get();

@@ -13,10 +13,7 @@ void ModelImporter::Init()
 	assimpImporter.Init();
 }
 
-bool ModelImporter::Load(
-	const std::wstring& fileName,
-	std::vector<ImportMeshData>& meshDataList,
-	std::vector<ImportMaterialData>& materialDatalist)
+bool ModelImporter::Load(const std::wstring& fileName, ImportModelData& modelData)
 {
-	return assimpImporter.Load(fileName, meshDataList, materialDatalist);
+	return assimpImporter.Load(fileName, modelData);
 }
