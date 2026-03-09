@@ -49,5 +49,5 @@ public:
 
 	void Init();
 
-	bool Load(const std::wstring& fileName, ImportModelData& modelData);
+	bool Import(const std::wstring& filePath);
 };

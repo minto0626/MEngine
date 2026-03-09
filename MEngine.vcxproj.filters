@@ -264,6 +264,9 @@
     <ClInclude Include="src\GraphicsEngine\Shader\ShaderDesc.h">
       <Filter>src\GraphicsEngine\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="src\ModelLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GraphicsEngine\Core\GfxCommandContext.cpp">
@@ -427,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="src\GUI\GUISystem.cpp">
       <Filter>src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelLoader.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

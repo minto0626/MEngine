@@ -10,6 +10,7 @@
 #include "Material/MaterialCache.h"
 #include "Material/MaterialRegistry.h"
 #include "ModelImporter.h"
+#include "ModelLoader.h"
 #include "Mesh/Mesh.h"
 #include "Sprite/Sprite.h"
 #include "Pipeline/RootSignature.h"
@@ -68,6 +69,7 @@ namespace Graphics
         Color buckBuffer_clearColor = Color::FromHex(0x6c9bd2);
 
 		ModelImporter modelImporter;
+        ModelLoader modelLoader;
 		TextureLoader textureLoader;
 		std::unique_ptr<MaterialCache> materialCache;
 		std::unique_ptr<RootSignatureRegistry> rootSignatureRegistry;

@@ -209,11 +209,16 @@ namespace Graphics
 		// テクスチャ取得のメモ
 		{
             ImportModelData modelData;
-			if (!modelImporter.Load(L"Assets/3D/samples/teapot/teapot.fbx", modelData))
+			if (!modelImporter.Import(L"Assets/3D/samples/teapot/teapot.fbx"))
 			{
 				assert(0 && "モデル読み込み失敗");
 				return;
 			}
+            if (!modelLoader.Load(L"Assets/3D/samples/teapot/teapot.fbx", modelData))
+            {
+                assert(0 && "モデル読み込み失敗");
+                return;
+            }
 			ImportMeshData& meshDataSrc = modelData.model.meshs[0];
 			if (modelData.materials.size() > 0 &&
                 modelData.materials[meshDataSrc.materialIndex].useDiffuseTexture)
@@ -254,20 +259,24 @@ namespace Graphics
 
 	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
 	{
-        // todo:
-        // modelを読み込んで.mesh（もしくは.model）ファイルを生成する。
-        // そのファイルを読み込んでMeshを生成する。      
+        // todo: meshを含む.modelへの変換は完了したので、modelからmeshを参照できるようにする。
+
         if (meshes.find(path) != meshes.end())
         {
             return meshes[path].get();
         }
 
         ImportModelData modelData;
-		if (!modelImporter.Load(path.c_str(), modelData))
+		if (!modelImporter.Import(path.c_str()))
 		{
 			assert(0 && "モデル読み込み失敗");
 			return nullptr;
 		}
+        if (!modelLoader.Load(path.c_str(), modelData))
+        {
+            assert(0 && "モデル読み込み失敗");
+            return nullptr;
+        }
 		// 今はメッシュが一つだけの想定
 		ImportMeshData& meshDataSrc = modelData.model.meshs[0];
         MeshData meshData = meshDataSrc.data;
