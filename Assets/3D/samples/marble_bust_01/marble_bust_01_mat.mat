@@ -1,0 +1,14 @@
+{
+    "shader": "Assets/shader/Basic3D.shader",
+    "shaderParams": {
+        "textures": [
+            {
+                "name": "mainTex",
+                "path": "Assets/3D/samples/marble_bust_01/textures/marble_bust_01_diff.jpg"
+            }
+        ]
+    },
+    "blend": "opaque",
+    "rasterizer": "cull_back",
+    "depthStencil": "depth_enable"
+}

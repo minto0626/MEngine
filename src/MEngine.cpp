@@ -85,10 +85,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto spriteRenderer = obj->AddComponent<Graphics::SpriteRenderer>();
         Graphics::Sprite* sprite = graphicsEngine.GetSprite("testSprite");
         spriteRenderer->SetSprite(sprite);
-        Graphics::Material* material = graphicsEngine.GetMaterial("cat_sprite_mat");
-	    auto texture = graphicsEngine.GetTexture("Assets/texture/free_cat.png");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-	    material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/texture/cat_sprite_mat.mat");
 	    spriteRenderer->SetMaterial(material);
     }
 
@@ -100,10 +97,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
 	    auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
 	    auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/teapot/teapot.fbx");
 	    meshRenderer->SetMesh(mesh);
-		Graphics::Material* material = graphicsEngine.GetMaterial("teapot_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/teapot/default.png");
-		UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-		material->SetTexture(texIdx, texture);
+		Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/teapot/teapot_mat.mat");
 		meshRenderer->SetMaterial(material);
     }
     {
@@ -114,10 +108,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/cube/cube.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("cube_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/cube/default.png");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/cube/cube_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -127,10 +118,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/horse/horse_statue_01.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("horse_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/horse/horse_statue_01_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/horse/horse_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -141,10 +129,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/duck_toy/rubber_duck_toy.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("duck_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/duck_toy/rubber_duck_toy_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/duck_toy/duck_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -155,10 +140,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/chair/mid_century_lounge_chair.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("chair_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/chair/mid_century_lounge_chair_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/chair/chair_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -168,10 +150,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/plane/plane.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("floor_mat");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/plane/checkered_pavement_tiles_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/plane/floor_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -182,10 +161,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/scene.gltf");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("roza");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/textures/defaultMat_diffuse.jpeg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/roza_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -195,10 +171,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/marble_bust_01/marble_bust_01.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("marble_bust_01");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/marble_bust_01/textures/marble_bust_01_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/marble_bust_01/marble_bust_01_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -208,10 +181,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/potted_plant_04/potted_plant_04.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("potted_plant_04");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/potted_plant_04/textures/potted_plant_04_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/potted_plant_04/potted_plant_04_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {
@@ -221,10 +191,7 @@ bool MEngine::Init(HWND hwnd, HINSTANCE hInstancce, SIZE& windowSize)
         auto meshRenderer = obj->AddComponent<Graphics::MeshRenderer>();
         auto mesh = graphicsEngine.GetMesh(L"Assets/3D/samples/round_wooden_table_01/round_wooden_table_01.fbx");
         meshRenderer->SetMesh(mesh);
-        Graphics::Material* material = graphicsEngine.GetMaterial("round_wooden_table_01");
-        auto texture = graphicsEngine.GetTexture("Assets/3D/samples/round_wooden_table_01/textures/round_wooden_table_01_diff.jpg");
-        UINT texIdx = graphicsEngine.GetRootParameterIndex("mainTex", *material);
-        material->SetTexture(texIdx, texture);
+        Graphics::Material* material = graphicsEngine.GetMaterial("Assets/3D/samples/round_wooden_table_01/round_wooden_table_01_mat.mat");
         meshRenderer->SetMaterial(material);
     }
     {

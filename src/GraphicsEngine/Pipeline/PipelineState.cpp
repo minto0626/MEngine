@@ -1,4 +1,5 @@
 ﻿#include "PipelineState.h"
+#include "GraphicsEngine/GraphicsEngine.h"
 #include "Shader/Shader.h"
 #include "RootSignature.h"
 #include "InputLayoutHelper.h"
@@ -25,22 +26,24 @@ void PipelineState::CreateFromDesc(
 	const Graphics::MaterialDesc& desc,
 	Graphics::RootSignatureRegistry& rootSignatureRegistry)
 {
-	auto rootSignature = rootSignatureRegistry.GetOrCreate(device, desc.rootSignatureDesc);
+    auto& shaderDesc = desc.shaderDesc;
+
+	auto rootSignature = rootSignatureRegistry.GetOrCreate(device, shaderDesc.rootSignatureDesc);
 
     Shader vs, ps;
 
-	auto inputLayout = InputLayoutHelper::CreateInputLayout(desc.inputElements);
+	auto inputLayout = InputLayoutHelper::CreateInputLayout(shaderDesc.inputElements);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = rootSignature->Get();
-    if (!desc.vertexShaderPath.empty())
+    if (!shaderDesc.vertexShaderPath.empty())
     {
-        vs.LoadVS(desc.vertexShaderPath.c_str(), "vs");
+        vs.LoadVS(shaderDesc.vertexShaderPath.c_str(), "vs");
         psoDesc.VS = vs.GetBytecode();
     }
-    if (!desc.pixelShaderPath.empty())
+    if (!shaderDesc.pixelShaderPath.empty())
     {
-	    ps.LoadPS(desc.pixelShaderPath.c_str(), "ps");
+	    ps.LoadPS(shaderDesc.pixelShaderPath.c_str(), "ps");
 	    psoDesc.PS = ps.GetBytecode();
     }
 	psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
@@ -49,10 +52,10 @@ void PipelineState::CreateFromDesc(
 	psoDesc.BlendState = Graphics::StateFactory::GetBlendState(desc.blendPreset);
 	psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;    // カットなし
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;   // 三角形で描画
-	psoDesc.NumRenderTargets = static_cast<UINT>(desc.rtvFormats.size());
-    for (size_t i = 0; i < desc.rtvFormats.size() && i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+	psoDesc.NumRenderTargets = static_cast<UINT>(shaderDesc.rtvFormats.size());
+    for (size_t i = 0; i < shaderDesc.rtvFormats.size() && i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
     {
-        psoDesc.RTVFormats[i] = desc.rtvFormats[i];
+        psoDesc.RTVFormats[i] = shaderDesc.rtvFormats[i];
     }
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.SampleDesc.Quality = 0;

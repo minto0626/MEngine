@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\GraphicsEngine\Shader\ShaderDesc.h" />
     <ClInclude Include="src\GUI\GUISystem.h" />
     <ClInclude Include="src\Library\imgui\imconfig.h" />
     <ClInclude Include="src\Library\imgui\imgui.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="src\Library\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\Library\imgui\imstb_textedit.h" />
     <ClInclude Include="src\Library\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Library\nlohmann_json\json.hpp" />
     <ClInclude Include="src\ModelImporter.h" />
     <ClInclude Include="src\AssimpImporter.h" />
     <ClInclude Include="src\GraphicsEngine\Core\d3dx12.h" />
@@ -201,6 +203,7 @@
     <ClInclude Include="src\Math\Matrix.h" />
     <ClInclude Include="src\Math\Vector.h" />
     <ClInclude Include="src\MEngine.h" />
+    <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\Scene\Camera.h" />
     <ClInclude Include="src\Scene\Component.h" />
@@ -258,6 +261,7 @@
     <ClCompile Include="src\Input\Keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MEngine.cpp" />
+    <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\Component.cpp" />
     <ClCompile Include="src\Scene\GameObject.cpp" />

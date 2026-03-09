@@ -1,20 +1,12 @@
 ﻿#pragma once
 #include "Pipeline/StateFactory.h"
-#include "Pipeline/RootSignatureDesc.h"
-#include "Pipeline/InputLayoutHelper.h"
-
-#include <string>
-#include <vector>
+#include "Shader/ShaderDesc.h"
 
 namespace Graphics
 {
 	struct MaterialDesc
 	{
-		std::wstring vertexShaderPath;
-		std::wstring pixelShaderPath;
-		std::vector<InputLayoutHelper::InputElement> inputElements;
-        std::vector<DXGI_FORMAT> rtvFormats;
-		RootSignatureDesc rootSignatureDesc;
+        ShaderDesc shaderDesc;
 		BlendPreset blendPreset;
 		RasterizerPreset rasterizerPreset;
 		DepthStencilPreset depthStencilPreset;

@@ -1,0 +1,14 @@
+{
+    "shader": "Assets/shader/Basic3D.shader",
+    "shaderParams": {
+        "textures": [
+            {
+                "name": "mainTex",
+                "path": "Assets/3D/samples/sculpture_bust_of_roza_loewenfeld/textures/defaultMat_diffuse.jpeg"
+            }
+        ]
+    },
+    "blend": "opaque",
+    "rasterizer": "cull_back",
+    "depthStencil": "depth_enable"
+}

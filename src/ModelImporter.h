@@ -8,20 +8,34 @@
 
 struct ImportMeshData
 {
-	std::vector<Graphics::MeshVertex> vertices;
-	std::vector<uint32_t> indices;
-	unsigned int materialIndex;
+    std::string name;
+    Graphics::MeshData data;
+    unsigned int materialIndex;
 };
 
 struct ImportMaterialData
 {
-	bool useDifuseColor;
-	Color diffuseColor;
-	bool useSpecularColor;
-	Color specularColor;
-	float shininess;
-	bool useDiffuseTexture;
-	std::string diffuseTexturePath;
+    std::string name;
+    bool useDifuseColor;
+    Color diffuseColor;
+    bool useSpecularColor;
+    Color specularColor;
+    float shininess;
+    bool useDiffuseTexture;
+    std::string diffuseTexturePath;
+};
+
+struct ImportModelNode
+{
+    std::string name;
+    std::vector<ImportMeshData> meshs;
+    std::vector<ImportModelNode> children;
+};
+
+struct ImportModelData
+{
+    ImportModelNode model;
+    std::vector<ImportMaterialData> materials;
 };
 
 class ModelImporter
@@ -35,8 +49,5 @@ public:
 
 	void Init();
 
-	bool Load(
-		const std::wstring& fileName,
-		std::vector<ImportMeshData>& meshDataList,
-		std::vector<ImportMaterialData>& materialDatalist);
+	bool Import(const std::wstring& filePath);
 };

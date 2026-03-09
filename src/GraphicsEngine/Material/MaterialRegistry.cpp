@@ -1,4 +1,8 @@
 ﻿#include "MaterialRegistry.h"
+#include "GraphicsEngine/GraphicsEngine.h"
+#include <fstream>
+#include <Library/nlohmann_json/json.hpp>
+using Json = nlohmann::json;
 
 namespace Graphics
 {
@@ -7,6 +11,96 @@ namespace Graphics
 		_materialCache(materialCache)
 	{
 	}
+
+    void MaterialRegistry::LoadFromFile(const std::string& filePath, MaterialDesc& materialDesc, ShaderParam& shaderParam)
+    {
+        std::ifstream inFile(filePath);
+        if (!inFile.is_open())
+        {
+            assert(0 && "マテリアル定義ファイルが見つかりません");
+        }
+
+        Json data;
+        inFile >> data;
+        inFile.close();
+
+        auto& shaderDesc = materialDesc.shaderDesc;
+
+        std::string shaderPath = data["shader"].get<std::string>();
+        std::ifstream shaderDescFile(shaderPath);
+        if (!shaderDescFile.is_open())
+        {
+            assert(0 && "シェーダー定義ファイルが見つかりません");
+        }
+
+        Json shader_data;
+        shaderDescFile >> shader_data;
+        shaderDescFile.close();
+
+        std::string vs_path = shader_data["shaders"]["vs"].get<std::string>();
+        std::string ps_path = shader_data["shaders"]["ps"].get<std::string>();
+        shaderDesc.vertexShaderPath = std::wstring(vs_path.begin(), vs_path.end());
+        shaderDesc.pixelShaderPath = std::wstring(ps_path.begin(), ps_path.end());
+        for (const auto& element : shader_data["input_elements"])
+        {
+            shaderDesc.inputElements.push_back
+            (
+                InputLayoutHelper::InputElement
+                (
+                    element["semantic"].get<std::string>(),
+                    Graphics::StringToFormat.at(element["format"].get<std::string>())
+                )
+            );
+        }
+        for (const auto& formatStr : shader_data["rtv_formats"])
+        {
+            shaderDesc.rtvFormats.push_back(Graphics::StringToFormat.at(formatStr.get<std::string>()));
+        }
+        for (const auto& param : shader_data["root_signature"]["params"])
+        {
+            Graphics::RootParamDesc root_param{};
+            root_param.name = param["name"].get<std::string>();
+            root_param.type = Graphics::StringToRangeType.at(param["type"].get<std::string>());
+            root_param.numDescriptors = param["numDescriptors"].get<UINT>();
+            root_param.shaderRegister = param["shaderRegister"].get<UINT>();
+            root_param.visibility = Graphics::StringToShaderVisibility.at(param["visibility"].get<std::string>());
+            shaderDesc.rootSignatureDesc.params.push_back(root_param);
+        }
+        for (const auto& sampler : shader_data["root_signature"]["samplers"])
+        {
+            Graphics::StaticSamplerDesc static_sampler{};
+            static_sampler.shaderRegister = sampler["shaderRegister"].get<UINT>();
+            static_sampler.visibility = Graphics::StringToShaderVisibility.at(sampler["visibility"].get<std::string>());
+            static_sampler.addressMode = Graphics::StringToTextureAddressMode.at(sampler["addressMode"].get<std::string>());
+            static_sampler.comparisonFunc = Graphics::StringToComparisonFunc.at(sampler["comparisonFunc"].get<std::string>());
+            static_sampler.filter = Graphics::StringToFilter.at(sampler["filter"].get<std::string>());
+            shaderDesc.rootSignatureDesc.staticSamplers.push_back(static_sampler);
+        }
+        shaderDescFile.close();
+
+        for (const auto& constant : data["shaderParams"]["constants"])
+        {
+            shaderParam.constants.push_back(
+                {
+                    constant["name"].get<std::string>(),
+                    constant["value"].get<std::vector<float>>(),
+                }
+            );
+        }
+        for (const auto& texture : data["shaderParams"]["textures"])
+        {
+            shaderParam.textures.push_back(
+                {
+                    texture["name"].get<std::string>(),
+                    texture["path"].get<std::string>(),
+                }
+            );
+        }
+
+        materialDesc.blendPreset = StringToBlendPreset.at(data["blend"].get<std::string>());
+        materialDesc.rasterizerPreset = StringToRasterizerPreset.at(data["rasterizer"].get<std::string>());
+        materialDesc.depthStencilPreset = StringToDepthStencilPreset.at(data["depthStencil"].get<std::string>());
+    }
 
 	void MaterialRegistry::Register(const std::string& key, const MaterialDesc& desc)
 	{
@@ -19,7 +113,7 @@ namespace Graphics
 		_materials[key] = std::move(material);
 	}
 
-	Material* MaterialRegistry::Get(const std::string key)
+	Material* MaterialRegistry::Get(const std::string key, ShaderParam& shaderParam)
 	{
 		auto it = _materials.find(key);
 		if (it != _materials.end())
@@ -27,6 +121,10 @@ namespace Graphics
 			return it->second.get();
 		}
 
-		return nullptr;
+        MaterialDesc materialDesc;
+        LoadFromFile(key, materialDesc, shaderParam);
+        Register(key, materialDesc);
+
+		return _materials[key].get();
 	}
 }

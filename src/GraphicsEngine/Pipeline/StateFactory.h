@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <d3d12.h>
+#include <unordered_map>
 #include "Core/d3dx12.h"
 
 namespace Graphics
@@ -13,7 +14,7 @@ namespace Graphics
 	enum class RasterizerPreset
 	{
 		CullBack,
-		CullNode,
+		CullNone,
 	};
 
 	enum class DepthStencilPreset
@@ -21,6 +22,25 @@ namespace Graphics
 		DepthEnable,
 		DepthDisable,
 	};
+
+    // ブレンドプリセット変換用マップ
+    static const std::unordered_map<std::string, BlendPreset> StringToBlendPreset =
+    {
+        { "opaque", BlendPreset::Opaque },
+        { "alpha_blend", BlendPreset::AlphaBlend },
+    };
+
+    static const std::unordered_map<std::string, RasterizerPreset> StringToRasterizerPreset =
+    {
+        { "cull_back", RasterizerPreset::CullBack },
+        { "cull_none", RasterizerPreset::CullNone },
+    };
+
+    static const std::unordered_map<std::string, DepthStencilPreset> StringToDepthStencilPreset =
+    {
+        { "depth_enable", DepthStencilPreset::DepthEnable },
+        { "depth_disable", DepthStencilPreset::DepthDisable },
+    };
 
 	namespace StateFactory
 	{
@@ -55,7 +75,7 @@ namespace Graphics
 		{
 			switch (preset)
 			{
-			case RasterizerPreset::CullNode:
+			case RasterizerPreset::CullNone:
 			{
 				auto desc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 				desc.CullMode = D3D12_CULL_MODE_NONE;

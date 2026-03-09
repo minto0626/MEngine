@@ -183,299 +183,22 @@ namespace Graphics
 
 	void GraphicsEngine::LoadContent()
 	{
-        RootSignatureDesc basic2DRootDesc;
-        {
-            basic2DRootDesc.params.push_back({ canvasDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX });
-            basic2DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_VERTEX });
-            basic2DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            basic2DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
-        }
-        std::wstring basic2DVSPath = L"Assets/shader/BasicVertexShader.hlsl";
-        std::wstring basic2DPSPath = L"Assets/shader/BasicPixelShader.hlsl";
-        std::vector<InputLayoutHelper::InputElement> basic2DInputElements =
-        {
-            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-        };
-        std::vector<DXGI_FORMAT> basic2DRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
-        RootSignatureDesc basic3DRootDesc;
-        {
-            basic3DRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            basic3DRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-            basic3DRootDesc.params.push_back({ "mainTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            basic3DRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
-        }
-        std::wstring basic3DVSPath = L"Assets/shader/Basic3DShader.hlsl";
-        std::wstring basic3DPSPath = L"Assets/shader/Basic3DShader.hlsl";
-        std::vector<InputLayoutHelper::InputElement> basic3DInputElements =
-        {
-            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-            { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-        };
-        std::vector<DXGI_FORMAT> basic3DRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32G32B32A32_FLOAT };
-
-        RootSignatureDesc postProcessRootDesc;
-        {
-            postProcessRootDesc.params.push_back({ "srcTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            postProcessRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
-        }
-        std::wstring postProcessVSPath = L"Assets/shader/PostProcess.hlsl";
-        std::wstring postProcessPSPath = L"Assets/shader/PostProcess.hlsl";
-        std::vector<InputLayoutHelper::InputElement> postProcessInputElements = 
-        {
-            // SV_VertexIDを使う場合、入力レイアウトは空で良い
-        };
-        std::vector<DXGI_FORMAT> postProcessRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
-        RootSignatureDesc shadowMapRootDesc;
-        {
-            shadowMapRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            shadowMapRootDesc.params.push_back({ worldMatParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, D3D12_SHADER_VISIBILITY_ALL });
-        }
-        std::wstring shadowMapVSPath = L"Assets/shader/Basic3DShadowMap.hlsl";
-        std::wstring shadowMapPSPath = L"";
-        std::vector<InputLayoutHelper::InputElement> shadowMapInputElements =
-        {
-            { "POSITION", DXGI_FORMAT_R32G32B32_FLOAT },
-            { "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT },
-            { "TEXCOORD", DXGI_FORMAT_R32G32_FLOAT },
-        };
-        std::vector<DXGI_FORMAT> shadowMapRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
-        RootSignatureDesc lightRootDesc;
-        {
-            lightRootDesc.params.push_back({ sceneDataParamName, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL });
-            lightRootDesc.params.push_back({ "albedoTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL });
-            lightRootDesc.params.push_back({ "normalTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_PIXEL });
-            lightRootDesc.params.push_back({ "positionTex", D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, D3D12_SHADER_VISIBILITY_PIXEL });
-            lightRootDesc.params.push_back({ shadowMapParamName, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3, D3D12_SHADER_VISIBILITY_PIXEL });
-            lightRootDesc.staticSamplers.push_back({ 0, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_ANISOTROPIC });
-            lightRootDesc.staticSamplers.push_back({ 1, D3D12_SHADER_VISIBILITY_PIXEL, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR });
-        }
-        std::wstring lightVSPath = L"Assets/shader/SceneLighting.hlsl";
-        std::wstring lightPSPath = L"Assets/shader/SceneLighting.hlsl";
-        std::vector<InputLayoutHelper::InputElement> lightInputElements =
-        {
-            // SV_VertexIDを使う場合、入力レイアウトは空で良い
-        };
-        std::vector<DXGI_FORMAT> lightRTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
-        // 猫のスプライト
-        {
-		    MaterialDesc materialDesc =
-		    {
-			    basic2DVSPath,
-			    basic2DPSPath,
-			    basic2DInputElements,
-                basic2DRTVFormats,
-			    basic2DRootDesc,
-			    BlendPreset::AlphaBlend,
-			    RasterizerPreset::CullNode,
-			    DepthStencilPreset::DepthDisable,
-		    };
-		    materialRegistry->Register("cat_sprite_mat", materialDesc);
-        }
-        // ティーポット
-        {
-            MaterialDesc materialDesc =
-		    {
-			    basic3DVSPath,
-			    basic3DPSPath,
-			    basic3DInputElements,
-                basic3DRTVFormats,
-			    basic3DRootDesc,
-			    BlendPreset::Opaque,
-			    RasterizerPreset::CullBack,
-			    DepthStencilPreset::DepthEnable,
-		    };
-		    materialRegistry->Register("teapot_mat", materialDesc);
-        }
-        // キューブ
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("cube_mat", materialDesc);
-        }
-        // 馬の像
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("horse_mat", materialDesc);
-        }
-        // おもちゃのアヒル
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("duck_mat", materialDesc);
-        }
-        // ラウンジチェア
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("chair_mat", materialDesc);
-        }
-        // 床
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("floor_mat", materialDesc);
-        }
-        // 女の像
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("roza", materialDesc);
-        }
-        // 大理石の胸像
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("marble_bust_01", materialDesc);
-        }
-        // 植物
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("potted_plant_04", materialDesc);
-        }
-        // 木製テーブル
-        {
-            MaterialDesc materialDesc =
-            {
-                basic3DVSPath,
-                basic3DPSPath,
-                basic3DInputElements,
-                basic3DRTVFormats,
-                basic3DRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("round_wooden_table_01", materialDesc);
-        }
         // ポストプロセス
         {
-            MaterialDesc materialDesc =
-            {
-                postProcessVSPath,
-                postProcessPSPath,
-                postProcessInputElements,
-                postProcessRTVFormats,
-                postProcessRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullNode,
-                DepthStencilPreset::DepthDisable,
-            };
-            materialRegistry->Register("PostProcess", materialDesc);
-            auto* mat = materialRegistry->Get("PostProcess");
+            auto* mat = GetMaterial("Assets/RenderPass/PostProcess.mat");
+            postProcessMat = mat;
             mat->SetTexture(GetRootParameterIndex("srcTex", *mat), offscreenRenderTarget->GetColorTexture());
         }
         // シャドウマップ
         {
-            MaterialDesc materialDesc =
-            {
-                shadowMapVSPath,
-                shadowMapPSPath,
-                shadowMapInputElements,
-                shadowMapRTVFormats,
-                shadowMapRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullBack,
-                DepthStencilPreset::DepthEnable,
-            };
-            materialRegistry->Register("ShadowMap", materialDesc);
-            auto* mat = materialRegistry->Get("ShadowMap");
+            auto* mat = GetMaterial("Assets/RenderPass/ShadowMap.mat");
+            shadowMapMat = mat;
             mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
         }
         // ライト描画
         {
-            MaterialDesc materialDesc =
-            {
-                lightVSPath,
-                lightPSPath,
-                lightInputElements,
-                lightRTVFormats,
-                lightRootDesc,
-                BlendPreset::Opaque,
-                RasterizerPreset::CullNode,
-                DepthStencilPreset::DepthDisable,
-            };
-            materialRegistry->Register("Lighting", materialDesc);
-            auto* mat = materialRegistry->Get("Lighting");
+            auto* mat = GetMaterial("Assets/RenderPass/SceneLighting.mat");
+            lightingMat = mat;
             mat->SetConstantBuffer(GetRootParameterIndex(sceneDataParamName, *mat), sceneCB);
             mat->SetTexture(GetRootParameterIndex("albedoTex", *mat), gBuffer[0]->GetColorTexture());
             mat->SetTexture(GetRootParameterIndex("normalTex", *mat), gBuffer[1]->GetColorTexture());
@@ -485,18 +208,22 @@ namespace Graphics
 
 		// テクスチャ取得のメモ
 		{
-			std::vector<ImportMeshData> meshDataList;
-			std::vector<ImportMaterialData> materialDataList;
-			if (!modelImporter.Load(L"Assets/3D/samples/teapot/teapot.fbx", meshDataList, materialDataList))
+            ImportModelData modelData;
+			if (!modelImporter.Import(L"Assets/3D/samples/teapot/teapot.fbx"))
 			{
 				assert(0 && "モデル読み込み失敗");
 				return;
 			}
-			ImportMeshData& meshDataSrc = meshDataList[0];
-			if (materialDataList.size() > 0 &&
-				materialDataList[meshDataSrc.materialIndex].useDiffuseTexture)
+            if (!modelLoader.Load(L"Assets/3D/samples/teapot/teapot.fbx", modelData))
+            {
+                assert(0 && "モデル読み込み失敗");
+                return;
+            }
+			ImportMeshData& meshDataSrc = modelData.model.meshs[0];
+			if (modelData.materials.size() > 0 &&
+                modelData.materials[meshDataSrc.materialIndex].useDiffuseTexture)
 			{
-                auto texture = GetTexture(materialDataList[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
+                auto texture = GetTexture(modelData.materials[meshDataSrc.materialIndex].diffuseTexturePath.c_str());
 			}
 		}
 	}
@@ -532,23 +259,27 @@ namespace Graphics
 
 	Mesh* GraphicsEngine::GetMesh(const std::wstring& path)
 	{
+        // todo: meshを含む.modelへの変換は完了したので、modelからmeshを参照できるようにする。
+
         if (meshes.find(path) != meshes.end())
         {
             return meshes[path].get();
         }
 
-		std::vector<ImportMeshData> meshDataList;
-		std::vector<ImportMaterialData> materialDataList;
-		if (!modelImporter.Load(path.c_str(), meshDataList, materialDataList))
+        ImportModelData modelData;
+		if (!modelImporter.Import(path.c_str()))
 		{
 			assert(0 && "モデル読み込み失敗");
 			return nullptr;
 		}
+        if (!modelLoader.Load(path.c_str(), modelData))
+        {
+            assert(0 && "モデル読み込み失敗");
+            return nullptr;
+        }
 		// 今はメッシュが一つだけの想定
-		ImportMeshData& meshDataSrc = meshDataList[0];
-		MeshData meshData;
-		meshData.vertices = meshDataSrc.vertices;
-		meshData.indices = meshDataSrc.indices;
+		ImportMeshData& meshDataSrc = modelData.model.meshs[0];
+        MeshData meshData = meshDataSrc.data;
 		auto mesh = std::make_unique<Mesh>();
 		mesh->Initialize(device.Get(), commandContext, meshData);
         auto ptr = mesh.get();
@@ -558,12 +289,28 @@ namespace Graphics
 
 	Material* GraphicsEngine::GetMaterial(const std::string& name)
 	{
-		return materialRegistry->Get(name);
+        ShaderParam shaderParam;
+        auto material = materialRegistry->Get(name, shaderParam);
+
+        // 定数バッファおよびテクスチャは、マテリアルが初めて作成されたときに設定されます。
+        for (auto& constant : shaderParam.constants)
+        {
+            UINT size = static_cast<UINT>(constant.value.size()) * sizeof(constant.value[0]);
+            auto constantBuffer = CreateConstantBuffer(size);
+            constantBuffer->Update(constant.value.data(), size);
+            material->SetConstantBuffer(GetRootParameterIndex(constant.paramName, *material), constantBuffer);
+        }
+        for (auto& texture : shaderParam.textures)
+        {
+            material->SetTexture(GetRootParameterIndex(texture.paramName, *material), GetTexture(texture.path));
+        }
+
+        return material;
 	}
 
 	UINT GraphicsEngine::GetRootParameterIndex(const std::string& name, const Material& mat)
 	{
-		auto& rootSignatureDesc = mat.GetDesc().rootSignatureDesc;
+		auto& rootSignatureDesc = mat.GetDesc().shaderDesc.rootSignatureDesc;
 		auto rootSignature = rootSignatureRegistry->GetOrCreate(device, rootSignatureDesc);
 		return rootSignature->GetRootIndex(name);
 	}
@@ -644,7 +391,6 @@ namespace Graphics
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
 
-        auto* shadowMapMat = materialRegistry->Get("ShadowMap");
         shadowMapMat->Bind(commandContext);
 
         for (auto& renderer : scene3DRenderers)
@@ -756,7 +502,6 @@ namespace Graphics
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
 
-        auto* lightingMat = materialRegistry->Get("Lighting");
         lightingMat->Bind(commandContext);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
@@ -775,7 +520,6 @@ namespace Graphics
         graphicsContext.SetRenderTarget(renderTarget);
         graphicsContext.ClearRenderTarget(renderTarget);
 
-        auto* postProcessMat = materialRegistry->Get("PostProcess");
         postProcessMat->Bind(commandContext);
         commandContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandContext.DrawInstanced(3);
